@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Task Manager</title>
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-light: #e0e7ff;
+    --primary-dark: #4f46e5;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --sidebar-w: 240px;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', 'Prompt', sans-serif; background: var(--gray-50); color: var(--gray-800); min-height: 100vh; }
+
+  /* ─── LAYOUT ─────────────────────────────────────── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--gray-200);
+    display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh;
+    z-index: 100; transition: transform .25s;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px; border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-logo .logo-icon {
+    width: 36px; height: 36px; background: var(--primary); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px;
+  }
+  .sidebar-logo span { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+  .sidebar-logo small { display: block; font-size: 11px; color: var(--gray-400); font-weight: 400; }
+
+  .sidebar-nav { padding: 12px 10px; flex: 1; overflow-y: auto; }
+  .nav-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-400); padding: 8px 10px 4px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 9px;
+    cursor: pointer; font-size: 14px; color: var(--gray-600); transition: all .15s; margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
+  .nav-item.active { background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+  .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; }
+
+  .sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--gray-100); font-size: 12px; color: var(--gray-400); }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar {
+    background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 28px;
+    height: 60px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 90;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+  .topbar-sub { font-size: 13px; color: var(--gray-400); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 9px;
+    font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .15s;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-300); }
+  .btn-outline:hover { background: var(--gray-50); }
+  .btn-sm { padding: 5px 11px; font-size: 12px; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { opacity: .88; }
+  .btn-success { background: var(--success); color: #fff; }
+
+  .content { padding: 28px; flex: 1; }
+
+  /* ─── VIEWS ─────────────────────────────────────── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ─── STAT CARDS ─────────────────────────────────── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: #fff; border-radius: var(--radius); padding: 20px 22px;
+    box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px;
+  }
+  .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .stat-info { flex: 1; }
+  .stat-num { font-size: 28px; font-weight: 800; line-height: 1; }
+  .stat-label { font-size: 13px; color: var(--gray-500); margin-top: 3px; }
+  .stat-delta { font-size: 12px; margin-top: 4px; }
+  .delta-up { color: var(--success); }
+  .delta-dn { color: var(--danger); }
+
+  /* ─── DASHBOARD GRID ─────────────────────────────── */
+  .dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+  .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+  .card-sub { font-size: 12px; color: var(--gray-400); }
+
+  /* Progress bars */
+  .member-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+  .member-row:last-child { border-bottom: none; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; text-transform: uppercase;
+  }
+  .member-info { flex: 1; min-width: 0; }
+  .member-name { font-size: 13px; font-weight: 600; }
+  .member-role { font-size: 11px; color: var(--gray-400); }
+  .progress-wrap { width: 120px; }
+  .progress-bar { height: 6px; background: var(--gray-100); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; background: var(--primary); transition: width .4s; }
+  .progress-pct { font-size: 11px; color: var(--gray-500); text-align: right; margin-top: 2px; }
+
+  /* Status summary donut */
+  .status-legend { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 10px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-size: 13px; color: var(--gray-600); flex: 1; }
+  .legend-count { font-size: 13px; font-weight: 700; }
+  .legend-pct { font-size: 11px; color: var(--gray-400); margin-left: 4px; }
+
+  /* Donut SVG */
+  .donut-wrap { display: flex; align-items: center; justify-content: center; position: relative; }
+  .donut-center { position: absolute; text-align: center; pointer-events: none; }
+  .donut-center .big { font-size: 26px; font-weight: 800; }
+  .donut-center .sm  { font-size: 11px; color: var(--gray-400); }
+
+  /* Recent tasks table */
+  .task-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .task-table th { text-align: left; padding: 0 10px 10px; color: var(--gray-400); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; border-bottom: 2px solid var(--gray-100); }
+  .task-table td { padding: 11px 10px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  .task-table tr:last-child td { border-bottom: none; }
+  .task-table tr:hover td { background: var(--gray-50); }
+
+  /* ─── STATUS & PRIORITY BADGES ───────────────────── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .badge-todo     { background: var(--gray-100); color: var(--gray-600); }
+  .badge-progress { background: #dbeafe; color: #1d4ed8; }
+  .badge-done     { background: var(--success-light); color: #065f46; }
+  .badge-hold     { background: var(--warning-light); color: #92400e; }
+  .badge-high     { background: #fee2e2; color: #991b1b; }
+  .badge-medium   { background: var(--warning-light); color: #92400e; }
+  .badge-low      { background: var(--success-light); color: #065f46; }
+
+  /* ─── WEEKLY PLANNER ─────────────────────────────── */
+  .week-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+  .week-nav { display: flex; align-items: center; gap: 6px; }
+  .week-nav-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--gray-200);
+    background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--gray-600); transition: all .15s;
+  }
+  .week-nav-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .week-label { font-size: 15px; font-weight: 700; color: var(--gray-800); min-width: 200px; text-align: center; }
+  .week-filters { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+  .filter-select {
+    padding: 6px 12px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px;
+    background: #fff; color: var(--gray-700); cursor: pointer; outline: none;
+  }
+  .filter-select:focus { border-color: var(--primary); }
+
+  /* Kanban columns */
+  .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .kanban-col { background: var(--gray-50); border-radius: var(--radius); padding: 14px; min-height: 300px; }
+  .kanban-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .kanban-col-title { font-size: 13px; font-weight: 700; color: var(--gray-700); display: flex; align-items: center; gap: 7px; }
+  .col-count { background: var(--gray-200); color: var(--gray-600); font-size: 11px; padding: 1px 7px; border-radius: 99px; font-weight: 700; }
+  .add-task-col-btn {
+    width: 24px; height: 24px; border-radius: 6px; border: none; background: transparent; cursor: pointer;
+    font-size: 18px; color: var(--gray-400); display: flex; align-items: center; justify-content: center; line-height: 1;
+    transition: all .15s;
+  }
+  .add-task-col-btn:hover { background: var(--primary-light); color: var(--primary); }
+
+  /* Task Card */
+  .task-card {
+    background: #fff; border-radius: 10px; padding: 13px 14px; margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07); cursor: pointer; transition: all .15s;
+    border-left: 3px solid transparent; position: relative;
+  }
+  .task-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .task-card-title { font-size: 13px; font-weight: 600; color: var(--gray-800); margin-bottom: 6px; line-height: 1.4; }
+  .task-card-desc { font-size: 12px; color: var(--gray-500); margin-bottom: 8px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .task-card-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .task-card-date { font-size: 11px; color: var(--gray-400); margin-left: auto; }
+  .task-card-assignee { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gray-500); }
+
+  /* ─── MY TASKS ───────────────────────────────────── */
+  .my-tasks-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .person-select-wrap { display: flex; align-items: center; gap: 10px; }
+  .my-tasks-grid { display: flex; flex-direction: column; gap: 10px; }
+  .my-task-item {
+    background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all .15s;
+    border-left: 4px solid var(--gray-200);
+  }
+  .my-task-item:hover { box-shadow: var(--shadow-lg); }
+  .my-task-item.priority-High { border-left-color: var(--danger); }
+  .my-task-item.priority-Medium { border-left-color: var(--warning); }
+  .my-task-item.priority-Low { border-left-color: var(--success); }
+  .my-task-content { flex: 1; min-width: 0; }
+  .my-task-title { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+  .my-task-desc { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+  .my-task-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .my-task-actions { display: flex; gap: 6px; }
+
+  /* Summary mini cards for My Tasks */
+  .my-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+  .my-sum-card { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); text-align: center; }
+  .my-sum-num { font-size: 22px; font-weight: 800; }
+  .my-sum-label { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+  /* ─── TEAM MEMBERS ───────────────────────────────── */
+  .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .member-card {
+    background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; transition: all .15s;
+  }
+  .member-card:hover { box-shadow: var(--shadow-lg); }
+  .member-card .avatar { width: 60px; height: 60px; font-size: 22px; margin-bottom: 4px; }
+  .member-card-name { font-size: 15px; font-weight: 700; }
+  .member-card-role { font-size: 12px; color: var(--gray-400); }
+  .member-card-stats { display: flex; gap: 16px; margin-top: 8px; }
+  .mcs-item { text-align: center; }
+  .mcs-num { font-size: 18px; font-weight: 800; color: var(--primary); }
+  .mcs-label { font-size: 10px; color: var(--gray-400); }
+  .member-card-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+  /* ─── MODAL ─────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 999;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: #fff; border-radius: 16px; box-shadow: var(--shadow-lg); width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform .2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-header { padding: 22px 24px 0; display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-size: 17px; font-weight: 800; }
+  .modal-close { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--gray-100); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: var(--gray-200); }
+  .modal-body { padding: 20px 24px 24px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label { font-size: 12px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: .05em; }
+  .form-control {
+    padding: 9px 12px; border: 1.5px solid var(--gray-200); border-radius: 9px; font-size: 13px;
+    color: var(--gray-800); outline: none; transition: border-color .15s; font-family: inherit;
+  }
+  .form-control:focus { border-color: var(--primary); }
+  textarea.form-control { resize: vertical; min-height: 80px; }
+  .color-picker-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .color-option {
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;
+    transition: all .15s; flex-shrink: 0;
+  }
+  .color-option.selected, .color-option:hover { border-color: var(--gray-800); transform: scale(1.1); }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-100); }
+
+  /* ─── WEEK SUMMARY PANEL ─────────────────────────── */
+  .week-summary-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px;
+  }
+  .wsb-item { background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow); text-align: center; }
+  .wsb-num { font-size: 20px; font-weight: 800; }
+  .wsb-label { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+  /* ─── EMPTY STATE ────────────────────────────────── */
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--gray-400); }
+  .empty-state .es-icon { font-size: 42px; margin-bottom: 12px; }
+  .empty-state p { font-size: 13px; }
+
+  /* ─── PRINT STYLES ───────────────────────────────── */
+  @media print {
+    .sidebar, .topbar, .btn, .week-filters, .modal-overlay { display: none !important; }
+    .main { margin-left: 0; }
+    .content { padding: 10px; }
+    body { background: #fff; }
+  }
+
+  /* ─── SCROLLBAR ──────────────────────────────────── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 99px; }
+
+  /* ─── TOAST ──────────────────────────────────────── */
+  .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+  .toast {
+    background: var(--gray-800); color: #fff; padding: 12px 18px; border-radius: 10px;
+    font-size: 13px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px;
+    animation: slideUp .25s ease; max-width: 300px;
+  }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 900px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .kanban { grid-template-columns: repeat(2, 1fr); }
+    .dash-grid { grid-template-columns: 1fr; }
+    .my-summary { grid-template-columns: repeat(2, 1fr); }
+    .week-summary-bar { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    :root { --sidebar-w: 0px; }
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); width: 240px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .kanban { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .topbar { padding: 0 16px; }
+    .content { padding: 16px; }
+  }
+
+  /* ─── DEPT COLOR DOTS ────────────────────────────── */
+  .dept-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+  /* ─── WEEK CALENDAR STRIP ────────────────────────── */
+  .week-strip { display: flex; gap: 6px; margin-bottom: 18px; }
+  .day-chip { flex: 1; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 8px 4px; text-align: center; font-size: 11px; }
+  .day-chip .dn { color: var(--gray-400); font-weight: 600; }
+  .day-chip .dd { font-size: 16px; font-weight: 800; color: var(--gray-700); margin: 3px 0; }
+  .day-chip .dc { font-size: 10px; color: var(--gray-400); }
+  .day-chip.today { border-color: var(--primary); background: var(--primary-light); }
+  .day-chip.today .dd { color: var(--primary-dark); }
+
+  /* Highlight overdue */
+  .overdue-label { font-size: 10px; color: var(--danger); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ═══ SIDEBAR ═══════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📋</div>
+      <div>
+        <span>TaskFlow</span>
+        <small>Team Manager</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">MENU</div>
+      <div class="nav-item active" onclick="showView('dashboard')">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showView('weekly')">
+        <span class="nav-icon">📅</span> Weekly Planner
+        <span class="nav-badge" id="badge-inprogress">0</span>
+      </div>
+      <div class="nav-item" onclick="showView('mytasks')">
+        <span class="nav-icon">👤</span> งานของฉัน
+      </div>
+
+      <div class="nav-section-title" style="margin-top:12px">SETTINGS</div>
+      <div class="nav-item" onclick="showView('members')">
+        <span class="nav-icon">👥</span> Team Members
+      </div>
+      <div class="nav-item" onclick="exportData()">
+        <span class="nav-icon">💾</span> Export Data
+      </div>
+      <div class="nav-item" onclick="document.getElementById('importFile').click()">
+        <span class="nav-icon">📂</span> Import Data
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    </nav>
+    <div class="sidebar-footer" id="sidebar-footer">สัปดาห์ที่ — / —</div>
+  </aside>
+
+  <!-- ═══ MAIN ═══════════════════════════════════════ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="topbar-title" id="topbar-title">Dashboard</div>
+          <div class="topbar-sub" id="topbar-sub"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Print</button>
+        <button class="btn btn-primary" onclick="openTaskModal()">+ เพิ่มงาน</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ DASHBOARD ══ -->
+      <div class="view active" id="view-dashboard">
+        <div class="stat-grid" id="stat-grid"></div>
+        <div class="dash-grid">
+          <div>
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">สถานะงานรายบุคคล</div>
+                  <div class="card-sub">ความคืบหน้าแต่ละคนในทีม</div>
+                </div>
+              </div>
+              <div id="member-progress-list"></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">งานล่าสุด (10 รายการ)</div>
+                <button class="btn btn-outline btn-sm" onclick="showView('weekly')">ดูทั้งหมด →</button>
+              </div>
+              <table class="task-table">
+                <thead><tr>
+                  <th>ชื่องาน</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th><th>Priority</th><th>กำหนด</th>
+                </tr></thead>
+                <tbody id="recent-tasks-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header"><div class="card-title">สรุปสถานะ</div></div>
+              <div class="donut-wrap" id="donut-wrap">
+                <svg id="donut-svg" width="160" height="160" viewBox="0 0 160 160"></svg>
+                <div class="donut-center" id="donut-center"></div>
+              </div>
+              <div class="status-legend" id="status-legend"></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">งาน Priority สูง 🔴</div></div>
+              <div id="high-priority-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ WEEKLY PLANNER ══ -->
+      <div class="view" id="view-weekly">
+        <div class="week-header">
+          <div class="week-nav">
+            <button class="week-nav-btn" onclick="changeWeek(-1)">←</button>
+            <div class="week-label" id="week-label-text">Loading...</div>
+            <button class="week-nav-btn" onclick="changeWeek(1)">→</button>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="goToCurrentWeek()">สัปดาห์นี้</button>
+          <div class="week-filters">
+            <select class="filter-select" id="filter-member" onchange="renderWeekly()">
+              <option value="">ทุกคน</option>
+            </select>
+            <select class="filter-select" id="filter-dept" onchange="renderWeekly()">
+              <option value="">ทุกแผนก</option>
+            </select>
+            <select class="filter-select" id="filter-priority" onchange="renderWeekly()">
+              <option value="">ทุก Priority</option>
+              <option value="High">🔴 High</option>
+              <option value="Medium">🟡 Medium</option>
+              <option value="Low">🟢 Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="week-strip" id="week-strip"></div>
+
+        <div class="week-summary-bar" id="week-summary-bar"></div>
+
+        <div class="kanban" id="kanban-board"></div>
+      </div>
+
+      <!-- ══ MY TASKS ══ -->
+      <div class="view" id="view-mytasks">
+        <div class="my-tasks-header">
+          <div class="person-select-wrap">
+            <label style="font-size:13px;font-weight:700;color:var(--gray-600)">เลือกสมาชิก:</label>
+            <select class="filter-select" id="my-person-select" onchange="renderMyTasks()" style="min-width:180px">
+              <option value="">-- เลือกชื่อ --</option>
+            </select>
+          </div>
+          <div class="week-filters">
+            <select class="filter-select" id="my-week-filter" onchange="renderMyTasks()">
+              <option value="">ทุกสัปดาห์</option>
+              <option value="current">สัปดาห์นี้</option>
+            </select>
+            <select class="filter-select" id="my-status-filter" onchange="renderMyTasks()">
+              <option value="">ทุกสถานะ</option>
+              <option value="Todo">📋 To Do</option>
+              <option value="In Progress">⚙️ In Progress</option>
+              <option value="Done">✅ Done</option>
+              <option value="On Hold">⏸️ On Hold</option>
+            </select>
+          </div>
+        </div>
+        <div class="my-summary" id="my-summary"></div>
+        <div class="my-tasks-grid" id="my-tasks-grid"></div>
+      </div>
+
+      <!-- ══ TEAM MEMBERS ══ -->
+      <div class="view" id="view-members">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
+          <button class="btn btn-primary" onclick="openMemberModal()">+ เพิ่มสมาชิก</button>
+        </div>
+        <div class="members-grid" id="members-grid"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ═══ TOAST ═══════════════════════════════════════ -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ═══ TASK MODAL ═══════════════════════════════════ -->
+<div class="modal-overlay" id="task-modal-overlay" onclick="closeTaskModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="task-modal-title">เพิ่มงานใหม่</div>
+      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">ชื่องาน *</label>
+          <input class="form-control" id="f-title" placeholder="ระบุชื่องาน..." required>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">รายละเอียดงาน</label>
+          <textarea class="form-control" id="f-desc" placeholder="อธิบายรายละเอียดของงาน..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ผู้รับผิดชอบ</label>
+          <select class="form-control" id="f-member">
+            <option value="">-- เลือกสมาชิก --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">สถานะ</label>
+          <select class="form-control" id="f-status">
+            <option value="Todo">📋 To Do</option>
+            <option value="In Progress">⚙️ In Progress</option>
+            <option value="Done">✅ Done</option>
+            <option value="On Hold">⏸️ On Hold</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-control" id="f-priority">
+            <option value="High">🔴 High</option>
+            <option value="Medium">🟡 Medium</option>
+            <option value="Low">🟢 Low</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">วันครบกำหนด</label>
+          <input class="form-control" type="date" id="f-due">
+        </div>
+        <div class="form-group">
+          <label class="form-label">สัปดาห์ที่</label>
+          <input class="form-control" type="number" id="f-week" min="1" max="53" placeholder="เช่น 23">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ปี</label>
+          <input class="form-control" type="number" id="f-year" placeholder="เช่น 2026">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">หมายเหตุ</label>
+          <textarea class="form-control" id="f-note" placeholder="หมายเหตุเพิ่มเติม..." style="min-height:60px"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="task-delete-btn" onclick="deleteCurrentTask()" style="display:none;margin-right:auto">🗑️ ลบงาน</button>
+        <button class="btn btn-outline" onclick="closeTaskModal()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="saveTask()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MEMBER MODAL ════════════════════════════════ -->
+<div class="modal-overlay" id="member-modal-overlay" onclick="closeMemberModal(event)">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title" id="member-modal-title">เพิ่มสมาชิกใหม่</div>
+      <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" style="grid-template-columns:1fr">
+        <div class="form-group">
+          <label class="form-label">ชื่อ-นามสกุล *</label>
+          <input class="form-control" id="m-name" placeholder="เช่น นาย สมชาย ใจดี">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ตำแหน่ง / แผนก *</label>
+          <input class="form-control" id="m-role" placeholder="เช่น Graphic Designer, Marketing">
+        </div>
+        <div class="form-group">
+          <label class="form-label">สีประจำตัว</label>
+          <div class="color-picker-row" id="color-picker-row"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" id="member-delete-btn" onclick="deleteCurrentMember()" style="display:none;margin-right:auto">🗑️ ลบสมาชิก</button>
+        <button class="btn btn-outline" onclick="closeMemberModal()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="saveMember()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+<script>
+// ══════════════════════════════════════════════════════
+//  FIREBASE CONFIG
+// ══════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyAfJ1dcmc9ZSKBl9k_gbxOh1H4cMvxVNxQ",
+  authDomain: "wpcteam-task-manager.firebaseapp.com",
+  projectId: "wpcteam-task-manager",
+  storageBucket: "wpcteam-task-manager.firebasestorage.app",
+  messagingSenderId: "152593210544",
+  appId: "1:152593210544:web:979724b09e3344ef3baf75"
+};
+
+firebase.initializeApp(firebaseConfig);
+const firestore = firebase.firestore();
+
+// ══════════════════════════════════════════════════════
+//  DATA STORE
+// ══════════════════════════════════════════════════════
+
+const COLORS = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ef4444','#14b8a6','#f97316','#84cc16'];
+
+let db = {
+  tasks: [],
+  members: [],
+  currentWeekOffset: 0
+};
+
+// ── Firebase helpers ──────────────────────────────────
+async function loadDB() {
+  try {
+    showLoadingOverlay(true);
+    const [tasksSnap, membersSnap] = await Promise.all([
+      firestore.collection('tasks').get(),
+      firestore.collection('members').get()
+    ]);
+    db.tasks   = tasksSnap.docs.map(d => d.data());
+    db.members = membersSnap.docs.map(d => d.data());
+    db.currentWeekOffset = parseInt(localStorage.getItem('weekOffset') || '0');
+    showLoadingOverlay(false);
+  } catch(e) {
+    console.error(e);
+    toast('ไม่สามารถเชื่อมต่อ Firebase ได้', 'error');
+    showLoadingOverlay(false);
+  }
+}
+
+async function saveTaskFS(task) {
+  await firestore.collection('tasks').doc(task.id).set(task);
+}
+
+async function removeTask(id) {
+  await firestore.collection('tasks').doc(id).delete();
+}
+
+async function saveMemberFS(member) {
+  await firestore.collection('members').doc(member.id).set(member);
+}
+
+async function removeMember(id) {
+  await firestore.collection('members').doc(id).delete();
+}
+
+function saveDB() {
+  localStorage.setItem('weekOffset', db.currentWeekOffset);
+}
+
+// ── Real-time listener ────────────────────────────────
+function startRealtimeSync() {
+  firestore.collection('tasks').onSnapshot(snap => {
+    db.tasks = snap.docs.map(d => d.data());
+    refreshCurrentView();
+    updateBadge();
+  });
+  firestore.collection('members').onSnapshot(snap => {
+    db.members = snap.docs.map(d => d.data());
+    populateMemberDropdowns();
+    refreshCurrentView();
+  });
+}
+
+// ── Loading overlay ───────────────────────────────────
+function showLoadingOverlay(show) {
+  let el = document.getElementById('loading-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loading-overlay';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#6366f1;gap:10px;';
+    el.innerHTML = '⚙️ กำลังเชื่อมต่อ Firebase...';
+    document.body.appendChild(el);
+  }
+  el.style.display = show ? 'flex' : 'none';
+}
+
+// ── ID generator ──────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+// ── Week helpers ──────────────────────────────────────
+function getISOWeek(d) {
+  const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = dt.getUTCDay() || 7;
+  dt.setUTCDate(dt.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
+  return Math.ceil((((dt - yearStart) / 86400000) + 1) / 7);
+}
+
+function getWeekStart(year, week) {
+  const jan4 = new Date(year, 0, 4);
+  const dayOfJan4 = jan4.getDay() || 7;
+  const weekStart = new Date(jan4);
+  weekStart.setDate(jan4.getDate() - (dayOfJan4 - 1) + (week - 1) * 7);
+  return weekStart;
+}
+
+function getActiveWeek() {
+  const now = new Date();
+  const d = new Date(now);
+  d.setDate(d.getDate() + db.currentWeekOffset * 7);
+  return { week: getISOWeek(d), year: d.getFullYear() };
+}
+
+function formatDate(str) {
+  if (!str) return '—';
+  const d = new Date(str + 'T00:00:00');
+  return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+}
+
+function isOverdue(dueStr) {
+  if (!dueStr) return false;
+  return new Date(dueStr + 'T23:59:59') < new Date();
+}
+
+// ══════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════
+
+const viewMap = {
+  dashboard: { title: 'Dashboard', sub: 'ภาพรวมทีม' },
+  weekly:    { title: 'Weekly Planner', sub: '' },
+  mytasks:   { title: 'งานของฉัน', sub: 'My Tasks' },
+  members:   { title: 'Team Members', sub: 'จัดการสมาชิกในทีม' }
+};
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const items = document.querySelectorAll('.nav-item');
+  const map = ['dashboard','weekly','mytasks','members'];
+  const idx = map.indexOf(id);
+  if (idx >= 0 && items[idx]) items[idx].classList.add('active');
+  document.getElementById('topbar-title').textContent = viewMap[id].title;
+  document.getElementById('topbar-sub').textContent = viewMap[id].sub;
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'weekly') renderWeekly();
+  if (id === 'mytasks') renderMyTasks();
+  if (id === 'members') renderMembers();
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER DASHBOARD
+// ══════════════════════════════════════════════════════
+
+function renderDashboard() {
+  const tasks = db.tasks;
+  const total   = tasks.length;
+  const done    = tasks.filter(t => t.status === 'Done').length;
+  const prog    = tasks.filter(t => t.status === 'In Progress').length;
+  const todo    = tasks.filter(t => t.status === 'Todo').length;
+  const hold    = tasks.filter(t => t.status === 'On Hold').length;
+  const overdue = tasks.filter(t => t.status !== 'Done' && isOverdue(t.due)).length;
+
+  // Stat cards
+  const sg = document.getElementById('stat-grid');
+  sg.innerHTML = [
+    { icon: '📋', color: '#e0e7ff', num: total,   label: 'งานทั้งหมด', delta: '' },
+    { icon: '⚙️', color: '#dbeafe', num: prog,    label: 'กำลังดำเนินการ', delta: '' },
+    { icon: '✅', color: '#d1fae5', num: done,    label: 'เสร็จแล้ว', delta: `${total ? Math.round(done/total*100) : 0}% ของทั้งหมด` },
+    { icon: '⚠️', color: '#fee2e2', num: overdue, label: 'เกินกำหนด', delta: '' },
+  ].map(s => `
+    <div class="stat-card">
+      <div class="stat-icon" style="background:${s.color}">${s.icon}</div>
+      <div class="stat-info">
+        <div class="stat-num">${s.num}</div>
+        <div class="stat-label">${s.label}</div>
+        ${s.delta ? `<div class="stat-delta delta-up">${s.delta}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  // Member progress
+  const mpl = document.getElementById('member-progress-list');
+  if (!db.members.length) { mpl.innerHTML = '<div class="empty-state"><div class="es-icon">👥</div><p>ยังไม่มีสมาชิก กรุณาเพิ่มสมาชิกก่อน</p></div>'; }
+  else {
+    mpl.innerHTML = db.members.map(m => {
+      const mt = tasks.filter(t => t.memberId === m.id);
+      const md = mt.filter(t => t.status === 'Done').length;
+      const pct = mt.length ? Math.round(md / mt.length * 100) : 0;
+      return `<div class="member-row">
+        <div class="avatar" style="background:${m.color}">${initials(m.name)}</div>
+        <div class="member-info">
+          <div class="member-name">${m.name}</div>
+          <div class="member-role">${m.role} · ${mt.length} งาน</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${m.color}"></div></div>
+          <div class="progress-pct">${md}/${mt.length} Done (${pct}%)</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Recent tasks
+  const rtb = document.getElementById('recent-tasks-body');
+  const recent = [...tasks].sort((a,b) => (b.createdAt||0) - (a.createdAt||0)).slice(0, 10);
+  if (!recent.length) { rtb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:20px">ยังไม่มีงาน</td></tr>'; }
+  else {
+    rtb.innerHTML = recent.map(t => {
+      const m = db.members.find(x => x.id === t.memberId);
+      const ov = isOverdue(t.due) && t.status !== 'Done';
+      return `<tr onclick="openTaskModal('${t.id}')" style="cursor:pointer">
+        <td><div style="font-weight:600;font-size:13px">${t.title}</div>${ov ? '<div class="overdue-label">⚠️ เกินกำหนด</div>' : ''}</td>
+        <td>${m ? `<div style="display:flex;align-items:center;gap:6px"><div class="avatar" style="background:${m.color};width:24px;height:24px;font-size:10px">${initials(m.name)}</div>${m.name}</div>` : '—'}</td>
+        <td>${statusBadge(t.status)}</td>
+        <td>${priorityBadge(t.priority)}</td>
+        <td style="font-size:12px;color:${ov?'var(--danger)':'var(--gray-500)'}">${formatDate(t.due)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Donut
+  const statusData = [
+    { label: 'To Do',       count: todo, color: '#9ca3af' },
+    { label: 'In Progress', count: prog, color: '#3b82f6' },
+    { label: 'Done',        count: done, color: '#10b981' },
+    { label: 'On Hold',     count: hold, color: '#f59e0b' },
+  ];
+  renderDonut(statusData, total);
+
+  // High priority
+  const hpl = document.getElementById('high-priority-list');
+  const hp = tasks.filter(t => t.priority === 'High' && t.status !== 'Done').slice(0, 6);
+  if (!hp.length) { hpl.innerHTML = '<div style="font-size:13px;color:var(--gray-400);padding:8px 0">ไม่มีงาน Priority สูงที่ค้างอยู่ 🎉</div>'; }
+  else {
+    hpl.innerHTML = hp.map(t => {
+      const m = db.members.find(x => x.id === t.memberId);
+      return `<div onclick="openTaskModal('${t.id}')" style="padding:9px 0;border-bottom:1px solid var(--gray-100);cursor:pointer;display:flex;gap:8px;align-items:center">
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${t.title}</div><div style="font-size:11px;color:var(--gray-400)">${m ? m.name : '—'} · ${formatDate(t.due)}</div></div>
+        ${statusBadge(t.status)}
+      </div>`;
+    }).join('');
+  }
+
+  updateBadge();
+}
+
+function renderDonut(data, total) {
+  const svg = document.getElementById('donut-svg');
+  const center = document.getElementById('donut-center');
+  const legend = document.getElementById('status-legend');
+  const r = 60, cx = 80, cy = 80, stroke = 20;
+  const circ = 2 * Math.PI * r;
+  let offset = 0;
+  let paths = '';
+  data.forEach(d => {
+    const frac = total ? d.count / total : 0;
+    const dash = frac * circ;
+    paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${stroke}" stroke-dasharray="${dash} ${circ - dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})" style="transition:all .4s"/>`;
+    offset += dash;
+  });
+  if (!total) paths = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--gray-200)" stroke-width="${stroke}"/>`;
+  svg.innerHTML = paths;
+  center.innerHTML = `<div class="big">${total}</div><div class="sm">งานทั้งหมด</div>`;
+  legend.innerHTML = data.map(d => {
+    const pct = total ? Math.round(d.count/total*100) : 0;
+    return `<div class="legend-item">
+      <div class="legend-dot" style="background:${d.color}"></div>
+      <div class="legend-label">${d.label}</div>
+      <div class="legend-count">${d.count}<span class="legend-pct">${pct}%</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER WEEKLY PLANNER
+// ══════════════════════════════════════════════════════
+
+const STATUSES = [
+  { key: 'Todo',        label: '📋 To Do',       color: '#9ca3af' },
+  { key: 'In Progress', label: '⚙️ In Progress',  color: '#3b82f6' },
+  { key: 'Done',        label: '✅ Done',         color: '#10b981' },
+  { key: 'On Hold',     label: '⏸️ On Hold',      color: '#f59e0b' },
+];
+
+function renderWeekly() {
+  const { week, year } = getActiveWeek();
+  const weekStart = getWeekStart(year, week);
+  const weekEnd   = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
+
+  document.getElementById('week-label-text').textContent =
+    `สัปดาห์ที่ ${week} · ${weekStart.toLocaleDateString('th-TH',{day:'numeric',month:'short'})} – ${weekEnd.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})}`;
+  document.getElementById('sidebar-footer').textContent = `สัปดาห์ที่ ${week} / ${year}`;
+  document.getElementById('topbar-sub').textContent = `สัปดาห์ที่ ${week} ปี ${year}`;
+
+  // Week strip (Mon-Sun)
+  const strip = document.getElementById('week-strip');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dayNames = ['จ','อ','พ','พฤ','ศ','ส','อา'];
+  strip.innerHTML = Array.from({length:7}, (_,i) => {
+    const d = new Date(weekStart); d.setDate(d.getDate() + i);
+    const isToday = d.getTime() === today.getTime();
+    const tasksOnDay = db.tasks.filter(t => t.week == week && t.year == year && t.due === d.toISOString().slice(0,10)).length;
+    return `<div class="day-chip ${isToday ? 'today' : ''}">
+      <div class="dn">${dayNames[i]}</div>
+      <div class="dd">${d.getDate()}</div>
+      <div class="dc">${tasksOnDay ? tasksOnDay + ' งาน' : '–'}</div>
+    </div>`;
+  }).join('');
+
+  // Filters
+  const fMember   = document.getElementById('filter-member').value;
+  const fDept     = document.getElementById('filter-dept').value;
+  const fPriority = document.getElementById('filter-priority').value;
+
+  let tasks = db.tasks.filter(t => t.week == week && t.year == year);
+  if (fMember)   tasks = tasks.filter(t => t.memberId === fMember);
+  if (fPriority) tasks = tasks.filter(t => t.priority === fPriority);
+  if (fDept) {
+    const members = db.members.filter(m => m.role.toLowerCase().includes(fDept.toLowerCase())).map(m => m.id);
+    tasks = tasks.filter(t => members.includes(t.memberId));
+  }
+
+  // Summary bar
+  const wsb = document.getElementById('week-summary-bar');
+  const wTotal = tasks.length, wDone = tasks.filter(t=>t.status==='Done').length,
+        wProg  = tasks.filter(t=>t.status==='In Progress').length,
+        wOver  = tasks.filter(t=>t.status!=='Done'&&isOverdue(t.due)).length;
+  wsb.innerHTML = [
+    { num: wTotal, label: 'งานสัปดาห์นี้',    color: 'var(--primary)' },
+    { num: wProg,  label: 'กำลังดำเนินการ',    color: '#3b82f6' },
+    { num: wDone,  label: 'เสร็จแล้ว',          color: 'var(--success)' },
+    { num: wOver,  label: 'เกินกำหนด',          color: 'var(--danger)' },
+  ].map(s => `<div class="wsb-item"><div class="wsb-num" style="color:${s.color}">${s.num}</div><div class="wsb-label">${s.label}</div></div>`).join('');
+
+  // Kanban
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = STATUSES.map(st => {
+    const cols = tasks.filter(t => t.status === st.key);
+    return `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title">
+          <div style="width:10px;height:10px;border-radius:50%;background:${st.color}"></div>
+          ${st.label}
+          <div class="col-count">${cols.length}</div>
+        </div>
+        <button class="add-task-col-btn" title="เพิ่มงาน" onclick="openTaskModal(null,'${st.key}')">+</button>
+      </div>
+      ${cols.length ? cols.map(t => taskCard(t)).join('') : '<div class="empty-state" style="padding:24px 10px"><div class="es-icon">📭</div><p>ไม่มีงาน</p></div>'}
+    </div>`;
+  }).join('');
+
+  updateBadge();
+}
+
+function taskCard(t) {
+  const m = db.members.find(x => x.id === t.memberId);
+  const ov = isOverdue(t.due) && t.status !== 'Done';
+  const borderColor = { High: 'var(--danger)', Medium: 'var(--warning)', Low: 'var(--success)' }[t.priority] || 'var(--gray-200)';
+  return `<div class="task-card" style="border-left-color:${borderColor}" onclick="openTaskModal('${t.id}')">
+    <div class="task-card-title">${t.title}</div>
+    ${t.desc ? `<div class="task-card-desc">${t.desc}</div>` : ''}
+    <div class="task-card-footer">
+      ${priorityBadge(t.priority)}
+      ${m ? `<div class="task-card-assignee"><div class="avatar" style="background:${m.color};width:20px;height:20px;font-size:9px">${initials(m.name)}</div>${m.name.split(' ')[0]}</div>` : ''}
+      <div class="task-card-date" style="color:${ov?'var(--danger)':'var(--gray-400)'}">
+        ${ov ? '⚠️ ' : ''}${formatDate(t.due)}
+      </div>
+    </div>
+    ${t.note ? `<div style="font-size:11px;color:var(--gray-400);margin-top:6px;font-style:italic">💬 ${t.note}</div>` : ''}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER MY TASKS
+// ══════════════════════════════════════════════════════
+
+function renderMyTasks() {
+  const personId = document.getElementById('my-person-select').value;
+  const weekF    = document.getElementById('my-week-filter').value;
+  const statusF  = document.getElementById('my-status-filter').value;
+  const { week, year } = getActiveWeek();
+
+  let tasks = db.tasks;
+  if (personId) tasks = tasks.filter(t => t.memberId === personId);
+  if (weekF === 'current') tasks = tasks.filter(t => t.week == week && t.year == year);
+  if (statusF) tasks = tasks.filter(t => t.status === statusF);
+
+  const summary = document.getElementById('my-summary');
+  const total = tasks.length, done = tasks.filter(t=>t.status==='Done').length,
+        prog  = tasks.filter(t=>t.status==='In Progress').length,
+        over  = tasks.filter(t=>t.status!=='Done'&&isOverdue(t.due)).length;
+  summary.innerHTML = [
+    { num: total, label: 'งานทั้งหมด',      color: 'var(--primary)' },
+    { num: prog,  label: 'กำลังทำ',          color: '#3b82f6' },
+    { num: done,  label: 'เสร็จแล้ว',        color: 'var(--success)' },
+    { num: over,  label: 'เกินกำหนด',        color: 'var(--danger)' },
+  ].map(s => `<div class="my-sum-card"><div class="my-sum-num" style="color:${s.color}">${s.num}</div><div class="my-sum-label">${s.label}</div></div>`).join('');
+
+  const grid = document.getElementById('my-tasks-grid');
+  if (!tasks.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="es-icon">🎉</div><p>ไม่มีงานในขณะนี้</p></div>';
+    return;
+  }
+  const sorted = [...tasks].sort((a,b) => {
+    const ps = { High:0, Medium:1, Low:2 };
+    return (ps[a.priority]||1) - (ps[b.priority]||1);
+  });
+  grid.innerHTML = sorted.map(t => {
+    const m = db.members.find(x => x.id === t.memberId);
+    const ov = isOverdue(t.due) && t.status !== 'Done';
+    return `<div class="my-task-item priority-${t.priority}" onclick="openTaskModal('${t.id}')">
+      <div class="my-task-content">
+        <div class="my-task-title">${t.title}</div>
+        ${t.desc ? `<div class="my-task-desc">${t.desc}</div>` : ''}
+        <div class="my-task-meta">
+          ${statusBadge(t.status)}
+          ${priorityBadge(t.priority)}
+          <span style="font-size:11px;color:${ov?'var(--danger)':'var(--gray-400)'}">${ov?'⚠️ ':''} ${formatDate(t.due)}</span>
+          <span style="font-size:11px;color:var(--gray-400)">สัปดาห์ที่ ${t.week||'?'}</span>
+        </div>
+        ${t.note ? `<div style="font-size:11px;color:var(--gray-400);margin-top:4px;font-style:italic">💬 ${t.note}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER MEMBERS
+// ══════════════════════════════════════════════════════
+
+function renderMembers() {
+  const grid = document.getElementById('members-grid');
+  if (!db.members.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">👥</div><p>ยังไม่มีสมาชิก คลิก "เพิ่มสมาชิก" เพื่อเริ่มต้น</p></div>';
+    return;
+  }
+  grid.innerHTML = db.members.map(m => {
+    const mt = db.tasks.filter(t => t.memberId === m.id);
+    const md = mt.filter(t => t.status === 'Done').length;
+    const mp = mt.filter(t => t.status === 'In Progress').length;
+    return `<div class="member-card">
+      <div class="avatar" style="background:${m.color};width:60px;height:60px;font-size:22px">${initials(m.name)}</div>
+      <div class="member-card-name">${m.name}</div>
+      <div class="member-card-role">${m.role}</div>
+      <div class="member-card-stats">
+        <div class="mcs-item"><div class="mcs-num">${mt.length}</div><div class="mcs-label">งานทั้งหมด</div></div>
+        <div class="mcs-item"><div class="mcs-num" style="color:var(--success)">${md}</div><div class="mcs-label">Done</div></div>
+        <div class="mcs-item"><div class="mcs-num" style="color:#3b82f6">${mp}</div><div class="mcs-label">กำลังทำ</div></div>
+      </div>
+      <div class="member-card-actions">
+        <button class="btn btn-outline btn-sm" onclick="openMemberModal('${m.id}')">✏️ แก้ไข</button>
+        <button class="btn btn-outline btn-sm" onclick="filterToMember('${m.id}')">📋 งาน</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterToMember(id) {
+  showView('mytasks');
+  document.getElementById('my-person-select').value = id;
+  renderMyTasks();
+}
+
+// ══════════════════════════════════════════════════════
+//  TASK MODAL
+// ══════════════════════════════════════════════════════
+
+let editingTaskId = null;
+
+function openTaskModal(id = null, defaultStatus = 'Todo') {
+  editingTaskId = id;
+  const { week, year } = getActiveWeek();
+  const overlay = document.getElementById('task-modal-overlay');
+  const deleteBtn = document.getElementById('task-delete-btn');
+
+  if (id) {
+    const t = db.tasks.find(x => x.id === id);
+    if (!t) return;
+    document.getElementById('task-modal-title').textContent = 'แก้ไขงาน';
+    document.getElementById('f-title').value    = t.title || '';
+    document.getElementById('f-desc').value     = t.desc || '';
+    document.getElementById('f-member').value   = t.memberId || '';
+    document.getElementById('f-status').value   = t.status || 'Todo';
+    document.getElementById('f-priority').value = t.priority || 'Medium';
+    document.getElementById('f-due').value      = t.due || '';
+    document.getElementById('f-week').value     = t.week || week;
+    document.getElementById('f-year').value     = t.year || year;
+    document.getElementById('f-note').value     = t.note || '';
+    deleteBtn.style.display = 'inline-flex';
+  } else {
+    document.getElementById('task-modal-title').textContent = 'เพิ่มงานใหม่';
+    document.getElementById('f-title').value    = '';
+    document.getElementById('f-desc').value     = '';
+    document.getElementById('f-member').value   = '';
+    document.getElementById('f-status').value   = defaultStatus;
+    document.getElementById('f-priority').value = 'Medium';
+    document.getElementById('f-due').value      = '';
+    document.getElementById('f-week').value     = week;
+    document.getElementById('f-year').value     = year;
+    document.getElementById('f-note').value     = '';
+    deleteBtn.style.display = 'none';
+  }
+  overlay.classList.add('open');
+}
+
+function closeTaskModal(e) {
+  if (e && e.target !== document.getElementById('task-modal-overlay')) return;
+  document.getElementById('task-modal-overlay').classList.remove('open');
+}
+
+function saveTask() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { toast('กรุณาระบุชื่องาน', 'error'); return; }
+
+  const task = {
+    id:        editingTaskId || uid(),
+    title,
+    desc:      document.getElementById('f-desc').value.trim(),
+    memberId:  document.getElementById('f-member').value,
+    status:    document.getElementById('f-status').value,
+    priority:  document.getElementById('f-priority').value,
+    due:       document.getElementById('f-due').value,
+    week:      parseInt(document.getElementById('f-week').value) || getActiveWeek().week,
+    year:      parseInt(document.getElementById('f-year').value) || getActiveWeek().year,
+    note:      document.getElementById('f-note').value.trim(),
+    createdAt: editingTaskId ? (db.tasks.find(t=>t.id===editingTaskId)||{}).createdAt || Date.now() : Date.now(),
+    updatedAt: Date.now()
+  };
+
+  try {
+    await saveTaskFS(task);
+    document.getElementById('task-modal-overlay').classList.remove('open');
+    toast(editingTaskId ? 'อัปเดตงานเรียบร้อย ✅' : 'เพิ่มงานใหม่เรียบร้อย ✅', 'success');
+  } catch(e) {
+    toast('บันทึกไม่สำเร็จ กรุณาลองใหม่', 'error');
+  }
+}
+
+function deleteCurrentTask() {
+  if (!editingTaskId) return;
+  if (!confirm('ต้องการลบงานนี้ใช่ไหม?')) return;
+  try {
+    await removeTask(editingTaskId);
+    document.getElementById('task-modal-overlay').classList.remove('open');
+    toast('ลบงานเรียบร้อย', 'success');
+  } catch(e) { toast('ลบไม่สำเร็จ', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════
+//  MEMBER MODAL
+// ══════════════════════════════════════════════════════
+
+let editingMemberId = null;
+let selectedColor   = COLORS[0];
+
+function openMemberModal(id = null) {
+  editingMemberId = id;
+  const overlay   = document.getElementById('member-modal-overlay');
+  const deleteBtn = document.getElementById('member-delete-btn');
+  renderColorPicker();
+
+  if (id) {
+    const m = db.members.find(x => x.id === id);
+    if (!m) return;
+    document.getElementById('member-modal-title').textContent = 'แก้ไขสมาชิก';
+    document.getElementById('m-name').value = m.name || '';
+    document.getElementById('m-role').value = m.role || '';
+    selectedColor = m.color || COLORS[0];
+    deleteBtn.style.display = 'inline-flex';
+  } else {
+    document.getElementById('member-modal-title').textContent = 'เพิ่มสมาชิกใหม่';
+    document.getElementById('m-name').value = '';
+    document.getElementById('m-role').value = '';
+    selectedColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+    deleteBtn.style.display = 'none';
+  }
+  renderColorPicker();
+  overlay.classList.add('open');
+}
+
+function renderColorPicker() {
+  document.getElementById('color-picker-row').innerHTML = COLORS.map(c =>
+    `<div class="color-option ${c === selectedColor ? 'selected' : ''}" style="background:${c}" onclick="selectColor('${c}')"></div>`
+  ).join('');
+}
+
+function selectColor(c) { selectedColor = c; renderColorPicker(); }
+
+function closeMemberModal(e) {
+  if (e && e.target !== document.getElementById('member-modal-overlay')) return;
+  document.getElementById('member-modal-overlay').classList.remove('open');
+}
+
+function saveMember() {
+  const name = document.getElementById('m-name').value.trim();
+  const role = document.getElementById('m-role').value.trim();
+  if (!name) { toast('กรุณาระบุชื่อสมาชิก', 'error'); return; }
+  if (!role) { toast('กรุณาระบุตำแหน่ง', 'error'); return; }
+
+  const member = { id: editingMemberId || uid(), name, role, color: selectedColor };
+
+  try {
+    await saveMemberFS(member);
+    document.getElementById('member-modal-overlay').classList.remove('open');
+    toast(editingMemberId ? 'อัปเดตสมาชิกเรียบร้อย ✅' : 'เพิ่มสมาชิกใหม่เรียบร้อย ✅', 'success');
+  } catch(e) { toast('บันทึกไม่สำเร็จ', 'error'); }
+}
+
+function deleteCurrentMember() {
+  if (!editingMemberId) return;
+  const mt = db.tasks.filter(t => t.memberId === editingMemberId).length;
+  if (mt > 0 && !confirm(`สมาชิกนี้มีงานอยู่ ${mt} รายการ ต้องการลบต่อไปไหม? (งานจะยังคงอยู่แต่ไม่มีผู้รับผิดชอบ)`)) return;
+  try {
+    await removeMember(editingMemberId);
+    document.getElementById('member-modal-overlay').classList.remove('open');
+    toast('ลบสมาชิกเรียบร้อย', 'success');
+  } catch(e) { toast('ลบไม่สำเร็จ', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════
+
+function initials(name) {
+  return name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+}
+
+function statusBadge(s) {
+  const map = { Todo: 'badge-todo', 'In Progress': 'badge-progress', Done: 'badge-done', 'On Hold': 'badge-hold' };
+  const label = { Todo: '📋 To Do', 'In Progress': '⚙️ กำลังทำ', Done: '✅ Done', 'On Hold': '⏸️ Hold' };
+  return `<span class="badge ${map[s]||''}">${label[s]||s}</span>`;
+}
+
+function priorityBadge(p) {
+  const map = { High: 'badge-high', Medium: 'badge-medium', Low: 'badge-low' };
+  const icon = { High: '🔴', Medium: '🟡', Low: '🟢' };
+  return `<span class="badge ${map[p]||''}">${icon[p]||''} ${p||'—'}</span>`;
+}
+
+function populateMemberDropdowns() {
+  const opts = '<option value="">-- เลือกสมาชิก --</option>' +
+    db.members.map(m => `<option value="${m.id}">${m.name} (${m.role})</option>`).join('');
+  document.getElementById('f-member').innerHTML = opts;
+  document.getElementById('my-person-select').innerHTML =
+    '<option value="">-- เลือกชื่อ --</option>' +
+    db.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  document.getElementById('filter-member').innerHTML =
+    '<option value="">ทุกคน</option>' +
+    db.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+
+  const depts = [...new Set(db.members.map(m => m.role))];
+  document.getElementById('filter-dept').innerHTML =
+    '<option value="">ทุกแผนก</option>' +
+    depts.map(d => `<option value="${d}">${d}</option>`).join('');
+}
+
+function updateBadge() {
+  const prog = db.tasks.filter(t => t.status === 'In Progress').length;
+  document.getElementById('badge-inprogress').textContent = prog;
+}
+
+function changeWeek(dir) {
+  db.currentWeekOffset += dir;
+  localStorage.setItem('weekOffset', db.currentWeekOffset);
+  renderWeekly();
+}
+
+function goToCurrentWeek() {
+  db.currentWeekOffset = 0;
+  localStorage.setItem('weekOffset', 0);
+  renderWeekly();
+}
+
+function refreshCurrentView() {
+  const activeView = document.querySelector('.view.active');
+  if (!activeView) return;
+  const id = activeView.id.replace('view-', '');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'weekly')    renderWeekly();
+  if (id === 'mytasks')   renderMyTasks();
+  if (id === 'members')   renderMembers();
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `taskflow_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('Export สำเร็จ 💾', 'success');
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.tasks || !imported.members) throw new Error('invalid');
+      toast('กำลัง Import ข้อมูลขึ้น Firebase...', '');
+      const batch = firestore.batch();
+      imported.tasks.forEach(t => batch.set(firestore.collection('tasks').doc(t.id), t));
+      imported.members.forEach(m => batch.set(firestore.collection('members').doc(m.id), m));
+      await batch.commit();
+      toast('Import สำเร็จ 🎉 ข้อมูลขึ้น Firebase แล้ว', 'success');
+    } catch(e) { toast('ไฟล์ไม่ถูกต้อง กรุณาใช้ไฟล์ JSON ที่ export จากระบบ', 'error'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function toast(msg, type = '') {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+
+(async () => {
+  await loadDB();
+  populateMemberDropdowns();
+  renderDashboard();
+  startRealtimeSync();
+})();
+
+// Keyboard: Escape closes modals
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('task-modal-overlay').classList.remove('open');
+    document.getElementById('member-modal-overlay').classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
