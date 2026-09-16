@@ -853,7 +853,7 @@ function renderWeekly() {
   ].map(s=>`<div class="wsb-item"><div class="wsb-num" style="color:${s.color}">${s.num}</div><div class="wsb-label">${s.label}</div></div>`).join('');
 
   document.getElementById('kanban-board').innerHTML = STATUSES.map(st=>{
-    const cols = tasks.filter(t=>t.status===st.key);
+    const cols = tasks.filter(t=>t.status===st.key).sort((a,b)=>{ const da=a.due||a.startDate||''; const db2=b.due||b.startDate||''; return da.localeCompare(db2); });
     return `<div class="kanban-col">
       <div class="kanban-col-header">
         <div class="kanban-col-title"><div style="width:10px;height:10px;border-radius:50%;background:${st.color}"></div>${st.label}<div class="col-count">${cols.length}</div></div>
