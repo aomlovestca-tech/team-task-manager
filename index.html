@@ -471,11 +471,11 @@
         </div>
         <div class="form-group">
           <label class="form-label">วันที่เริ่มต้น</label>
-          <input class="form-control" type="date" id="f-start-date">
+          <input class="form-control" type="date" id="f-start-date" onchange="autoUpdateWeekFromDate()">
         </div>
         <div class="form-group">
           <label class="form-label">วันที่สิ้นสุด / กำหนดส่ง</label>
-          <input class="form-control" type="date" id="f-due">
+          <input class="form-control" type="date" id="f-due" onchange="autoUpdateWeekFromDate()">
         </div>
         <div class="form-group full">
           <label class="form-label">สัปดาห์ที่ (พร้อมวันที่)</label>
@@ -815,7 +815,7 @@ function renderWeekly() {
   document.getElementById('week-strip').innerHTML = Array.from({length:7},(_,i)=>{
     const d = new Date(weekStart); d.setDate(d.getDate()+i);
     const isToday = d.getTime()===today.getTime();
-    const cnt = db.tasks.filter(t=>t.week==week&&t.year==year&&t.due===d.toISOString().slice(0,10)).length;
+    const cnt = db.tasks.filter(t=>t.due===d.toISOString().slice(0,10)).length;
     return `<div class="day-chip ${isToday?'today':''}"><div class="dn">${dayNames[i]}</div><div class="dd">${d.getDate()}</div><div class="dc">${cnt?cnt+' งาน':'–'}</div></div>`;
   }).join('');
 
@@ -837,7 +837,20 @@ function renderWeekly() {
       return true;
     });
   } else {
-    tasks = db.tasks.filter(t => t.week==week && t.year==year);
+    const weekStartStr = weekStart.toISOString().slice(0,10);
+    const weekEndStr   = weekEnd.toISOString().slice(0,10);
+    tasks = db.tasks.filter(t => {
+      const tStart = t.startDate || '';
+      const tEnd   = t.due || '';
+      // Task has at least one date → use date-range overlap (supports multi-week tasks)
+      if (tStart || tEnd) {
+        const s = tStart || tEnd; // effective start
+        const e = tEnd || tStart; // effective end
+        return s <= weekEndStr && e >= weekStartStr;
+      }
+      // No dates → fall back to explicit week/year assignment
+      return t.week == week && t.year == year;
+    });
   }
 
   if (fMember)   tasks = tasks.filter(t => getTaskMemberIds(t).includes(fMember));
@@ -1062,6 +1075,17 @@ function toggleMemberChip(id) {
   renderMemberChips();
 }
 
+function autoUpdateWeekFromDate() {
+  const startDate = document.getElementById('f-start-date').value;
+  const due       = document.getElementById('f-due').value;
+  const dateRef   = startDate || due;
+  if (!dateRef) return;
+  const d = new Date(dateRef + 'T00:00:00');
+  const w = getISOWeek(d);
+  const y = getISOWeekYear(d);
+  document.getElementById('f-week-select').innerHTML = generateWeekOptions(y, w);
+}
+
 function openTaskModal(id=null, defaultStatus='Todo') {
   editingTaskId = id;
   const { week, year } = getActiveWeek();
@@ -1109,8 +1133,18 @@ function closeTaskModal(e) {
 async function saveTask() {
   const title = document.getElementById('f-title').value.trim();
   if (!title) { toast('กรุณาระบุชื่องาน','error'); return; }
-  const wv = document.getElementById('f-week-select').value;
-  const [wy,ww] = wv ? wv.split('-').map(Number) : [getActiveWeek().year, getActiveWeek().week];
+  // Auto-compute week/year from dates if provided; otherwise use dropdown
+  const fStartDate = document.getElementById('f-start-date').value;
+  const fDueDate   = document.getElementById('f-due').value;
+  let wy, ww;
+  if (fStartDate || fDueDate) {
+    const dateRef = new Date((fStartDate || fDueDate) + 'T00:00:00');
+    ww = getISOWeek(dateRef);
+    wy = getISOWeekYear(dateRef);
+  } else {
+    const wv = document.getElementById('f-week-select').value;
+    [wy,ww] = wv ? wv.split('-').map(Number) : [getActiveWeek().year, getActiveWeek().week];
+  }
   const task = {
     id:         editingTaskId || uid(),
     title,
