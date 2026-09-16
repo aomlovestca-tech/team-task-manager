@@ -471,15 +471,11 @@
         </div>
         <div class="form-group">
           <label class="form-label">วันที่เริ่มต้น</label>
-          <input class="form-control" type="date" id="f-start-date" onchange="autoUpdateWeekFromDate()">
+          <input class="form-control" type="date" id="f-start-date">
         </div>
         <div class="form-group">
           <label class="form-label">วันที่สิ้นสุด / กำหนดส่ง</label>
-          <input class="form-control" type="date" id="f-due" onchange="autoUpdateWeekFromDate()">
-        </div>
-        <div class="form-group full">
-          <label class="form-label">สัปดาห์ที่ (พร้อมวันที่)</label>
-          <select class="form-control" id="f-week-select"></select>
+          <input class="form-control" type="date" id="f-due">
         </div>
         <div class="form-group full">
           <label class="form-label">หมายเหตุ</label>
@@ -1075,26 +1071,10 @@ function toggleMemberChip(id) {
   renderMemberChips();
 }
 
-function autoUpdateWeekFromDate() {
-  const startDate = document.getElementById('f-start-date').value;
-  const due       = document.getElementById('f-due').value;
-  const dateRef   = startDate || due;
-  if (!dateRef) return;
-  const d = new Date(dateRef + 'T00:00:00');
-  const w = getISOWeek(d);
-  const y = getISOWeekYear(d);
-  document.getElementById('f-week-select').innerHTML = generateWeekOptions(y, w);
-}
-
 function openTaskModal(id=null, defaultStatus='Todo') {
   editingTaskId = id;
-  const { week, year } = getActiveWeek();
   const overlay = document.getElementById('task-modal-overlay');
   const deleteBtn = document.getElementById('task-delete-btn');
-
-  let selW=week, selY=year;
-  if (id) { const t=db.tasks.find(x=>x.id===id); if(t){selW=t.week||week;selY=t.year||year;} }
-  document.getElementById('f-week-select').innerHTML = generateWeekOptions(selY, selW);
 
   if (id) {
     const t = db.tasks.find(x=>x.id===id);
@@ -1133,7 +1113,7 @@ function closeTaskModal(e) {
 async function saveTask() {
   const title = document.getElementById('f-title').value.trim();
   if (!title) { toast('กรุณาระบุชื่องาน','error'); return; }
-  // Auto-compute week/year from dates if provided; otherwise use dropdown
+  // Auto-compute week/year from dates; fallback to active week
   const fStartDate = document.getElementById('f-start-date').value;
   const fDueDate   = document.getElementById('f-due').value;
   let wy, ww;
@@ -1142,8 +1122,7 @@ async function saveTask() {
     ww = getISOWeek(dateRef);
     wy = getISOWeekYear(dateRef);
   } else {
-    const wv = document.getElementById('f-week-select').value;
-    [wy,ww] = wv ? wv.split('-').map(Number) : [getActiveWeek().year, getActiveWeek().week];
+    ({ week: ww, year: wy } = getActiveWeek());
   }
   const task = {
     id:         editingTaskId || uid(),
