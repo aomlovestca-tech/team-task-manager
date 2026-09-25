@@ -185,21 +185,36 @@
   .month-stat-num { font-size: 20px; font-weight: 800; }
   .month-stat-label { font-size: 10px; color: var(--gray-400); margin-top: 3px; line-height: 1.3; }
 
-  /* MY TASKS */
-  .my-tasks-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-  .my-summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
-  .my-sum-card { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); text-align: center; }
-  .my-sum-num { font-size: 22px; font-weight: 800; }
-  .my-sum-label { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
-  .my-tasks-grid { display: flex; flex-direction: column; gap: 10px; }
-  .my-task-item { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); cursor: pointer; transition: all .15s; border-left: 4px solid var(--gray-200); }
-  .my-task-item:hover { box-shadow: var(--shadow-lg); }
-  .my-task-item.priority-High { border-left-color: var(--danger); }
-  .my-task-item.priority-Medium { border-left-color: var(--warning); }
-  .my-task-item.priority-Low { border-left-color: var(--success); }
-  .my-task-title { font-size: 14px; font-weight: 600; }
-  .my-task-desc { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
-  .my-task-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  /* MY TASKS v2 */
+  .mt-page { display:flex; flex-direction:column; gap:16px; }
+  .mt-member-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .mt-mchip { display:flex; align-items:center; gap:7px; padding:6px 14px 6px 8px; border-radius:100px; background:var(--gray-100); border:1.5px solid transparent; cursor:pointer; font-size:13px; font-weight:600; color:var(--gray-600); transition:all .15s; white-space:nowrap; }
+  .mt-mchip:hover { background:var(--gray-200); }
+  .mt-mchip.mt-active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .mt-mav { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#fff; flex-shrink:0; }
+  .mt-status-bar { display:flex; gap:6px; flex-wrap:wrap; }
+  .mt-sbtn { padding:5px 14px; border-radius:100px; border:1.5px solid var(--gray-200); background:#fff; font-size:12px; font-weight:600; color:var(--gray-500); cursor:pointer; transition:all .15s; }
+  .mt-sbtn:hover { border-color:var(--primary); color:var(--primary); }
+  .mt-sbtn.mt-s-active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .mt-summary { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:4px; }
+  .mt-sum-chip { display:flex; align-items:center; gap:10px; background:#fff; border-radius:10px; padding:10px 16px; box-shadow:var(--shadow); flex:1; min-width:120px; }
+  .mt-sum-num { font-size:20px; font-weight:800; }
+  .mt-sum-label { font-size:11px; color:var(--gray-400); margin-top:1px; }
+  .mt-task-list { display:flex; flex-direction:column; gap:8px; }
+  .mt-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:var(--shadow); cursor:pointer; transition:all .15s; display:flex; gap:12px; align-items:flex-start; border-left:3px solid var(--gray-200); }
+  .mt-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-1px); }
+  .mt-card.pri-High { border-left-color:var(--danger); }
+  .mt-card.pri-Medium { border-left-color:var(--warning); }
+  .mt-card.pri-Low { border-left-color:var(--success); }
+  .mt-card-body { flex:1; min-width:0; }
+  .mt-card-title { font-size:14px; font-weight:600; color:var(--gray-800); line-height:1.4; }
+  .mt-card-desc { font-size:12px; color:var(--gray-500); margin-top:3px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .mt-card-foot { display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .mt-card-note { font-size:11px; color:var(--gray-400); margin-top:5px; display:flex; align-items:center; gap:4px; }
+  .mt-empty { text-align:center; padding:48px 24px; color:var(--gray-400); font-size:14px; }
+  .mt-count-label { font-size:11px; color:var(--gray-400); padding:6px 0 2px; font-weight:600; letter-spacing:.04em; }
+  @media(min-width:768px){ .mt-task-list { display:grid; grid-template-columns:1fr 1fr; gap:10px; } }
+  @media(max-width:420px){ .mt-mchip { font-size:12px; padding:5px 10px 5px 6px; } }
 
   /* TEAM MEMBERS */
   .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 16px; }
@@ -381,7 +396,9 @@
   .wm-stat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
   .wm-stat-num { font-weight:800; font-size:14px; }
   .wm-stat-chip.wm-overdue-chip { border-color:#fca5a5; background:#fef2f2; }
-  .wm-week-range { margin-left:auto; font-size:12px; color:var(--gray-400); align-self:center; }
+  .wm-week-range { margin-left:auto; font-size:12px; color:var(--gray-400); align-self:center; display:flex; align-items:center; gap:4px; }
+  .wm-title-icon { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background:rgba(255,255,255,.2); flex-shrink:0; }
+  .wm-title-icon svg { width:20px; height:20px; stroke:rgba(255,255,255,.9); }
 
   .wm-member-section { padding:12px 20px; background:#fff; border-bottom:2px solid var(--gray-100); margin: 0 -20px 20px; }
   .wm-member-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--gray-400); margin-bottom:9px; }
@@ -408,7 +425,8 @@
   .wm-section { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
   .wm-section.wm-full { grid-column:1/-1; }
   .wm-sec-head { display:flex; align-items:center; gap:8px; padding:12px 16px 10px; border-bottom:1px solid var(--gray-100); }
-  .wm-sec-icon { font-size:16px; line-height:1; }
+  .wm-sec-icon { font-size:16px; line-height:1; display:flex; align-items:center; width:18px; height:18px; flex-shrink:0; }
+  .wm-sec-icon svg { width:18px; height:18px; }
   .wm-sec-title { font-size:13px; font-weight:700; flex:1; }
   .wm-sec-count { font-size:11px; font-weight:700; border-radius:10px; padding:2px 8px; }
   .wm-done .wm-sec-head { background:#ecfdf5; border-bottom-color:#a7f3d0; } .wm-done .wm-sec-title { color:#059669; } .wm-done .wm-sec-count { background:#059669; color:#fff; }
@@ -528,7 +546,7 @@
         <div class="wm-header">
           <div class="wm-top">
             <div class="wm-title-group">
-              <span style="font-size:22px">📋</span>
+              <span class="wm-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg></span>
               <div>
                 <h2>Weekly Meeting</h2>
                 <div style="font-size:11px;opacity:.7;margin-top:1px">TaskFlow · WPC Team Manager</div>
@@ -556,8 +574,8 @@
           <div class="wm-stat-chip"><div class="wm-stat-dot" style="background:#2563eb"></div><span class="wm-stat-num" style="color:#2563eb" id="wm-s-inprog">0</span><span style="color:var(--gray-500)">กำลังทำ</span></div>
           <div class="wm-stat-chip"><div class="wm-stat-dot" style="background:var(--gray-400)"></div><span class="wm-stat-num" id="wm-s-todo">0</span><span style="color:var(--gray-500)">รอทำ</span></div>
           <div class="wm-stat-chip"><div class="wm-stat-dot" style="background:#d97706"></div><span class="wm-stat-num" style="color:#d97706" id="wm-s-hold">0</span><span style="color:var(--gray-500)">รอพัก</span></div>
-          <div class="wm-stat-chip wm-overdue-chip"><div class="wm-stat-dot" style="background:#dc2626"></div><span class="wm-stat-num" style="color:#dc2626" id="wm-s-overdue">0</span><span style="color:#dc2626">เกินกำหนด ⚠</span></div>
-          <div class="wm-week-range">🗓 <span id="wm-week-range">—</span></div>
+          <div class="wm-stat-chip wm-overdue-chip"><div class="wm-stat-dot" style="background:#dc2626"></div><span class="wm-stat-num" style="color:#dc2626" id="wm-s-overdue">0</span><span style="color:#dc2626;display:flex;align-items:center;gap:3px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>เกินกำหนด</span></div>
+          <div class="wm-week-range"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="wm-week-range">—</span></div>
         </div>
 
         <!-- ── MEMBER SELECTOR ── -->
@@ -589,27 +607,18 @@
 
       <!-- MY TASKS -->
       <div class="view" id="view-mytasks">
-        <div class="my-tasks-header">
-          <div style="display:flex;align-items:center;gap:10px">
-            <label style="font-size:13px;font-weight:700;color:var(--gray-600)">เลือกสมาชิก:</label>
-            <select class="filter-select" id="my-person-select" onchange="renderMyTasks()" style="min-width:180px"><option value="">-- เลือกชื่อ --</option></select>
+        <div class="mt-page">
+          <div class="mt-member-bar" id="mt-member-bar"></div>
+          <div class="mt-status-bar" id="mt-status-bar">
+            <div class="mt-sbtn mt-s-active" onclick="mtSelectStatus('')">ทุกสถานะ</div>
+            <div class="mt-sbtn" onclick="mtSelectStatus('In Progress')">กำลังทำ</div>
+            <div class="mt-sbtn" onclick="mtSelectStatus('Todo')">รอดำเนินการ</div>
+            <div class="mt-sbtn" onclick="mtSelectStatus('Done')">เสร็จสิ้น</div>
+            <div class="mt-sbtn" onclick="mtSelectStatus('On Hold')">รอพัก</div>
           </div>
-          <div class="week-filters">
-            <select class="filter-select" id="my-week-filter" onchange="renderMyTasks()">
-              <option value="">ทุกสัปดาห์</option>
-              <option value="current">สัปดาห์นี้</option>
-            </select>
-            <select class="filter-select" id="my-status-filter" onchange="renderMyTasks()">
-              <option value="">ทุกสถานะ</option>
-              <option value="Todo">To Do · รอดำเนินการ</option>
-              <option value="In Progress">In Progress · กำลังทำ</option>
-              <option value="Done">Done · เสร็จสิ้น</option>
-              <option value="On Hold">On Hold · รอพัก</option>
-            </select>
-          </div>
+          <div class="mt-summary" id="mt-summary"></div>
+          <div class="mt-task-list" id="mt-task-list"></div>
         </div>
-        <div class="my-summary" id="my-summary"></div>
-        <div class="my-tasks-grid" id="my-tasks-grid"></div>
       </div>
 
 
@@ -1232,14 +1241,14 @@ function wmTaskCard(t, showNextBadge) {
   if (t.startDate && t.due && t.startDate!==t.due) due = t.startDate.slice(5)+' – '+t.due.slice(5);
   else if (t.due) due = t.due.slice(5);
   else if (t.startDate) due = t.startDate.slice(5);
-  return `<div class="wm-task-card">
+  return `<div class="wm-task-card" onclick="openTaskModal('${t.id}')" style="cursor:pointer">
     <div class="wm-task-num">·</div>
     <div class="wm-task-body">
       <div class="wm-task-title">${t.title||'—'}</div>
       <div class="wm-task-meta">
         <span class="wm-pri ${wmPriClass(t.priority)}">${t.priority||'—'}</span>
-        ${ov?'<span class="wm-overdue-badge">⚠ เกินกำหนด</span>':(due?`<span class="wm-due">📅 ${due}</span>`:'')}
-        ${showNextBadge?'<span class="wm-next-badge">📆 สัปดาห์หน้า</span>':''}
+        ${ov?'<span class="wm-overdue-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>เกินกำหนด</span>':(due?`<span class="wm-due"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${due}</span>`:'')}
+        ${showNextBadge?'<span class="wm-next-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>สัปดาห์หน้า</span>':''}
       </div>
     </div>
   </div>`;
@@ -1329,12 +1338,12 @@ function wmRenderMemberReport() {
   </div>`;
 
   const grid = `<div class="wm-grid">
-    ${wmSection('wm-done',       '✅','เสร็จแล้ว · Done',            done,           '— ไม่มีงานที่เสร็จ —')}
-    ${wmSection('wm-inprog',     '🔵','กำลังทำ · In Progress',       inprog,         '— ไม่มีงานที่กำลังดำเนินการ —')}
-    ${wmSection('wm-todo',       '⭕','รอดำเนินการสัปดาห์นี้ · To Do', todoThisWeek, '— ไม่มีงานรอดำเนินการ —')}
-    ${wmSection('wm-hold',       '⏸','รอพัก · On Hold',              hold,           '— ไม่มีงานรอพัก —')}
-    ${nextWeek.length?wmSection('wm-next wm-full','📆','งานสัปดาห์หน้า · Up Next', nextWeek, '', true):''}
-    ${overdue.length?wmSection('wm-overdue wm-full','⚠️','งานเกินกำหนด · Overdue', overdue, ''):''}
+    ${wmSection('wm-done',   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>','เสร็จแล้ว · Done',              done,         '— ไม่มีงานที่เสร็จ —')}
+    ${wmSection('wm-inprog', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>','กำลังทำ · In Progress',         inprog,       '— ไม่มีงานที่กำลังดำเนินการ —')}
+    ${wmSection('wm-todo',   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/></svg>','รอดำเนินการสัปดาห์นี้ · To Do', todoThisWeek,'— ไม่มีงานรอดำเนินการ —')}
+    ${wmSection('wm-hold',   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>','รอพัก · On Hold',               hold,         '— ไม่มีงานรอพัก —')}
+    ${nextWeek.length?wmSection('wm-next wm-full','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>','งานสัปดาห์หน้า · Up Next', nextWeek, '', true):''}
+    ${overdue.length?wmSection('wm-overdue wm-full','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>','งานเกินกำหนด · Overdue', overdue, ''):''}
   </div>`;
 
   area.innerHTML = header + grid;
@@ -1450,46 +1459,92 @@ function renderMonthly() {
 }
 
 // ══════════════════════════════════════════════════════
-//  RENDER MY TASKS
+//  MY TASKS v2
 // ══════════════════════════════════════════════════════
+let mtCurrentMemberId = '';
+let mtCurrentStatus   = '';
+
+function mtBuildMemberBar() {
+  const bar = document.getElementById('mt-member-bar');
+  if (!bar) return;
+  const all = [
+    `<div class="mt-mchip ${mtCurrentMemberId===''?'mt-active':''}" onclick="mtSelectMember('')">
+       <div class="mt-mav" style="background:var(--gray-400)">ทุก</div>ทุกคน
+     </div>`
+  ];
+  db.members.forEach(m => {
+    const active = mtCurrentMemberId === m.id;
+    all.push(`<div class="mt-mchip ${active?'mt-active':''}" onclick="mtSelectMember('${m.id}')">
+       <div class="mt-mav" style="background:${m.color||'var(--primary)'}">${(m.name||'?').charAt(0).toUpperCase()}</div>
+       ${m.name.split(' ')[0]}
+     </div>`);
+  });
+  bar.innerHTML = all.join('');
+}
+
+function mtSelectMember(id) {
+  mtCurrentMemberId = id;
+  mtBuildMemberBar();
+  renderMyTasks();
+}
+
+function mtSelectStatus(s) {
+  mtCurrentStatus = s;
+  document.querySelectorAll('.mt-sbtn').forEach(btn => btn.classList.remove('mt-s-active'));
+  event.currentTarget.classList.add('mt-s-active');
+  renderMyTasks();
+}
+
 function renderMyTasks() {
-  const personId = document.getElementById('my-person-select').value;
-  const weekF    = document.getElementById('my-week-filter').value;
-  const statusF  = document.getElementById('my-status-filter').value;
-  const { week, year } = getActiveWeek();
+  mtBuildMemberBar();
 
   let tasks = db.tasks;
-  if (personId) tasks = tasks.filter(t => getTaskMemberIds(t).includes(personId));
-  if (weekF==='current') tasks = tasks.filter(t => t.week==week && t.year==year);
-  if (statusF) tasks = tasks.filter(t => t.status===statusF);
+  if (mtCurrentMemberId) tasks = tasks.filter(t => getTaskMemberIds(t).includes(mtCurrentMemberId));
+  if (mtCurrentStatus)   tasks = tasks.filter(t => t.status === mtCurrentStatus);
 
-  const total=tasks.length, done=tasks.filter(t=>t.status==='Done').length,
-        prog=tasks.filter(t=>t.status==='In Progress').length, over=tasks.filter(t=>isOverdue(t.due,t.status)).length;
-  document.getElementById('my-summary').innerHTML=[
-    {num:total,label:'งานทั้งหมด',           color:'var(--primary)'},
-    {num:prog, label:'In Progress · กำลังทำ', color:'#3b82f6'},
-    {num:done, label:'Done · เสร็จสิ้น',      color:'var(--success)'},
-    {num:over, label:'เกินกำหนด',             color:'var(--danger)'},
-  ].map(s=>`<div class="my-sum-card"><div class="my-sum-num" style="color:${s.color}">${s.num}</div><div class="my-sum-label">${s.label}</div></div>`).join('');
+  // summary counts (always from member-filtered, before status filter)
+  let memberTasks = db.tasks;
+  if (mtCurrentMemberId) memberTasks = memberTasks.filter(t => getTaskMemberIds(t).includes(mtCurrentMemberId));
+  const total = memberTasks.length;
+  const done  = memberTasks.filter(t=>t.status==='Done').length;
+  const prog  = memberTasks.filter(t=>t.status==='In Progress').length;
+  const over  = memberTasks.filter(t=>isOverdue(t.due,t.status)).length;
 
-  const grid=document.getElementById('my-tasks-grid');
-  if (!tasks.length){grid.innerHTML='<div class="empty-state"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><p>ไม่มีงานในขณะนี้</p></div>';return;}
-  const sorted=[...tasks].sort((a,b)=>({High:0,Medium:1,Low:2}[a.priority]||1)-({High:0,Medium:1,Low:2}[b.priority]||1));
-  grid.innerHTML=sorted.map(t=>{
-    const members=getTaskMemberIds(t).map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
-    const names=members.map(m=>m.name.split(' ')[0]).join(', ');
-    const ov=isOverdue(t.due,t.status);
-    const dateRange=t.startDate?`${formatDate(t.startDate)} – ${formatDate(t.due)}`:formatDate(t.due);
-    return `<div class="my-task-item priority-${t.priority}" onclick="openTaskModal('${t.id}')">
-      <div class="my-task-title">${t.title}</div>
-      ${t.desc?`<div class="my-task-desc">${t.desc}</div>`:''}
-      <div class="my-task-meta">
-        ${statusBadge(t.status)} ${priorityBadge(t.priority)}
-        ${names?`<span style="font-size:11px;color:var(--gray-500)">${names}</span>`:''}
-        <span style="font-size:11px;color:${ov?'var(--danger)':'var(--gray-400)'}">${dateRange}</span>
-        <span style="font-size:11px;color:var(--gray-400)">สัปดาห์ ${t.week||'?'}</span>
+  document.getElementById('mt-summary').innerHTML = [
+    {num:total, label:'ทั้งหมด',   color:'var(--primary)'},
+    {num:prog,  label:'กำลังทำ',   color:'#2563eb'},
+    {num:done,  label:'เสร็จสิ้น', color:'var(--success)'},
+    {num:over,  label:'เกินกำหนด', color:'var(--danger)'},
+  ].map(s=>`<div class="mt-sum-chip">
+    <div><div class="mt-sum-num" style="color:${s.color}">${s.num}</div><div class="mt-sum-label">${s.label}</div></div>
+  </div>`).join('');
+
+  const list = document.getElementById('mt-task-list');
+  if (!tasks.length) {
+    list.innerHTML='<div class="mt-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="margin-bottom:8px;opacity:.35"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><div>ไม่มีงานในขณะนี้</div></div>';
+    return;
+  }
+
+  const priOrd = {High:0,Medium:1,Low:2};
+  const sorted = [...tasks].sort((a,b)=>(priOrd[a.priority]??1)-(priOrd[b.priority]??1));
+
+  list.innerHTML = sorted.map(t=>{
+    const members  = getTaskMemberIds(t).map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
+    const names    = members.map(m=>m.name.split(' ')[0]).join(', ');
+    const ov       = isOverdue(t.due, t.status);
+    const dateStr  = t.startDate ? `${formatDate(t.startDate)} – ${formatDate(t.due)}` : formatDate(t.due);
+    return `<div class="mt-card pri-${t.priority||'Medium'}" onclick="openTaskModal('${t.id}')">
+      <div class="mt-card-body">
+        <div class="mt-card-title">${t.title||'—'}</div>
+        ${t.desc?`<div class="mt-card-desc">${t.desc}</div>`:''}
+        <div class="mt-card-foot">
+          ${statusBadge(t.status)}
+          ${priorityBadge(t.priority)}
+          ${names?`<span style="font-size:11px;color:var(--gray-500)">${names}</span>`:''}
+          ${dateStr?`<span style="font-size:11px;color:${ov?'var(--danger)':'var(--gray-400)'}">${dateStr}</span>`:''}
+        </div>
+        ${t.note?`<div class="mt-card-note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
       </div>
-      ${t.note?`<div class="task-card-note" style="margin-top:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -1521,7 +1576,7 @@ function renderMembers() {
   }).join('');
 }
 
-function filterToMember(id) { showView('mytasks'); document.getElementById('my-person-select').value=id; renderMyTasks(); }
+function filterToMember(id) { showView('mytasks'); mtCurrentMemberId=id; mtCurrentStatus=''; renderMyTasks(); }
 
 // ══════════════════════════════════════════════════════
 //  TASK MODAL – MULTI ASSIGNEE
@@ -1699,7 +1754,6 @@ async function deleteCurrentMember() {
 // ══════════════════════════════════════════════════════
 function populateMemberDropdowns() {
   const opts = db.members.map(m=>`<option value="${m.id}">${m.name} (${m.role})</option>`).join('');
-  document.getElementById('my-person-select').innerHTML='<option value="">-- เลือกชื่อ --</option>'+opts;
   document.getElementById('filter-member').innerHTML='<option value="">ทุกคน</option>'+opts;
   document.getElementById('month-member').innerHTML='<option value="">ทุกคนในทีม</option>'+opts;
 }
