@@ -1264,13 +1264,40 @@ function wmRenderMemberReport() {
   const init = (m.name||'?').charAt(0).toUpperCase();
 
   const myTasks = db.tasks.filter(t=>getTaskMemberIds(t).includes(mid));
-  const {mon, sun} = wmGetWeekBounds(0);
+  const {mon, sun}         = wmGetWeekBounds(0);
   const {mon:nextMon, sun:nextSun} = wmGetWeekBounds(1);
+  const {mon:prevMon, sun:prevSun} = wmGetWeekBounds(-1);
+  const prevMonStr = prevMon.toISOString().slice(0,10);
+  const prevSunStr = prevSun.toISOString().slice(0,10);
 
-  const done    = myTasks.filter(t=>t.status==='Done');
-  const inprog  = myTasks.filter(t=>t.status==='In Progress');
-  const hold    = myTasks.filter(t=>t.status==='On Hold');
-  const overdue = myTasks.filter(t=>isOverdue(t.due,t.status));
+  // Done: this week + last week (show tasks whose date range overlaps prevMon–thisSun)
+  // Tasks with no date → include (can't determine when, assume relevant)
+  const done = myTasks.filter(t=>{
+    if (t.status!=='Done') return false;
+    if (!t.due && !t.startDate) return true;
+    return wmDateInRange(t.startDate, t.due, prevMon, sun);
+  });
+
+  // In Progress: this week only
+  const inprog = myTasks.filter(t=>{
+    if (t.status!=='In Progress') return false;
+    if (!t.due && !t.startDate) return true; // active, no date → show
+    return wmDateInRange(t.startDate, t.due, mon, sun);
+  });
+
+  // On Hold: this week only
+  const hold = myTasks.filter(t=>{
+    if (t.status!=='On Hold') return false;
+    if (!t.due && !t.startDate) return true;
+    return wmDateInRange(t.startDate, t.due, mon, sun);
+  });
+
+  // Overdue: overdue tasks whose due date falls in the previous week (prevMon–prevSun)
+  const overdue = myTasks.filter(t=>{
+    if (!isOverdue(t.due, t.status)) return false;
+    if (!t.due) return false;
+    return t.due >= prevMonStr && t.due <= prevSunStr;
+  });
 
   // Todo this week = status Todo AND date overlaps current week
   const todoThisWeek = myTasks.filter(t=>{
@@ -1279,7 +1306,7 @@ function wmRenderMemberReport() {
     return wmDateInRange(t.startDate, t.due, mon, sun);
   });
 
-  // Next week = status Todo AND date overlaps NEXT week (and NOT this week, unless no date)
+  // Next week = status Todo AND date overlaps NEXT week (and NOT this week)
   const nextWeek = myTasks.filter(t=>{
     if (t.status!=='Todo') return false;
     if (!t.due && !t.startDate) return false;
@@ -1295,6 +1322,7 @@ function wmRenderMemberReport() {
       <div class="wm-mstat"><div class="wm-mstat-num" style="color:#059669">${done.length}</div><div class="wm-mstat-label">Done</div></div>
       <div class="wm-mstat"><div class="wm-mstat-num" style="color:#2563eb">${inprog.length}</div><div class="wm-mstat-label">กำลังทำ</div></div>
       <div class="wm-mstat"><div class="wm-mstat-num">${todoThisWeek.length}</div><div class="wm-mstat-label">รอทำ</div></div>
+      ${hold.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#6b7280">${hold.length}</div><div class="wm-mstat-label">รอพัก</div></div>`:''}
       ${nextWeek.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#7c3aed">${nextWeek.length}</div><div class="wm-mstat-label">สัปดาห์หน้า</div></div>`:''}
       ${overdue.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#dc2626">${overdue.length}</div><div class="wm-mstat-label">เกินกำหนด</div></div>`:''}
     </div>
