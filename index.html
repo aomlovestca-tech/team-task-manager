@@ -350,6 +350,91 @@
     .ch-overview-grid { grid-template-columns:1fr; }
   }
 
+
+  /* ── WEEKLY MEETING ── */
+  .wm-header { background: linear-gradient(135deg,#5b21b6 0%,#7c3aed 60%,#8b5cf6 100%); color:#fff; padding: 0 20px; border-radius: var(--radius) var(--radius) 0 0; margin: -20px -20px 0 -20px; }
+  .wm-top { display:flex; align-items:center; justify-content:space-between; padding:14px 0 10px; gap:12px; flex-wrap:wrap; }
+  .wm-title-group { display:flex; align-items:center; gap:10px; }
+  .wm-title-group h2 { font-size:20px; font-weight:800; letter-spacing:-.3px; }
+  .wm-week-badge { background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:3px 12px; font-size:12px; font-weight:600; }
+  .wm-clock { text-align:center; }
+  .wm-clock-time { font-family:'Inter',monospace; font-size:30px; font-weight:800; letter-spacing:1px; line-height:1; }
+  .wm-clock-date { font-size:12px; opacity:.85; margin-top:3px; }
+  .wm-countdown { text-align:right; }
+  .wm-countdown-num { font-size:26px; font-weight:800; line-height:1; }
+  .wm-countdown-label { font-size:11px; opacity:.8; }
+  .wm-countdown-bar { width:110px; height:4px; background:rgba(255,255,255,.25); border-radius:2px; margin:5px 0 0 auto; overflow:hidden; }
+  .wm-countdown-fill { height:100%; border-radius:2px; background:#fbbf24; }
+  .wm-week-strip { display:flex; gap:0; padding:0 0 12px; justify-content:center; }
+  .wm-day-cell { flex:1; max-width:100px; text-align:center; padding:7px 4px; border-radius:8px; }
+  .wm-day-cell.wm-today { background:rgba(255,255,255,.2); border:1.5px solid rgba(255,255,255,.5); }
+  .wm-day-cell.wm-past { opacity:.5; }
+  .wm-day-cell.wm-future { opacity:.72; }
+  .wm-day-cell.wm-weekend { opacity:.38; }
+  .wm-day-name { font-size:10px; font-weight:600; opacity:.8; letter-spacing:.4px; }
+  .wm-day-num { font-size:18px; font-weight:800; line-height:1.1; margin:2px 0; }
+  .wm-day-tasks { font-size:10px; opacity:.7; }
+  .wm-today-dot { width:5px; height:5px; background:#fbbf24; border-radius:50%; margin:3px auto 0; }
+
+  .wm-stats-bar { display:flex; gap:8px; padding:12px 20px; flex-wrap:wrap; background:#fff; border-bottom:1px solid var(--gray-100); margin: 0 -20px; }
+  .wm-stat-chip { display:flex; align-items:center; gap:6px; background:var(--gray-50); border:1px solid var(--gray-200); border-radius:20px; padding:5px 12px; font-size:12px; }
+  .wm-stat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .wm-stat-num { font-weight:800; font-size:14px; }
+  .wm-stat-chip.wm-overdue-chip { border-color:#fca5a5; background:#fef2f2; }
+  .wm-week-range { margin-left:auto; font-size:12px; color:var(--gray-400); align-self:center; }
+
+  .wm-member-section { padding:12px 20px; background:#fff; border-bottom:2px solid var(--gray-100); margin: 0 -20px 20px; }
+  .wm-member-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--gray-400); margin-bottom:9px; }
+  .wm-member-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .wm-chip { display:flex; align-items:center; gap:7px; border-radius:30px; padding:6px 12px 6px 7px; cursor:pointer; border:2px solid transparent; background:var(--gray-100); transition:all .15s; font-weight:600; font-size:13px; color:var(--gray-700); }
+  .wm-chip:hover { background:var(--primary-light); border-color:var(--primary); color:var(--primary-dark); }
+  .wm-chip.wm-active { background:var(--primary); color:#fff; border-color:var(--primary); box-shadow:0 2px 10px rgba(124,58,237,.3); }
+  .wm-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; color:#fff; }
+  .wm-chip.wm-active .wm-avatar { background:rgba(255,255,255,.25) !important; }
+  .wm-nav-btn { margin-left:auto; display:flex; align-items:center; gap:7px; background:var(--primary); color:#fff; border:none; border-radius:24px; padding:8px 18px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; box-shadow:0 2px 8px rgba(124,58,237,.25); }
+  .wm-nav-btn:hover { background:var(--primary-dark); transform:translateY(-1px); }
+  .wm-nav-prog { font-size:11px; color:var(--gray-400); font-weight:600; margin-left:2px; white-space:nowrap; }
+
+  .wm-member-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; background:#fff; border-radius:var(--radius); padding:14px 18px; box-shadow:var(--shadow); }
+  .wm-m-avatar { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:#fff; flex-shrink:0; }
+  .wm-m-name { font-size:18px; font-weight:800; color:var(--gray-900); }
+  .wm-m-sub { font-size:12px; color:var(--gray-400); margin-top:2px; }
+  .wm-m-stats { margin-left:auto; display:flex; gap:14px; }
+  .wm-mstat { text-align:center; }
+  .wm-mstat-num { font-size:20px; font-weight:800; line-height:1; }
+  .wm-mstat-label { font-size:10px; color:var(--gray-400); margin-top:2px; }
+
+  .wm-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .wm-section { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+  .wm-section.wm-full { grid-column:1/-1; }
+  .wm-sec-head { display:flex; align-items:center; gap:8px; padding:12px 16px 10px; border-bottom:1px solid var(--gray-100); }
+  .wm-sec-icon { font-size:16px; line-height:1; }
+  .wm-sec-title { font-size:13px; font-weight:700; flex:1; }
+  .wm-sec-count { font-size:11px; font-weight:700; border-radius:10px; padding:2px 8px; }
+  .wm-done .wm-sec-head { background:#ecfdf5; border-bottom-color:#a7f3d0; } .wm-done .wm-sec-title { color:#059669; } .wm-done .wm-sec-count { background:#059669; color:#fff; }
+  .wm-inprog .wm-sec-head { background:#eff6ff; border-bottom-color:#bfdbfe; } .wm-inprog .wm-sec-title { color:#2563eb; } .wm-inprog .wm-sec-count { background:#2563eb; color:#fff; }
+  .wm-todo .wm-sec-head { background:#f9fafb; border-bottom-color:var(--gray-200); } .wm-todo .wm-sec-title { color:var(--gray-600); } .wm-todo .wm-sec-count { background:var(--gray-500); color:#fff; }
+  .wm-hold .wm-sec-head { background:#fffbeb; border-bottom-color:#fde68a; } .wm-hold .wm-sec-title { color:#d97706; } .wm-hold .wm-sec-count { background:#d97706; color:#fff; }
+  .wm-next .wm-sec-head { background:#f5f3ff; border-bottom-color:#ddd6fe; } .wm-next .wm-sec-title { color:#7c3aed; } .wm-next .wm-sec-count { background:#7c3aed; color:#fff; }
+  .wm-overdue .wm-sec-head { background:#fef2f2; border-bottom-color:#fca5a5; } .wm-overdue .wm-sec-title { color:#dc2626; } .wm-overdue .wm-sec-count { background:#dc2626; color:#fff; }
+
+  .wm-task-list { padding:8px 10px; }
+  .wm-task-card { display:flex; align-items:flex-start; gap:8px; padding:9px 8px; border-radius:7px; margin-bottom:5px; border:1px solid var(--gray-100); }
+  .wm-task-card:last-child { margin-bottom:0; }
+  .wm-task-card:hover { background:var(--gray-50); }
+  .wm-task-num { width:18px; height:18px; border-radius:50%; background:var(--gray-200); color:var(--gray-500); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .wm-task-body { flex:1; min-width:0; }
+  .wm-task-title { font-size:13px; font-weight:600; color:var(--gray-800); line-height:1.35; margin-bottom:3px; }
+  .wm-task-meta { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+  .wm-pri { font-size:10px; font-weight:700; border-radius:5px; padding:1px 6px; }
+  .wm-pri-high { background:#fef2f2; color:#dc2626; }
+  .wm-pri-med { background:#fffbeb; color:#d97706; }
+  .wm-pri-low { background:#eff6ff; color:#2563eb; }
+  .wm-due { font-size:10px; color:var(--gray-400); }
+  .wm-overdue-badge { font-size:10px; color:#dc2626; font-weight:700; background:#fef2f2; border-radius:5px; padding:1px 6px; }
+  .wm-next-badge { font-size:10px; color:#7c3aed; font-weight:700; background:#f5f3ff; border:1px solid #ddd6fe; border-radius:5px; padding:1px 6px; }
+  .wm-empty { padding:20px; text-align:center; color:var(--gray-400); font-size:12px; }
+  @media(max-width:768px) { .wm-grid { grid-template-columns:1fr; } .wm-m-stats { display:none; } .wm-countdown { display:none; } .wm-clock-time { font-size:22px; } }
 </style>
 </head>
 <body>
@@ -367,7 +452,7 @@
     <nav class="sidebar-nav">
       <div class="nav-section-title">MENU</div>
       <div class="nav-item active" onclick="showView('dashboard')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Dashboard</div>
-      <div class="nav-item" onclick="showView('weekly')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Weekly Planner <span class="nav-badge" id="badge-inprogress">0</span></div>
+      <div class="nav-item" onclick="showView('weekly')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Weekly Meeting <span class="nav-badge" id="badge-inprogress">0</span></div>
       <div class="nav-item" onclick="showView('challenge')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6-6 6 6"/><path d="M6 12l6-6 6 6"/><path d="M6 15l6-6 6 6"/></svg></span> Challenge</div>
       <div class="nav-item" onclick="showView('mytasks')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> งานของฉัน</div>
       <div class="nav-section-title" style="margin-top:12px">SETTINGS</div>
@@ -439,32 +524,50 @@
 
       <!-- WEEKLY PLANNER -->
       <div class="view" id="view-weekly">
-        <div class="week-header">
-          <div class="week-nav">
-            <button class="week-nav-btn" onclick="changeWeek(-1)">←</button>
-            <div class="week-label" id="week-label-text">Loading...</div>
-            <button class="week-nav-btn" onclick="changeWeek(1)">→</button>
-          </div>
-          <button class="btn btn-outline btn-sm" onclick="goToCurrentWeek()">สัปดาห์นี้</button>
-          <div class="week-filters">
-            <select class="filter-select" id="filter-member" onchange="renderWeekly()"><option value="">ทุกคน</option></select>
-            <select class="filter-select" id="filter-priority" onchange="renderWeekly()">
-              <option value="">ทุก Priority</option>
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
-            </select>
-            <div class="date-range-group">
-              <input type="date" class="filter-select" id="filter-date-from" onchange="renderWeekly()" title="ตั้งแต่วันที่">
-              <span>–</span>
-              <input type="date" class="filter-select" id="filter-date-to" onchange="renderWeekly()" title="ถึงวันที่">
-              <button class="btn btn-outline btn-sm" onclick="clearDateFilter()" title="ล้าง">✕</button>
+        <!-- ── MEETING HEADER ── -->
+        <div class="wm-header">
+          <div class="wm-top">
+            <div class="wm-title-group">
+              <span style="font-size:22px">📋</span>
+              <div>
+                <h2>Weekly Meeting</h2>
+                <div style="font-size:11px;opacity:.7;margin-top:1px">TaskFlow · WPC Team Manager</div>
+              </div>
+              <div class="wm-week-badge" id="wm-week-badge">สัปดาห์ที่ —</div>
+            </div>
+            <div class="wm-clock">
+              <div class="wm-clock-time" id="wm-clock-time">—</div>
+              <div class="wm-clock-date" id="wm-clock-date">—</div>
+            </div>
+            <div class="wm-countdown">
+              <div style="font-size:10px;opacity:.7;margin-bottom:2px;text-align:right">ถึงสิ้นปี</div>
+              <div class="wm-countdown-num" id="wm-days-left">—</div>
+              <div class="wm-countdown-label">วัน</div>
+              <div class="wm-countdown-bar"><div class="wm-countdown-fill" id="wm-year-bar" style="width:0%"></div></div>
             </div>
           </div>
+          <div class="wm-week-strip" id="wm-week-strip"></div>
         </div>
-        <div class="week-strip" id="week-strip"></div>
-        <div class="week-summary-bar" id="week-summary-bar"></div>
-        <div class="kanban" id="kanban-board"></div>
+
+        <!-- ── STATS BAR ── -->
+        <div class="wm-stats-bar">
+          <div class="wm-stat-chip"><div class="wm-stat-dot" style="background:var(--primary)"></div><span class="wm-stat-num" id="wm-s-total">0</span><span style="color:var(--gray-500)">ทั้งหมด</span></div>
+          <div class="wm-stat-chip"><div class="wm-stat-dot" style="background:#059669"></div><span class="wm-stat-num" style="color:#059669" id="wm-s-done">0</span><span style="color:var(--gray-500)">Done</span></div>
+          <div class="wm-stat-chip"><div class="wm-stat-dot" style="background:#2563eb"></div><span class="wm-stat-num" style="color:#2563eb" id="wm-s-inprog">0</span><span style="color:var(--gray-500)">กำลังทำ</span></div>
+          <div class="wm-stat-chip"><div class="wm-stat-dot" style="background:var(--gray-400)"></div><span class="wm-stat-num" id="wm-s-todo">0</span><span style="color:var(--gray-500)">รอทำ</span></div>
+          <div class="wm-stat-chip"><div class="wm-stat-dot" style="background:#d97706"></div><span class="wm-stat-num" style="color:#d97706" id="wm-s-hold">0</span><span style="color:var(--gray-500)">รอพัก</span></div>
+          <div class="wm-stat-chip wm-overdue-chip"><div class="wm-stat-dot" style="background:#dc2626"></div><span class="wm-stat-num" style="color:#dc2626" id="wm-s-overdue">0</span><span style="color:#dc2626">เกินกำหนด ⚠</span></div>
+          <div class="wm-week-range">🗓 <span id="wm-week-range">—</span></div>
+        </div>
+
+        <!-- ── MEMBER SELECTOR ── -->
+        <div class="wm-member-section">
+          <div class="wm-member-label">รายงานสมาชิก · คลิกเลือกเพื่อดูงาน</div>
+          <div class="wm-member-row" id="wm-member-row"></div>
+        </div>
+
+        <!-- ── REPORT AREA ── -->
+        <div id="wm-report-area"></div>
       </div>
 
       <!-- MONTHLY REPORT -->
@@ -874,7 +977,7 @@ function generateWeekOptions(selYear, selWeek) {
 // ══════════════════════════════════════════════════════
 const VIEW_META = {
   dashboard: { title:'Dashboard',       sub:'ภาพรวมทีม' },
-  weekly:    { title:'Weekly Planner',  sub:'' },
+  weekly:    { title:'Weekly Meeting',  sub:'รายงานสถานการณ์งานประจำสัปดาห์' },
   monthly:   { title:'Monthly Report',  sub:'สรุปงานรายเดือน' },
   mytasks:   { title:'งานของฉัน',        sub:'My Tasks' },
   members:   { title:'Team Members',    sub:'จัดการสมาชิกในทีม' },
@@ -1008,91 +1111,223 @@ const STATUSES = [
   { key:'On Hold',     label:'On Hold · รอพัก',        color:'#f59e0b' },
 ];
 
-function renderWeekly() {
-  const { week, year } = getActiveWeek();
-  const weekStart = getWeekStart(year, week);
-  const weekEnd   = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
+// ══ WEEKLY MEETING ══
+const WM_TH_DAYS    = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const WM_TH_MONTHS  = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const WM_TH_SHORT   = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+let wmClockInterval = null;
+let wmCurrentMemberIdx = 0;
 
-  document.getElementById('week-label-text').textContent =
-    `สัปดาห์ที่ ${week} · ${weekStart.toLocaleDateString('th-TH',{day:'numeric',month:'short'})} – ${weekEnd.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})}`;
-  document.getElementById('sidebar-footer').textContent = `สัปดาห์ที่ ${week} / ${year}`;
-  document.getElementById('topbar-sub').textContent = `สัปดาห์ที่ ${week} ปี ${year}`;
+function wmPad(n) { return String(n).padStart(2,'0'); }
+function wmBEYear(d) { return d.getFullYear() + 543; }
 
-  // Week strip
-  const today = new Date(); today.setHours(0,0,0,0);
-  const dayNames = ['จ','อ','พ','พฤ','ศ','ส','อา'];
-  document.getElementById('week-strip').innerHTML = Array.from({length:7},(_,i)=>{
-    const d = new Date(weekStart); d.setDate(d.getDate()+i);
-    const isToday = d.getTime()===today.getTime();
-    const cnt = db.tasks.filter(t=>t.due===d.toISOString().slice(0,10)).length;
-    return `<div class="day-chip ${isToday?'today':''}"><div class="dn">${dayNames[i]}</div><div class="dd">${d.getDate()}</div><div class="dc">${cnt?cnt+' งาน':'–'}</div></div>`;
-  }).join('');
+function wmGetWeekBounds(offsetWeeks) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const day = now.getDay();
+  const mon = new Date(now); mon.setDate(now.getDate() - ((day+6)%7) + offsetWeeks*7);
+  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  return { mon, sun };
+}
 
-  // Filters
-  const fMember   = document.getElementById('filter-member').value;
-  const fPriority = document.getElementById('filter-priority').value;
-  const fFrom     = document.getElementById('filter-date-from').value;
-  const fTo       = document.getElementById('filter-date-to').value;
+function wmGetISOWeek(date) {
+  const d = new Date(date); d.setHours(0,0,0,0);
+  d.setDate(d.getDate()+3-(d.getDay()+6)%7);
+  const w = new Date(d.getFullYear(),0,4);
+  return 1+Math.round(((d-w)/86400000-3+(w.getDay()+6)%7)/7);
+}
 
-  let tasks;
-  if (fFrom || fTo) {
-    // Date-range mode: tasks whose [startDate,due] overlaps [fFrom,fTo]
-    tasks = db.tasks.filter(t => {
-      const tS = t.startDate || t.due || '';
-      const tE = t.due || t.startDate || '';
-      if (!tS && !tE) return false;
-      if (fFrom && tE && tE < fFrom) return false;
-      if (fTo   && tS && tS > fTo)   return false;
-      return true;
-    });
-  } else {
-    const weekStartStr = weekStart.toISOString().slice(0,10);
-    const weekEndStr   = weekEnd.toISOString().slice(0,10);
-    tasks = db.tasks.filter(t => {
-      const tStart = t.startDate || '';
-      const tEnd   = t.due || '';
-      // Task has at least one date → use date-range overlap (supports multi-week tasks)
-      if (tStart || tEnd) {
-        const s = tStart || tEnd; // effective start
-        const e = tEnd || tStart; // effective end
-        return s <= weekEndStr && e >= weekStartStr;
-      }
-      // No dates → fall back to explicit week/year assignment
-      return t.week == week && t.year == year;
-    });
+function wmDateInRange(taskStart, taskDue, rangeStart, rangeEnd) {
+  const s = taskStart || taskDue || ''; const e = taskDue || taskStart || '';
+  if (!s && !e) return false;
+  const rs = rangeStart.toISOString().slice(0,10); const re = rangeEnd.toISOString().slice(0,10);
+  return (s||e) <= re && (e||s) >= rs;
+}
+
+function wmUpdateClock() {
+  const now = new Date();
+  const el = document.getElementById('wm-clock-time');
+  const el2 = document.getElementById('wm-clock-date');
+  if (!el) return;
+  el.textContent = wmPad(now.getHours())+':'+wmPad(now.getMinutes())+':'+wmPad(now.getSeconds());
+  el2.textContent = WM_TH_DAYS[now.getDay()]+'ที่ '+now.getDate()+' '+WM_TH_MONTHS[now.getMonth()]+' '+wmBEYear(now);
+}
+
+function wmUpdateCountdown() {
+  const now = new Date();
+  const end = new Date(now.getFullYear(),11,31,23,59,59);
+  const start = new Date(now.getFullYear(),0,1);
+  const left = Math.ceil((end-now)/86400000);
+  const pct = Math.round((1-left/Math.ceil((end-start)/86400000))*100);
+  const el = document.getElementById('wm-days-left');
+  const bar = document.getElementById('wm-year-bar');
+  if (el) el.textContent = left;
+  if (bar) bar.style.width = pct+'%';
+}
+
+function wmBuildWeekStrip() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const {mon} = wmGetWeekBounds(0);
+  const weekNum = wmGetISOWeek(now);
+  const badge = document.getElementById('wm-week-badge');
+  if (badge) badge.textContent = 'สัปดาห์ที่ '+weekNum;
+  const dayShort = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  let html = '';
+  for (let i=0;i<7;i++) {
+    const d = new Date(mon); d.setDate(mon.getDate()+i);
+    const isToday = d.getTime()===now.getTime();
+    const isPast = d < now; const isWknd = i===5||i===6;
+    const cnt = db.tasks.filter(t=>{ const due=t.due||''; return due===d.toISOString().slice(0,10); }).length;
+    let cls = 'wm-day-cell';
+    if (isToday) cls+=' wm-today';
+    else if (isPast) cls+=' wm-past';
+    else cls+=' wm-future';
+    if (isWknd) cls+=' wm-weekend';
+    html += `<div class="${cls}"><div class="wm-day-name">${dayShort[i]}</div><div class="wm-day-num">${d.getDate()}</div><div class="wm-day-tasks">${cnt?cnt+' งาน':'–'}</div>${isToday?'<div class="wm-today-dot"></div>':''}</div>`;
   }
+  const strip = document.getElementById('wm-week-strip');
+  if (strip) strip.innerHTML = html;
 
-  if (fMember)   tasks = tasks.filter(t => getTaskMemberIds(t).includes(fMember));
-  if (fPriority) tasks = tasks.filter(t => t.priority===fPriority);
+  // Week range label
+  const {sun} = wmGetWeekBounds(0);
+  const wr = document.getElementById('wm-week-range');
+  if (wr) wr.textContent = mon.getDate()+' '+WM_TH_SHORT[mon.getMonth()]+' – '+sun.getDate()+' '+WM_TH_SHORT[sun.getMonth()]+' '+wmBEYear(now);
+}
 
-  const wTotal=tasks.length, wDone=tasks.filter(t=>t.status==='Done').length,
-        wProg=tasks.filter(t=>t.status==='In Progress').length, wOver=tasks.filter(t=>isOverdue(t.due,t.status)).length;
-  document.getElementById('week-summary-bar').innerHTML=[
-    {num:wTotal,label:'งานทั้งหมด',      color:'var(--primary)'},
-    {num:wProg, label:'กำลังดำเนินการ',  color:'#3b82f6'},
-    {num:wDone, label:'Done · เสร็จ',    color:'var(--success)'},
-    {num:wOver, label:'เกินกำหนด',       color:'var(--danger)'},
-  ].map(s=>`<div class="wsb-item"><div class="wsb-num" style="color:${s.color}">${s.num}</div><div class="wsb-label">${s.label}</div></div>`).join('');
+function wmUpdateStats() {
+  const all = db.tasks;
+  document.getElementById('wm-s-total').textContent  = all.length;
+  document.getElementById('wm-s-done').textContent   = all.filter(t=>t.status==='Done').length;
+  document.getElementById('wm-s-inprog').textContent = all.filter(t=>t.status==='In Progress').length;
+  document.getElementById('wm-s-todo').textContent   = all.filter(t=>t.status==='Todo').length;
+  document.getElementById('wm-s-hold').textContent   = all.filter(t=>t.status==='On Hold').length;
+  document.getElementById('wm-s-overdue').textContent = all.filter(t=>isOverdue(t.due,t.status)).length;
+}
 
-  document.getElementById('kanban-board').innerHTML = STATUSES.map(st=>{
-    const cols = tasks.filter(t=>t.status===st.key).sort((a,b)=>{ const da=a.due||a.startDate||''; const db2=b.due||b.startDate||''; return da.localeCompare(db2); });
-    return `<div class="kanban-col">
-      <div class="kanban-col-header">
-        <div class="kanban-col-title"><div style="width:10px;height:10px;border-radius:50%;background:${st.color}"></div>${st.label}<div class="col-count">${cols.length}</div></div>
-        <button class="add-task-col-btn" onclick="openTaskModal(null,'${st.key}')">+</button>
-      </div>
-      ${cols.length?cols.map(t=>taskCard(t)).join(''):'<div class="empty-state" style="padding:24px 10px"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div><p>ไม่มีงาน</p></div>'}
+function wmBuildMemberRow() {
+  const members = db.members;
+  const row = document.getElementById('wm-member-row');
+  if (!row) return;
+  let html = members.map((m,i)=>{
+    const active = i===wmCurrentMemberIdx ? 'wm-active' : '';
+    const init = (m.name||'?').charAt(0).toUpperCase();
+    const col = m.color||'#7c3aed';
+    return `<div class="wm-chip ${active}" onclick="wmSelectMember(${i})">
+      <div class="wm-avatar" style="background:${active?'rgba(255,255,255,.25)':col}">${init}</div>
+      ${m.name||'—'}
     </div>`;
   }).join('');
+  html += `<span class="wm-nav-prog" id="wm-nav-prog">${wmCurrentMemberIdx+1} / ${members.length}</span>`;
+  html += `<button class="wm-nav-btn" onclick="wmNextMember()">ถัดไป →</button>`;
+  row.innerHTML = html;
+}
 
+function wmSelectMember(idx) { wmCurrentMemberIdx=idx; wmBuildMemberRow(); wmRenderMemberReport(); }
+function wmNextMember() { wmCurrentMemberIdx=(wmCurrentMemberIdx+1)%Math.max(db.members.length,1); wmBuildMemberRow(); wmRenderMemberReport(); }
+
+function wmPriClass(p) { return p==='High'?'wm-pri-high':p==='Low'?'wm-pri-low':'wm-pri-med'; }
+
+function wmTaskCard(t, showNextBadge) {
+  const ov = isOverdue(t.due, t.status);
+  let due = '';
+  if (t.startDate && t.due && t.startDate!==t.due) due = t.startDate.slice(5)+' – '+t.due.slice(5);
+  else if (t.due) due = t.due.slice(5);
+  else if (t.startDate) due = t.startDate.slice(5);
+  return `<div class="wm-task-card">
+    <div class="wm-task-num">·</div>
+    <div class="wm-task-body">
+      <div class="wm-task-title">${t.title||'—'}</div>
+      <div class="wm-task-meta">
+        <span class="wm-pri ${wmPriClass(t.priority)}">${t.priority||'—'}</span>
+        ${ov?'<span class="wm-overdue-badge">⚠ เกินกำหนด</span>':(due?`<span class="wm-due">📅 ${due}</span>`:'')}
+        ${showNextBadge?'<span class="wm-next-badge">📆 สัปดาห์หน้า</span>':''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function wmSection(cls, icon, title, tasks, emptyMsg, showNextBadge) {
+  const body = tasks.length ? tasks.map(t=>wmTaskCard(t,showNextBadge)).join('') : `<div class="wm-empty">${emptyMsg}</div>`;
+  return `<div class="wm-section ${cls}">
+    <div class="wm-sec-head"><span class="wm-sec-icon">${icon}</span><span class="wm-sec-title">${title}</span><span class="wm-sec-count">${tasks.length}</span></div>
+    <div class="wm-task-list">${body}</div>
+  </div>`;
+}
+
+function wmRenderMemberReport() {
+  const area = document.getElementById('wm-report-area');
+  if (!area) return;
+  const members = db.members;
+  if (!members.length) { area.innerHTML='<div class="empty-state" style="padding:40px;text-align:center;color:var(--gray-400)">ยังไม่มีสมาชิก</div>'; return; }
+  const m = members[wmCurrentMemberIdx] || members[0];
+  const mid = m.id;
+  const col = m.color||'#7c3aed';
+  const init = (m.name||'?').charAt(0).toUpperCase();
+
+  const myTasks = db.tasks.filter(t=>getTaskMemberIds(t).includes(mid));
+  const {mon, sun} = wmGetWeekBounds(0);
+  const {mon:nextMon, sun:nextSun} = wmGetWeekBounds(1);
+
+  const done    = myTasks.filter(t=>t.status==='Done');
+  const inprog  = myTasks.filter(t=>t.status==='In Progress');
+  const hold    = myTasks.filter(t=>t.status==='On Hold');
+  const overdue = myTasks.filter(t=>isOverdue(t.due,t.status));
+
+  // Todo this week = status Todo AND date overlaps current week
+  const todoThisWeek = myTasks.filter(t=>{
+    if (t.status!=='Todo') return false;
+    if (!t.due && !t.startDate) return true; // no date → show in this week
+    return wmDateInRange(t.startDate, t.due, mon, sun);
+  });
+
+  // Next week = status Todo AND date overlaps NEXT week (and NOT this week, unless no date)
+  const nextWeek = myTasks.filter(t=>{
+    if (t.status!=='Todo') return false;
+    if (!t.due && !t.startDate) return false;
+    const inThis = wmDateInRange(t.startDate, t.due, mon, sun);
+    const inNext = wmDateInRange(t.startDate, t.due, nextMon, nextSun);
+    return inNext && !inThis;
+  });
+
+  const header = `<div class="wm-member-header">
+    <div class="wm-m-avatar" style="background:${col}">${init}</div>
+    <div><div class="wm-m-name">${m.name||'—'}</div><div class="wm-m-sub">รายงานสถานการณ์งานประจำสัปดาห์</div></div>
+    <div class="wm-m-stats">
+      <div class="wm-mstat"><div class="wm-mstat-num" style="color:#059669">${done.length}</div><div class="wm-mstat-label">Done</div></div>
+      <div class="wm-mstat"><div class="wm-mstat-num" style="color:#2563eb">${inprog.length}</div><div class="wm-mstat-label">กำลังทำ</div></div>
+      <div class="wm-mstat"><div class="wm-mstat-num">${todoThisWeek.length}</div><div class="wm-mstat-label">รอทำ</div></div>
+      ${nextWeek.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#7c3aed">${nextWeek.length}</div><div class="wm-mstat-label">สัปดาห์หน้า</div></div>`:''}
+      ${overdue.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#dc2626">${overdue.length}</div><div class="wm-mstat-label">เกินกำหนด</div></div>`:''}
+    </div>
+  </div>`;
+
+  const grid = `<div class="wm-grid">
+    ${wmSection('wm-done',       '✅','เสร็จแล้ว · Done',            done,           '— ไม่มีงานที่เสร็จ —')}
+    ${wmSection('wm-inprog',     '🔵','กำลังทำ · In Progress',       inprog,         '— ไม่มีงานที่กำลังดำเนินการ —')}
+    ${wmSection('wm-todo',       '⭕','รอดำเนินการสัปดาห์นี้ · To Do', todoThisWeek, '— ไม่มีงานรอดำเนินการ —')}
+    ${wmSection('wm-hold',       '⏸','รอพัก · On Hold',              hold,           '— ไม่มีงานรอพัก —')}
+    ${nextWeek.length?wmSection('wm-next wm-full','📆','งานสัปดาห์หน้า · Up Next', nextWeek, '', true):''}
+    ${overdue.length?wmSection('wm-overdue wm-full','⚠️','งานเกินกำหนด · Overdue', overdue, ''):''}
+  </div>`;
+
+  area.innerHTML = header + grid;
+}
+
+function renderWeekly() {
+  // init clock
+  if (wmClockInterval) clearInterval(wmClockInterval);
+  wmUpdateClock();
+  wmUpdateCountdown();
+  wmClockInterval = setInterval(wmUpdateClock, 1000);
+  wmBuildWeekStrip();
+  wmUpdateStats();
+  // reset to first member if db.members changed
+  if (wmCurrentMemberIdx >= db.members.length) wmCurrentMemberIdx = 0;
+  wmBuildMemberRow();
+  wmRenderMemberReport();
   updateBadge();
 }
 
-function clearDateFilter() {
-  document.getElementById('filter-date-from').value='';
-  document.getElementById('filter-date-to').value='';
-  renderWeekly();
-}
+function clearDateFilter() { /* legacy - no longer used in weekly meeting */ }
 
 function taskCard(t) {
   const ids = getTaskMemberIds(t);
