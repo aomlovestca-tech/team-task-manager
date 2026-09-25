@@ -443,6 +443,9 @@
   .wm-task-num { width:18px; height:18px; border-radius:50%; background:var(--gray-200); color:var(--gray-500); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
   .wm-task-body { flex:1; min-width:0; }
   .wm-task-title { font-size:13px; font-weight:600; color:var(--gray-800); line-height:1.35; margin-bottom:3px; }
+  .wm-task-desc { font-size:11.5px; color:var(--gray-500); line-height:1.5; margin-bottom:5px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .wm-task-note { font-size:11px; color:var(--gray-400); margin-top:4px; display:flex; align-items:center; gap:4px; }
+  .wm-task-note svg { flex-shrink:0; opacity:.7; }
   .wm-task-meta { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
   .wm-pri { font-size:10px; font-weight:700; border-radius:5px; padding:1px 6px; }
   .wm-pri-high { background:#fef2f2; color:#dc2626; }
@@ -1245,6 +1248,8 @@ function wmTaskCard(t, showNextBadge) {
     <div class="wm-task-num">·</div>
     <div class="wm-task-body">
       <div class="wm-task-title">${t.title||'—'}</div>
+      ${t.desc?`<div class="wm-task-desc">${t.desc}</div>`:''}
+      ${t.note?`<div class="wm-task-note"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
       <div class="wm-task-meta">
         <span class="wm-pri ${wmPriClass(t.priority)}">${t.priority||'—'}</span>
         ${ov?'<span class="wm-overdue-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>เกินกำหนด</span>':(due?`<span class="wm-due"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${due}</span>`:'')}
