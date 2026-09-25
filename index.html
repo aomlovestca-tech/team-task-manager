@@ -6,14 +6,14 @@
 <title>TaskFlow</title>
 <style>
   :root {
-    --primary: #6366f1; --primary-light: #e0e7ff; --primary-dark: #4f46e5;
+    --primary: #7C3AED; --primary-light: #EDE9FE; --primary-dark: #6D28D9; --primary-faint: #F5F3FF;
     --success: #10b981; --success-light: #d1fae5;
     --warning: #f59e0b; --warning-light: #fef3c7;
     --danger: #ef4444; --danger-light: #fee2e2;
     --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
     --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
     --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
-    --sidebar-w: 240px; --radius: 12px;
+    --sidebar-w: 240px; --radius: 12px; --bottom-nav-h: 60px;
     --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
     --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
   }
@@ -24,15 +24,17 @@
   /* SIDEBAR */
   .sidebar { width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
   .sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 10px; }
-  .sidebar-logo .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+  .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+  .logo-icon svg { width: 20px; height: 20px; }
   .sidebar-logo span { font-size: 15px; font-weight: 700; color: var(--gray-800); }
   .sidebar-logo small { display: block; font-size: 11px; color: var(--gray-400); }
   .sidebar-nav { padding: 12px 10px; flex: 1; overflow-y: auto; }
   .nav-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-400); padding: 8px 10px 4px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 9px; cursor: pointer; font-size: 14px; color: var(--gray-600); transition: all .15s; margin-bottom: 2px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; cursor: pointer; font-size: 14px; color: var(--gray-600); transition: all .15s; margin-bottom: 2px; min-height: 44px; }
   .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
   .nav-item.active { background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
-  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-icon svg { width: 18px; height: 18px; }
   .nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; }
   .sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--gray-100); font-size: 12px; color: var(--gray-400); }
 
@@ -45,8 +47,16 @@
   .topbar-right { display: flex; align-items: center; gap: 8px; }
   .content { padding: 28px; flex: 1; }
 
+  /* BOTTOM NAV */
+  .bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-h); background: #fff; border-top: 1px solid var(--gray-200); z-index: 100; flex-direction: row; }
+  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: var(--gray-400); transition: color .15s; padding: 6px 4px; }
+  .bn-item svg { width: 22px; height: 22px; }
+  .bn-item span { font-size: 9px; font-weight: 600; }
+  .bn-item.active { color: var(--primary); }
+
   /* BUTTONS */
-  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; min-height: 36px; }
+  .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
   .btn-primary { background: var(--primary); color: #fff; }
   .btn-primary:hover { background: var(--primary-dark); }
   .btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-300); }
@@ -62,7 +72,8 @@
   /* STAT CARDS */
   .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
   .stat-card { background: #fff; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px; }
-  .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-icon svg { width: 24px; height: 24px; }
   .stat-num { font-size: 28px; font-weight: 800; line-height: 1; }
   .stat-label { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
 
@@ -113,15 +124,16 @@
   .badge-high     { background: #fee2e2; color: #991b1b; }
   .badge-medium   { background: var(--warning-light); color: #92400e; }
   .badge-low      { background: var(--success-light); color: #065f46; }
+  .prio-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
 
   /* WEEKLY PLANNER */
   .week-header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
   .week-nav { display: flex; align-items: center; gap: 6px; }
-  .week-nav-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--gray-200); background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--gray-600); transition: all .15s; }
+  .week-nav-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--gray-200); background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--gray-600); transition: all .15s; }
   .week-nav-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
   .week-label { font-size: 14px; font-weight: 700; color: var(--gray-800); min-width: 240px; text-align: center; }
   .week-filters { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; align-items: center; }
-  .filter-select { padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 12px; background: #fff; color: var(--gray-700); cursor: pointer; outline: none; }
+  .filter-select { padding: 7px 10px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 12px; background: #fff; color: var(--gray-700); cursor: pointer; outline: none; min-height: 36px; }
   .filter-select:focus { border-color: var(--primary); }
   .date-range-group { display: flex; align-items: center; gap: 4px; }
   .date-range-group span { font-size: 12px; color: var(--gray-400); }
@@ -132,7 +144,7 @@
   .kanban-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .kanban-col-title { font-size: 12px; font-weight: 700; color: var(--gray-700); display: flex; align-items: center; gap: 7px; }
   .col-count { background: var(--gray-200); color: var(--gray-600); font-size: 11px; padding: 1px 7px; border-radius: 99px; font-weight: 700; }
-  .add-task-col-btn { width: 24px; height: 24px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-size: 18px; color: var(--gray-400); display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .add-task-col-btn { width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-size: 20px; color: var(--gray-400); display: flex; align-items: center; justify-content: center; transition: all .15s; }
   .add-task-col-btn:hover { background: var(--primary-light); color: var(--primary); }
 
   /* TASK CARD */
@@ -141,12 +153,16 @@
   .task-card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
   .task-card-desc { font-size: 12px; color: var(--gray-500); margin-bottom: 8px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .task-card-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .task-card-date { font-size: 11px; color: var(--gray-400); margin-left: auto; }
+  .task-card-date { font-size: 11px; color: var(--gray-400); margin-left: auto; display: flex; align-items: center; gap: 3px; }
   .task-card-assignees { display: flex; align-items: center; gap: 2px; font-size: 11px; color: var(--gray-500); }
+  .task-card-note { display: flex; align-items: flex-start; gap: 4px; font-size: 11px; color: var(--gray-400); margin-top: 6px; font-style: italic; line-height: 1.4; }
+  .task-card-note svg { width: 12px; height: 12px; flex-shrink: 0; margin-top: 1px; }
+  .overdue-icon { display: inline-flex; align-items: center; gap: 2px; color: var(--danger); }
+  .overdue-icon svg { width: 12px; height: 12px; }
 
   /* WEEK STRIP */
-  .week-strip { display: flex; gap: 6px; margin-bottom: 18px; }
-  .day-chip { flex: 1; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 8px 4px; text-align: center; font-size: 11px; }
+  .week-strip { display: flex; gap: 6px; margin-bottom: 18px; overflow-x: auto; }
+  .day-chip { flex: 1; min-width: 42px; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 8px 4px; text-align: center; font-size: 11px; }
   .day-chip .dn { color: var(--gray-400); font-weight: 600; }
   .day-chip .dd { font-size: 16px; font-weight: 800; color: var(--gray-700); margin: 3px 0; }
   .day-chip .dc { font-size: 10px; color: var(--gray-400); }
@@ -198,47 +214,50 @@
   .member-card-actions { display: flex; gap: 8px; margin-top: 8px; }
 
   /* MODAL */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 999; display: flex; align-items: flex-end; justify-content: center; padding: 0; opacity: 0; pointer-events: none; transition: opacity .2s; }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal { background: #fff; border-radius: 16px; box-shadow: var(--shadow-lg); width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform .2s; }
+  .modal { background: #fff; border-radius: 20px 20px 0 0; box-shadow: var(--shadow-lg); width: 100%; max-width: 640px; max-height: 92vh; overflow-y: auto; transform: translateY(30px); transition: transform .25s; }
   .modal-overlay.open .modal { transform: translateY(0); }
-  .modal-header { padding: 22px 24px 0; display: flex; align-items: center; justify-content: space-between; }
+  .modal-handle { width: 36px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 12px auto 0; }
+  .modal-header { padding: 14px 20px 0; display: flex; align-items: center; justify-content: space-between; }
   .modal-title { font-size: 17px; font-weight: 800; }
   .modal-close { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--gray-100); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
   .modal-close:hover { background: var(--gray-200); }
-  .modal-body { padding: 20px 24px 24px; }
+  .modal-body { padding: 18px 20px 32px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: 1 / -1; }
   .form-label { font-size: 12px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: .05em; }
-  .form-control { padding: 9px 12px; border: 1.5px solid var(--gray-200); border-radius: 9px; font-size: 13px; color: var(--gray-800); outline: none; transition: border-color .15s; font-family: inherit; }
+  .form-control { padding: 10px 12px; border: 1.5px solid var(--gray-200); border-radius: 9px; font-size: 13px; color: var(--gray-800); outline: none; transition: border-color .15s; font-family: inherit; min-height: 44px; }
   .form-control:focus { border-color: var(--primary); }
   textarea.form-control { resize: vertical; min-height: 80px; }
   .color-picker-row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .color-option { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all .15s; }
+  .color-option { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all .15s; }
   .color-option.selected, .color-option:hover { border-color: var(--gray-800); transform: scale(1.1); }
   .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-100); }
 
   /* MULTI MEMBER CHIPS */
-  .member-chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border: 1.5px solid var(--gray-200); border-radius: 9px; min-height: 46px; max-height: 160px; overflow-y: auto; }
+  .member-chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border: 1.5px solid var(--gray-200); border-radius: 9px; min-height: 50px; max-height: 160px; overflow-y: auto; }
   .member-chips-wrap:focus-within { border-color: var(--primary); }
-  .member-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px 5px 7px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--gray-200); font-size: 12px; font-weight: 600; transition: all .15s; background: #fff; user-select: none; }
+  .member-chip { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px 6px 7px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--gray-200); font-size: 12px; font-weight: 600; transition: all .15s; background: #fff; user-select: none; min-height: 36px; }
   .member-chip:hover { border-color: var(--primary); }
   .member-chip.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); }
 
   /* MISC */
-  .overdue-label { font-size: 10px; color: var(--danger); font-weight: 700; }
-  .empty-state { text-align: center; padding: 48px 20px; color: var(--gray-400); }
-  .empty-state .es-icon { font-size: 42px; margin-bottom: 12px; }
+  .overdue-label { font-size: 10px; color: var(--danger); font-weight: 700; display: flex; align-items: center; gap: 3px; }
+  .overdue-label svg { width: 11px; height: 11px; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
+  .empty-state .es-icon { width: 44px; height: 44px; margin: 0 auto 10px; opacity: .35; }
+  .empty-state .es-icon svg { width: 44px; height: 44px; }
   .empty-state p { font-size: 13px; }
-  .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+  .toast-wrap { position: fixed; bottom: 80px; right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
   .toast { background: var(--gray-800); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; animation: slideUp .25s ease; max-width: 300px; }
   .toast.success { background: var(--success); }
   .toast.error { background: var(--danger); }
   @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
   @media print {
-    .sidebar,.topbar,.btn,.week-filters,.modal-overlay { display: none !important; }
+    .sidebar,.topbar,.btn,.week-filters,.modal-overlay,.bottom-nav { display: none !important; }
     .main { margin-left: 0; }
     body { background: #fff; }
   }
@@ -248,17 +267,89 @@
     .dash-grid { grid-template-columns: 1fr; }
     .my-summary,.week-summary-bar { grid-template-columns: repeat(2,1fr); }
   }
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     :root { --sidebar-w: 0px; }
-    .sidebar { transform: translateX(-100%); }
-    .kanban { grid-template-columns: 1fr; }
-    .form-grid { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .bottom-nav { display: flex; }
+    .content { padding: 16px; padding-bottom: calc(var(--bottom-nav-h) + 20px); }
     .topbar { padding: 0 16px; }
-    .content { padding: 16px; }
+    .topbar-right .btn-print, .topbar-right .btn-excel { display: none; }
+    .kanban { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 8px; -webkit-overflow-scrolling: touch; grid-template-columns: unset; }
+    .kanban-col { min-width: 276px; scroll-snap-align: start; flex-shrink: 0; }
+    .stat-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .week-label { min-width: 0; font-size: 13px; }
+    .week-filters { margin-left: 0; width: 100%; }
+    .dash-grid { grid-template-columns: 1fr; }
+    .my-summary { grid-template-columns: repeat(2,1fr); }
+    .week-summary-bar { grid-template-columns: repeat(2,1fr); }
+    .progress-wrap { display: none; }
   }
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 99px; }
+
+  /* ── CHALLENGE ───────────────────────────────── */
+  .ch-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+  .ch-list { display:flex; flex-direction:column; gap:16px; }
+  .ch-card { background:#fff; border-radius:var(--radius); border:1px solid var(--gray-200); padding:20px; cursor:pointer; transition:box-shadow .2s; }
+  .ch-card:hover { box-shadow:var(--shadow-lg); }
+  .ch-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .ch-card-name { font-size:16px; font-weight:700; color:var(--gray-800); }
+  .ch-card-dates { font-size:12px; color:var(--gray-400); margin-top:2px; }
+  .ch-card-badges { display:flex; gap:6px; flex-wrap:wrap; }
+  .ch-prog-bar { height:10px; background:var(--gray-200); border-radius:99px; overflow:hidden; margin:10px 0 6px; }
+  .ch-prog-fill { height:100%; background:var(--primary); border-radius:99px; transition:width .4s; }
+  .ch-prog-label { font-size:12px; color:var(--gray-500); }
+  .ch-task-count { font-size:12px; color:var(--gray-400); margin-top:4px; }
+  .ch-blocker-badge { background:#fee2e2; color:#dc2626; font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; }
+
+  /* Challenge detail */
+  .ch-detail-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+  .ch-back-btn { background:none; border:1px solid var(--gray-300); color:var(--gray-600); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+  .ch-tabs { display:flex; gap:4px; background:var(--gray-100); border-radius:10px; padding:4px; margin-bottom:20px; width:fit-content; }
+  .ch-tab { padding:7px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; color:var(--gray-500); transition:all .15s; }
+  .ch-tab.active { background:#fff; color:var(--primary-dark); box-shadow:0 1px 4px rgba(0,0,0,.1); }
+  .ch-overview-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  .ch-stat-box { background:#fff; border-radius:10px; border:1px solid var(--gray-200); padding:16px; text-align:center; }
+  .ch-stat-num { font-size:28px; font-weight:800; color:var(--primary); }
+  .ch-stat-lbl { font-size:12px; color:var(--gray-400); margin-top:2px; }
+  .ch-member-row { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--gray-100); }
+  .ch-member-row:last-child { border-bottom:none; }
+  .ch-task-row { display:flex; align-items:flex-start; gap:12px; padding:14px 0; border-bottom:1px solid var(--gray-100); }
+  .ch-task-row:last-child { border-bottom:none; }
+  .ch-task-info { flex:1; min-width:0; }
+  .ch-task-title { font-size:14px; font-weight:600; color:var(--gray-800); }
+  .ch-task-assign { font-size:12px; color:var(--gray-400); margin-top:2px; }
+  .ch-task-blocker { font-size:12px; color:#dc2626; background:#fee2e2; padding:4px 10px; border-radius:6px; margin-top:6px; display:inline-block; }
+  .ch-progress-input { width:64px; padding:4px 8px; border:1px solid var(--gray-300); border-radius:6px; text-align:center; font-size:13px; }
+  .ch-edit-btn { background:none; border:1px solid var(--gray-300); padding:5px 12px; border-radius:7px; cursor:pointer; font-size:12px; color:var(--gray-600); }
+  .ch-edit-btn:hover { background:var(--gray-100); }
+  .ch-mytasks-select { padding:7px 12px; border:1px solid var(--gray-300); border-radius:8px; font-size:13px; min-width:180px; }
+  .ch-empty { text-align:center; padding:60px 20px; color:var(--gray-400); font-size:15px; }
+  .ch-create-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+  .ch-create-overlay.open { opacity:1; pointer-events:auto; }
+  .ch-modal { background:#fff; border-radius:20px 20px 0 0; width:100%; max-width:640px; max-height:90vh; overflow-y:auto; padding:24px; }
+  .ch-modal-handle { width:40px; height:4px; background:var(--gray-300); border-radius:99px; margin:0 auto 20px; }
+  .ch-modal-title { font-size:17px; font-weight:700; margin-bottom:16px; color:var(--gray-800); }
+  .ch-task-pick-list { max-height:280px; overflow-y:auto; border:1px solid var(--gray-200); border-radius:10px; }
+  .ch-task-pick-item { display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--gray-100); cursor:pointer; }
+  .ch-task-pick-item:last-child { border-bottom:none; }
+  .ch-task-pick-item:hover { background:var(--gray-50); }
+  .ch-task-pick-item input[type=checkbox] { accent-color:var(--primary); width:16px; height:16px; flex-shrink:0; }
+  .ch-task-edit-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:210; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+  .ch-task-edit-overlay.open { opacity:1; pointer-events:auto; }
+  .ch-task-edit-modal { background:#fff; border-radius:16px; width:100%; max-width:480px; padding:24px; max-height:90vh; overflow-y:auto; }
+  @media(max-width:768px){
+    .ch-overview-grid { grid-template-columns:1fr 1fr; }
+    .ch-detail-header { gap:8px; }
+    .ch-modal { border-radius:20px 20px 0 0; }
+  }
+  @media(max-width:480px){
+    .ch-overview-grid { grid-template-columns:1fr; }
+  }
+
 </style>
 </head>
 <body>
@@ -267,7 +358,7 @@
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-icon">📋</div>
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
       <div>
         <span>TaskFlow</span>
         <small>Team Manager</small>
@@ -275,14 +366,15 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section-title">MENU</div>
-      <div class="nav-item active" onclick="showView('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
-      <div class="nav-item" onclick="showView('weekly')"><span class="nav-icon">📅</span> Weekly Planner <span class="nav-badge" id="badge-inprogress">0</span></div>
-      <div class="nav-item" onclick="showView('monthly')"><span class="nav-icon">📆</span> Monthly Report</div>
-      <div class="nav-item" onclick="showView('mytasks')"><span class="nav-icon">👤</span> งานของฉัน</div>
+      <div class="nav-item active" onclick="showView('dashboard')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Dashboard</div>
+      <div class="nav-item" onclick="showView('weekly')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Weekly Planner <span class="nav-badge" id="badge-inprogress">0</span></div>
+      <div class="nav-item" onclick="showView('challenge')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6-6 6 6"/><path d="M6 12l6-6 6 6"/><path d="M6 15l6-6 6 6"/></svg></span> Challenge</div>
+      <div class="nav-item" onclick="showView('mytasks')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> งานของฉัน</div>
       <div class="nav-section-title" style="margin-top:12px">SETTINGS</div>
-      <div class="nav-item" onclick="showView('members')"><span class="nav-icon">👥</span> Team Members</div>
-      <div class="nav-item" onclick="exportData()"><span class="nav-icon">💾</span> Export JSON</div>
-      <div class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon">📂</span> Import Data</div>
+      <div class="nav-item" onclick="showView('members')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Team Members</div>
+      <div class="nav-item" onclick="showView('monthly')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Monthly Report</div>
+      <div class="nav-item" onclick="exportData()"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Export JSON</div>
+      <div class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> Import Data</div>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
     </nav>
     <div class="sidebar-footer" id="sidebar-footer">สัปดาห์ที่ — / —</div>
@@ -298,8 +390,8 @@
         </div>
       </div>
       <div class="topbar-right">
-        <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Print</button>
-        <button class="btn btn-success btn-sm" onclick="exportExcel()">📊 Export Excel</button>
+        <button class="btn btn-outline btn-sm btn-print" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
+        <button class="btn btn-success btn-sm btn-excel" onclick="exportExcel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg> Excel</button>
         <button class="btn btn-primary" onclick="openTaskModal()">+ เพิ่มงาน</button>
       </div>
     </div>
@@ -338,7 +430,7 @@
               <div class="status-legend" id="status-legend"></div>
             </div>
             <div class="card">
-              <div class="card-header"><div class="card-title">งาน Priority สูง 🔴</div></div>
+              <div class="card-header"><div class="card-title">งาน Priority สูง</div></div>
               <div id="high-priority-list"></div>
             </div>
           </div>
@@ -358,9 +450,9 @@
             <select class="filter-select" id="filter-member" onchange="renderWeekly()"><option value="">ทุกคน</option></select>
             <select class="filter-select" id="filter-priority" onchange="renderWeekly()">
               <option value="">ทุก Priority</option>
-              <option value="High">🔴 High</option>
-              <option value="Medium">🟡 Medium</option>
-              <option value="Low">🟢 Low</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
             </select>
             <div class="date-range-group">
               <input type="date" class="filter-select" id="filter-date-from" onchange="renderWeekly()" title="ตั้งแต่วันที่">
@@ -406,15 +498,42 @@
             </select>
             <select class="filter-select" id="my-status-filter" onchange="renderMyTasks()">
               <option value="">ทุกสถานะ</option>
-              <option value="Todo">📋 To Do · รอดำเนินการ</option>
-              <option value="In Progress">⚙️ In Progress · กำลังทำ</option>
-              <option value="Done">✅ Done · เสร็จสิ้น</option>
-              <option value="On Hold">⏸️ On Hold · รอพัก</option>
+              <option value="Todo">To Do · รอดำเนินการ</option>
+              <option value="In Progress">In Progress · กำลังทำ</option>
+              <option value="Done">Done · เสร็จสิ้น</option>
+              <option value="On Hold">On Hold · รอพัก</option>
             </select>
           </div>
         </div>
         <div class="my-summary" id="my-summary"></div>
         <div class="my-tasks-grid" id="my-tasks-grid"></div>
+      </div>
+
+
+      <!-- CHALLENGE -->
+      <div class="view" id="view-challenge">
+        <div id="ch-list-panel">
+          <div class="ch-header">
+            <div><h2 style="font-size:18px;font-weight:700;color:var(--gray-800)">Challenge</h2><div style="font-size:13px;color:var(--gray-400)">ติดตามชาเลนจ์ของทีม</div></div>
+            <button class="btn btn-primary" onclick="openChCreate()">+ สร้างชาเลนจ์</button>
+          </div>
+          <div class="ch-list" id="ch-list-items"></div>
+        </div>
+        <div id="ch-detail-panel" style="display:none">
+          <div class="ch-detail-header">
+            <button class="ch-back-btn" onclick="showChList()">← กลับ</button>
+            <div>
+              <div id="ch-detail-name" style="font-size:18px;font-weight:700;color:var(--gray-800)"></div>
+              <div id="ch-detail-dates" style="font-size:12px;color:var(--gray-400)"></div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="deleteCurrentChallenge()" style="margin-left:auto;color:#dc2626;border-color:#fca5a5">ลบ</button>
+          </div>
+          <div class="ch-tabs">
+            <div class="ch-tab active" id="ch-tab-overview" onclick="switchChTab('overview')">ภาพรวมทีม</div>
+            <div class="ch-tab" id="ch-tab-mytasks" onclick="switchChTab('mytasks')">งานของฉัน</div>
+          </div>
+          <div id="ch-tab-content"></div>
+        </div>
       </div>
 
       <!-- TEAM MEMBERS -->
@@ -431,9 +550,89 @@
 
 <div class="toast-wrap" id="toast-wrap"></div>
 
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="bn-item active" onclick="showView('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>หน้าหลัก</span>
+  </div>
+  <div class="bn-item" onclick="showView('weekly')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Weekly</span>
+  </div>
+  <div class="bn-item" onclick="showView('challenge')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6-6 6 6"/><path d="M6 12l6-6 6 6"/><path d="M6 15l6-6 6 6"/></svg>
+    <span>Challenge</span>
+  </div>
+  <div class="bn-item" onclick="showView('mytasks')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>งานฉัน</span>
+  </div>
+  <div class="bn-item" onclick="showView('members')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>ทีม</span>
+  </div>
+</nav>
+
+
+<!-- CHALLENGE CREATE MODAL -->
+<div class="ch-create-overlay" id="ch-create-overlay" onclick="closChCreate(event)">
+  <div class="ch-modal">
+    <div class="ch-modal-handle"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="ch-modal-title">สร้างชาเลนจ์ใหม่</div>
+      <button style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--gray-400)" onclick="closChCreate()">✕</button>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">ชื่อชาเลนจ์ *</label>
+      <input class="form-control" id="ch-f-name" placeholder="เช่น Sprint Q4 · ยอดขายสัปดาห์นี้">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">รายละเอียด</label>
+      <textarea class="form-control" id="ch-f-desc" rows="2" placeholder="อธิบายเป้าหมายของชาเลนจ์..."></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div class="form-group">
+        <label class="form-label">วันที่เริ่ม</label>
+        <input class="form-control" type="date" id="ch-f-start">
+      </div>
+      <div class="form-group">
+        <label class="form-label">วันที่สิ้นสุด</label>
+        <input class="form-control" type="date" id="ch-f-end">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">เลือกงาน (Tasks) ที่ต้องการติดตาม</label>
+      <div style="margin-bottom:8px"><input class="form-control" id="ch-task-search" placeholder="ค้นหางาน..." oninput="renderChTaskPicker()"></div>
+      <div class="ch-task-pick-list" id="ch-task-pick-list"></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="saveChallenge()">บันทึกชาเลนจ์</button>
+  </div>
+</div>
+
+<!-- CHALLENGE TASK EDIT MODAL -->
+<div class="ch-task-edit-overlay" id="ch-task-edit-overlay" onclick="closeChTaskEdit(event)">
+  <div class="ch-task-edit-modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-size:16px;font-weight:700;color:var(--gray-800)" id="ch-te-title"></div>
+      <button style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--gray-400)" onclick="closeChTaskEdit()">✕</button>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">% ความคืบหน้า</label>
+      <input class="form-control" type="number" id="ch-te-progress" min="0" max="100" placeholder="0-100">
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Blockers / ปัญหาที่ติดขัด</label>
+      <textarea class="form-control" id="ch-te-blockers" rows="3" placeholder="ระบุปัญหา หรือ ติดขัดอะไร... (ถ้าไม่มีให้ว่างไว้)"></textarea>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="saveChTaskEdit()">บันทึก</button>
+  </div>
+</div>
+
 <!-- TASK MODAL -->
 <div class="modal-overlay" id="task-modal-overlay" onclick="closeTaskModal(event)">
   <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-header">
       <div class="modal-title" id="task-modal-title">เพิ่มงานใหม่</div>
       <button class="modal-close" onclick="closeTaskModal()">✕</button>
@@ -455,18 +654,18 @@
         <div class="form-group">
           <label class="form-label">สถานะ</label>
           <select class="form-control" id="f-status">
-            <option value="Todo">📋 To Do · รอดำเนินการ</option>
-            <option value="In Progress">⚙️ In Progress · กำลังทำ</option>
-            <option value="Done">✅ Done · เสร็จสิ้น</option>
-            <option value="On Hold">⏸️ On Hold · รอพัก</option>
+            <option value="Todo">To Do · รอดำเนินการ</option>
+            <option value="In Progress">In Progress · กำลังทำ</option>
+            <option value="Done">Done · เสร็จสิ้น</option>
+            <option value="On Hold">On Hold · รอพัก</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Priority</label>
           <select class="form-control" id="f-priority">
-            <option value="High">🔴 High</option>
-            <option value="Medium">🟡 Medium</option>
-            <option value="Low">🟢 Low</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
           </select>
         </div>
         <div class="form-group">
@@ -483,9 +682,9 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" id="task-delete-btn" onclick="deleteCurrentTask()" style="display:none;margin-right:auto">🗑️ ลบงาน</button>
+        <button class="btn btn-danger" id="task-delete-btn" onclick="deleteCurrentTask()" style="display:none;margin-right:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> ลบงาน</button>
         <button class="btn btn-outline" onclick="closeTaskModal()">ยกเลิก</button>
-        <button class="btn btn-primary" onclick="saveTask()">💾 บันทึก</button>
+        <button class="btn btn-primary" onclick="saveTask()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
       </div>
     </div>
   </div>
@@ -494,6 +693,7 @@
 <!-- MEMBER MODAL -->
 <div class="modal-overlay" id="member-modal-overlay" onclick="closeMemberModal(event)">
   <div class="modal" style="max-width:440px">
+    <div class="modal-handle"></div>
     <div class="modal-header">
       <div class="modal-title" id="member-modal-title">เพิ่มสมาชิกใหม่</div>
       <button class="modal-close" onclick="closeMemberModal()">✕</button>
@@ -505,9 +705,9 @@
         <div class="form-group"><label class="form-label">สีประจำตัว</label><div class="color-picker-row" id="color-picker-row"></div></div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger" id="member-delete-btn" onclick="deleteCurrentMember()" style="display:none;margin-right:auto">🗑️ ลบสมาชิก</button>
+        <button class="btn btn-danger" id="member-delete-btn" onclick="deleteCurrentMember()" style="display:none;margin-right:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> ลบสมาชิก</button>
         <button class="btn btn-outline" onclick="closeMemberModal()">ยกเลิก</button>
-        <button class="btn btn-primary" onclick="saveMember()">💾 บันทึก</button>
+        <button class="btn btn-primary" onclick="saveMember()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
       </div>
     </div>
   </div>
@@ -535,7 +735,8 @@ const firestore = firebase.firestore();
 //  DATA STORE
 // ══════════════════════════════════════════════════════
 const COLORS = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ef4444','#14b8a6','#f97316','#84cc16'];
-let db = { tasks: [], members: [], currentWeekOffset: 0 };
+let db = { tasks: [], members: [], challenges: [], currentWeekOffset: 0 };
+let _chState = { currentId: null, tab: 'overview', editTaskIdx: null };
 
 // Backward compat: tasks may have memberId (string) or memberIds (array)
 function getTaskMemberIds(t) {
@@ -556,12 +757,14 @@ function getTaskMonth(t) {
 async function loadDB() {
   try {
     showLoadingOverlay(true);
-    const [ts, ms] = await Promise.all([
+    const [ts, ms, cs] = await Promise.all([
       firestore.collection('tasks').get(),
-      firestore.collection('members').get()
+      firestore.collection('members').get(),
+      firestore.collection('challenges').get()
     ]);
-    db.tasks   = ts.docs.map(d => d.data());
-    db.members = ms.docs.map(d => d.data());
+    db.tasks      = ts.docs.map(d => d.data());
+    db.members    = ms.docs.map(d => d.data());
+    db.challenges = cs.docs.map(d => d.data());
     db.currentWeekOffset = parseInt(localStorage.getItem('weekOffset') || '0');
     showLoadingOverlay(false);
   } catch(e) {
@@ -585,6 +788,10 @@ function startRealtimeSync() {
     db.members = snap.docs.map(d => d.data());
     populateMemberDropdowns(); refreshCurrentView();
   });
+  firestore.collection('challenges').onSnapshot(snap => {
+    db.challenges = snap.docs.map(d => d.data());
+    refreshCurrentView();
+  });
 }
 
 function showLoadingOverlay(show) {
@@ -593,7 +800,7 @@ function showLoadingOverlay(show) {
     el = document.createElement('div');
     el.id = 'loading-overlay';
     el.style.cssText = 'position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#6366f1;';
-    el.innerHTML = '⚙️ กำลังเชื่อมต่อ Firebase...';
+    el.innerHTML = 'กำลังเชื่อมต่อ Firebase...';
     document.body.appendChild(el);
   }
   el.style.display = show ? 'flex' : 'none';
@@ -671,23 +878,28 @@ const VIEW_META = {
   weekly:    { title:'Weekly Planner',  sub:'' },
   monthly:   { title:'Monthly Report',  sub:'สรุปงานรายเดือน' },
   mytasks:   { title:'งานของฉัน',        sub:'My Tasks' },
-  members:   { title:'Team Members',    sub:'จัดการสมาชิกในทีม' }
+  members:   { title:'Team Members',    sub:'จัดการสมาชิกในทีม' },
+  challenge: { title:'Challenge',        sub:'ติดตามชาเลนจ์ของทีม' }
 };
 
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const navOrder = ['dashboard','weekly','monthly','mytasks','members'];
+  document.querySelectorAll('.bn-item').forEach(n => n.classList.remove('active'));
+  const navOrder = ['dashboard','weekly','challenge','mytasks','members'];
   const idx = navOrder.indexOf(id);
   const items = document.querySelectorAll('.nav-item');
+  const bnItems = document.querySelectorAll('.bn-item');
   if (idx >= 0 && items[idx]) items[idx].classList.add('active');
+  if (idx >= 0 && bnItems[idx]) bnItems[idx].classList.add('active');
   const meta = VIEW_META[id] || {};
   document.getElementById('topbar-title').textContent = meta.title || id;
   document.getElementById('topbar-sub').textContent = meta.sub || '';
   if (id === 'dashboard') renderDashboard();
   if (id === 'weekly')    renderWeekly();
   if (id === 'monthly')   renderMonthly();
+  if (id === 'challenge')  renderChallenge();
   if (id === 'mytasks')   renderMyTasks();
   if (id === 'members')   renderMembers();
 }
@@ -696,15 +908,16 @@ function showView(id) {
 //  STATUS / PRIORITY HELPERS
 // ══════════════════════════════════════════════════════
 const STATUS_BADGE_CLASS = { Todo:'badge-todo', 'In Progress':'badge-progress', Done:'badge-done', 'On Hold':'badge-hold' };
-const STATUS_LABEL = { Todo:'📋 To Do · รอดำเนินการ', 'In Progress':'⚙️ In Progress · กำลังทำ', Done:'✅ Done · เสร็จสิ้น', 'On Hold':'⏸️ On Hold · รอพัก' };
+const STATUS_LABEL = { Todo:'To Do · รอดำเนินการ', 'In Progress':'In Progress · กำลังทำ', Done:'Done · เสร็จสิ้น', 'On Hold':'On Hold · รอพัก' };
 const PRIORITY_BADGE_CLASS = { High:'badge-high', Medium:'badge-medium', Low:'badge-low' };
-const PRIORITY_ICON = { High:'🔴', Medium:'🟡', Low:'🟢' };
+const PRIORITY_DOT_COLOR = { High:'#ef4444', Medium:'#f59e0b', Low:'#10b981' };
 
 function statusBadge(s) {
   return `<span class="badge ${STATUS_BADGE_CLASS[s]||''}">${STATUS_LABEL[s]||s}</span>`;
 }
 function priorityBadge(p) {
-  return `<span class="badge ${PRIORITY_BADGE_CLASS[p]||''}">${PRIORITY_ICON[p]||''} ${p||'—'}</span>`;
+  const c = PRIORITY_DOT_COLOR[p]||'#9ca3af';
+  return `<span class="badge ${PRIORITY_BADGE_CLASS[p]||''}"><span class="prio-dot" style="background:${c}"></span>${p||'—'}</span>`;
 }
 function initials(name) {
   return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
@@ -722,16 +935,17 @@ function renderDashboard() {
   const hold    = tasks.filter(t => t.status==='On Hold').length;
   const overdue = tasks.filter(t => isOverdue(t.due, t.status)).length;
 
-  document.getElementById('stat-grid').innerHTML = [
-    { icon:'📋', color:'#e0e7ff', num:total,   label:'งานทั้งหมด' },
-    { icon:'⚙️', color:'#dbeafe', num:prog,    label:'In Progress · กำลังทำ' },
-    { icon:'✅', color:'#d1fae5', num:done,    label:`Done · เสร็จ (${total?Math.round(done/total*100):0}%)` },
-    { icon:'⚠️', color:'#fee2e2', num:overdue, label:'เกินกำหนด' },
-  ].map(s=>`<div class="stat-card"><div class="stat-icon" style="background:${s.color}">${s.icon}</div><div><div class="stat-num">${s.num}</div><div class="stat-label">${s.label}</div></div></div>`).join('');
+  const statIcons = [
+    { svg:`<svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>`, color:'#EDE9FE', num:total,   label:'งานทั้งหมด' },
+    { svg:`<svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, color:'#dbeafe', num:prog,    label:'In Progress · กำลังทำ' },
+    { svg:`<svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`, color:'#d1fae5', num:done,    label:`Done · เสร็จ (${total?Math.round(done/total*100):0}%)` },
+    { svg:`<svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`, color:'#fee2e2', num:overdue, label:'เกินกำหนด' },
+  ];
+  document.getElementById('stat-grid').innerHTML = statIcons.map(s=>`<div class="stat-card"><div class="stat-icon" style="background:${s.color}">${s.svg}</div><div><div class="stat-num">${s.num}</div><div class="stat-label">${s.label}</div></div></div>`).join('');
 
   // Member progress
   const mpl = document.getElementById('member-progress-list');
-  mpl.innerHTML = db.members.length ? db.members.map(m => {
+  mpl.innerHTML = db.members.length ? db.members.map((m) => {
     const mt = tasks.filter(t => getTaskMemberIds(t).includes(m.id));
     const md = mt.filter(t => t.status==='Done').length;
     const pct = mt.length ? Math.round(md/mt.length*100) : 0;
@@ -743,7 +957,7 @@ function renderDashboard() {
         <div class="progress-pct">${md}/${mt.length} Done (${pct}%)</div>
       </div>
     </div>`;
-  }).join('') : '<div class="empty-state"><div class="es-icon">👥</div><p>ยังไม่มีสมาชิก</p></div>';
+  }).join('') : '<div class="empty-state"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><p>ยังไม่มีสมาชิก</p></div>';
 
   // Recent tasks
   const recent = [...tasks].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,10);
@@ -754,7 +968,7 @@ function renderDashboard() {
     const ov = isOverdue(t.due, t.status);
     const avs = members.slice(0,3).map(m=>`<div class="avatar" style="background:${m.color};width:22px;height:22px;font-size:9px;margin-right:-6px;border:2px solid #fff">${initials(m.name)}</div>`).join('');
     return `<tr onclick="openTaskModal('${t.id}')" style="cursor:pointer">
-      <td><div style="font-weight:600">${t.title}</div>${ov?'<div class="overdue-label">⚠️ เกินกำหนด</div>':''}</td>
+      <td><div style="font-weight:600">${t.title}</div>${ov?'<div class="overdue-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>เกินกำหนด</div>':''}</td>
       <td><div style="display:flex;align-items:center;gap:6px">${avs}<span style="margin-left:8px;font-size:12px">${names}</span></div></td>
       <td>${statusBadge(t.status)}</td><td>${priorityBadge(t.priority)}</td>
       <td style="font-size:12px;color:${ov?'var(--danger)':'var(--gray-500)'}">${formatDate(t.due)}</td>
@@ -780,7 +994,7 @@ function renderDashboard() {
       <div style="flex:1"><div style="font-size:13px;font-weight:600">${t.title}</div><div style="font-size:11px;color:var(--gray-400)">${names} · ${formatDate(t.due)}</div></div>
       ${statusBadge(t.status)}
     </div>`;
-  }).join(''):'<div style="font-size:13px;color:var(--gray-400);padding:8px 0">ไม่มีงาน Priority สูงที่ค้างอยู่ 🎉</div>';
+  }).join(''):'<div style="font-size:13px;color:var(--gray-400);padding:8px 0">ไม่มีงาน Priority สูงที่ค้างอยู่</div>';
 
   updateBadge();
 }
@@ -789,10 +1003,10 @@ function renderDashboard() {
 //  RENDER WEEKLY PLANNER
 // ══════════════════════════════════════════════════════
 const STATUSES = [
-  { key:'Todo',        label:'📋 To Do · รอดำเนินการ',   color:'#9ca3af' },
-  { key:'In Progress', label:'⚙️ In Progress · กำลังทำ', color:'#3b82f6' },
-  { key:'Done',        label:'✅ Done · เสร็จสิ้น',       color:'#10b981' },
-  { key:'On Hold',     label:'⏸️ On Hold · รอพัก',        color:'#f59e0b' },
+  { key:'Todo',        label:'To Do · รอดำเนินการ',   color:'#9ca3af' },
+  { key:'In Progress', label:'In Progress · กำลังทำ', color:'#3b82f6' },
+  { key:'Done',        label:'Done · เสร็จสิ้น',       color:'#10b981' },
+  { key:'On Hold',     label:'On Hold · รอพัก',        color:'#f59e0b' },
 ];
 
 function renderWeekly() {
@@ -868,7 +1082,7 @@ function renderWeekly() {
         <div class="kanban-col-title"><div style="width:10px;height:10px;border-radius:50%;background:${st.color}"></div>${st.label}<div class="col-count">${cols.length}</div></div>
         <button class="add-task-col-btn" onclick="openTaskModal(null,'${st.key}')">+</button>
       </div>
-      ${cols.length?cols.map(t=>taskCard(t)).join(''):'<div class="empty-state" style="padding:24px 10px"><div class="es-icon">📭</div><p>ไม่มีงาน</p></div>'}
+      ${cols.length?cols.map(t=>taskCard(t)).join(''):'<div class="empty-state" style="padding:24px 10px"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div><p>ไม่มีงาน</p></div>'}
     </div>`;
   }).join('');
 
@@ -895,9 +1109,9 @@ function taskCard(t) {
     <div class="task-card-footer">
       ${priorityBadge(t.priority)}
       ${members.length?`<div class="task-card-assignees">${avs}<span style="margin-left:6px">${names}</span></div>`:''}
-      <div class="task-card-date" style="color:${ov?'var(--danger)':'var(--gray-400)'}">${ov?'⚠️ ':''}${dateRange}</div>
+      <div class="task-card-date" style="color:${ov?'var(--danger)':'var(--gray-400)'}">${ov?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>':''}${dateRange}</div>
     </div>
-    ${t.note?`<div style="font-size:11px;color:var(--gray-400);margin-top:6px;font-style:italic">💬 ${t.note}</div>`:''}
+    ${t.note?`<div class="task-card-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
   </div>`;
 }
 
@@ -953,7 +1167,7 @@ function renderMonthly() {
         <div class="month-stat"><div class="month-stat-num" style="color:var(--warning)">${notDone}</div><div class="month-stat-label">ยังไม่เสร็จ</div></div>
       </div>
     </div>`;
-  }).join('') : '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">👥</div><p>ยังไม่มีสมาชิก</p></div>';
+  }).join('') : '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><p>ยังไม่มีสมาชิก</p></div>';
 
   // Task list
   const sorted = [...monthTasks].sort((a,b)=>(a.startDate||a.due||'').localeCompare(b.startDate||b.due||''));
@@ -964,7 +1178,7 @@ function renderMonthly() {
     const ov = isOverdue(t.due, t.status);
     const dateRange = t.startDate ? `${formatDate(t.startDate)} – ${formatDate(t.due)}` : formatDate(t.due);
     return `<tr onclick="openTaskModal('${t.id}')" style="cursor:pointer">
-      <td><div style="font-weight:600">${t.title}</div>${ov?'<div class="overdue-label">⚠️ เกินกำหนด</div>':''}</td>
+      <td><div style="font-weight:600">${t.title}</div>${ov?'<div class="overdue-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>เกินกำหนด</div>':''}</td>
       <td style="font-size:12px">${names}</td>
       <td>${statusBadge(t.status)}</td><td>${priorityBadge(t.priority)}</td>
       <td style="font-size:12px">${dateRange}</td>
@@ -997,7 +1211,7 @@ function renderMyTasks() {
   ].map(s=>`<div class="my-sum-card"><div class="my-sum-num" style="color:${s.color}">${s.num}</div><div class="my-sum-label">${s.label}</div></div>`).join('');
 
   const grid=document.getElementById('my-tasks-grid');
-  if (!tasks.length){grid.innerHTML='<div class="empty-state"><div class="es-icon">🎉</div><p>ไม่มีงานในขณะนี้</p></div>';return;}
+  if (!tasks.length){grid.innerHTML='<div class="empty-state"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><p>ไม่มีงานในขณะนี้</p></div>';return;}
   const sorted=[...tasks].sort((a,b)=>({High:0,Medium:1,Low:2}[a.priority]||1)-({High:0,Medium:1,Low:2}[b.priority]||1));
   grid.innerHTML=sorted.map(t=>{
     const members=getTaskMemberIds(t).map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
@@ -1009,11 +1223,11 @@ function renderMyTasks() {
       ${t.desc?`<div class="my-task-desc">${t.desc}</div>`:''}
       <div class="my-task-meta">
         ${statusBadge(t.status)} ${priorityBadge(t.priority)}
-        ${names?`<span style="font-size:11px;color:var(--gray-500)">👤 ${names}</span>`:''}
-        <span style="font-size:11px;color:${ov?'var(--danger)':'var(--gray-400)'}">${ov?'⚠️ ':''}${dateRange}</span>
+        ${names?`<span style="font-size:11px;color:var(--gray-500)">${names}</span>`:''}
+        <span style="font-size:11px;color:${ov?'var(--danger)':'var(--gray-400)'}">${dateRange}</span>
         <span style="font-size:11px;color:var(--gray-400)">สัปดาห์ ${t.week||'?'}</span>
       </div>
-      ${t.note?`<div style="font-size:11px;color:var(--gray-400);margin-top:4px;font-style:italic">💬 ${t.note}</div>`:''}
+      ${t.note?`<div class="task-card-note" style="margin-top:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -1023,7 +1237,7 @@ function renderMyTasks() {
 // ══════════════════════════════════════════════════════
 function renderMembers() {
   const grid=document.getElementById('members-grid');
-  if (!db.members.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">👥</div><p>ยังไม่มีสมาชิก คลิก "เพิ่มสมาชิก"</p></div>';return;}
+  if (!db.members.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><p>ยังไม่มีสมาชิก คลิก "เพิ่มสมาชิก"</p></div>';return;}
   grid.innerHTML=db.members.map(m=>{
     const mt=db.tasks.filter(t=>getTaskMemberIds(t).includes(m.id));
     const md=mt.filter(t=>t.status==='Done').length;
@@ -1038,8 +1252,8 @@ function renderMembers() {
         <div class="mcs-item"><div class="mcs-num" style="color:#3b82f6">${mp}</div><div class="mcs-label">กำลังทำ</div></div>
       </div>
       <div class="member-card-actions">
-        <button class="btn btn-outline btn-sm" onclick="openMemberModal('${m.id}')">✏️ แก้ไข</button>
-        <button class="btn btn-outline btn-sm" onclick="filterToMember('${m.id}')">📋 งาน</button>
+        <button class="btn btn-outline btn-sm" onclick="openMemberModal('${m.id}')">แก้ไข</button>
+        <button class="btn btn-outline btn-sm" onclick="filterToMember('${m.id}')">ดูงาน</button>
       </div>
     </div>`;
   }).join('');
@@ -1142,7 +1356,7 @@ async function saveTask() {
   try {
     await saveTaskFS(task);
     document.getElementById('task-modal-overlay').classList.remove('open');
-    toast(editingTaskId?'อัปเดตงานเรียบร้อย ✅':'เพิ่มงานใหม่เรียบร้อย ✅','success');
+    toast(editingTaskId?'อัปเดตงานเรียบร้อย':'เพิ่มงานใหม่เรียบร้อย','success');
   } catch(e) { toast('บันทึกไม่สำเร็จ กรุณาลองใหม่','error'); }
 }
 
@@ -1203,7 +1417,7 @@ async function saveMember() {
   try {
     await saveMemberFS({id:editingMemberId||uid(),name,role,color:selectedColor});
     document.getElementById('member-modal-overlay').classList.remove('open');
-    toast(editingMemberId?'อัปเดตสมาชิกเรียบร้อย ✅':'เพิ่มสมาชิกใหม่เรียบร้อย ✅','success');
+    toast(editingMemberId?'อัปเดตสมาชิกเรียบร้อย':'เพิ่มสมาชิกใหม่เรียบร้อย','success');
   } catch(e){toast('บันทึกไม่สำเร็จ','error');}
 }
 
@@ -1243,13 +1457,318 @@ function refreshCurrentView() {
   if(id==='monthly')   renderMonthly();
   if(id==='mytasks')   renderMyTasks();
   if(id==='members')   renderMembers();
+  if(id==='challenge')  renderChallenge();
+}
+
+
+// ══════════════════════════════════════════════════════
+//  CHALLENGE FEATURE
+// ══════════════════════════════════════════════════════
+async function saveChallengeFS(ch) { await firestore.collection('challenges').doc(ch.id).set(ch); }
+async function removeChallengeFS(id) { await firestore.collection('challenges').doc(id).delete(); }
+
+function chPct(ch) {
+  if (!ch.tasks || !ch.tasks.length) return 0;
+  const sum = ch.tasks.reduce((a,t)=>a+(t.progress||0),0);
+  return Math.round(sum / ch.tasks.length);
+}
+
+function chBlockerCount(ch) {
+  if (!ch.tasks) return 0;
+  return ch.tasks.filter(t=>t.blockers && t.blockers.trim()).length;
+}
+
+function renderChallenge() {
+  if (_chState.currentId) {
+    renderChDetail();
+  } else {
+    renderChList();
+  }
+}
+
+function renderChList() {
+  document.getElementById('ch-list-panel').style.display='';
+  document.getElementById('ch-detail-panel').style.display='none';
+  const el = document.getElementById('ch-list-items');
+  if (!db.challenges || !db.challenges.length) {
+    el.innerHTML = '<div class="ch-empty">ยังไม่มีชาเลนจ์ · กดปุ่ม "+ สร้างชาเลนจ์" เพื่อเริ่ม</div>';
+    return;
+  }
+  const sorted = [...db.challenges].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+  el.innerHTML = sorted.map(ch=>{
+    const pct = chPct(ch);
+    const blockers = chBlockerCount(ch);
+    const taskCount = ch.tasks ? ch.tasks.length : 0;
+    return `<div class="ch-card" onclick="openChDetail('${ch.id}')">
+      <div class="ch-card-header">
+        <div>
+          <div class="ch-card-name">${ch.name}</div>
+          ${ch.startDate||ch.endDate ? `<div class="ch-card-dates">${ch.startDate||''} ${ch.endDate?' – '+ch.endDate:''}</div>` : ''}
+        </div>
+        <div class="ch-card-badges">
+          ${blockers ? `<span class="ch-blocker-badge">⚠ ${blockers} ติดขัด</span>` : ''}
+        </div>
+      </div>
+      ${ch.desc ? `<div style="font-size:13px;color:var(--gray-500);margin-bottom:10px">${ch.desc}</div>` : ''}
+      <div class="ch-prog-bar"><div class="ch-prog-fill" style="width:${pct}%"></div></div>
+      <div style="display:flex;justify-content:space-between">
+        <div class="ch-prog-label">${pct}% เสร็จสิ้น</div>
+        <div class="ch-task-count">${taskCount} งาน</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showChList() {
+  _chState.currentId = null;
+  renderChList();
+}
+
+function openChDetail(id) {
+  _chState.currentId = id;
+  _chState.tab = 'overview';
+  document.getElementById('ch-tab-overview').classList.add('active');
+  document.getElementById('ch-tab-mytasks').classList.remove('active');
+  renderChDetail();
+}
+
+function renderChDetail() {
+  document.getElementById('ch-list-panel').style.display='none';
+  document.getElementById('ch-detail-panel').style.display='';
+  const ch = db.challenges.find(c=>c.id===_chState.currentId);
+  if (!ch) { showChList(); return; }
+  document.getElementById('ch-detail-name').textContent = ch.name;
+  document.getElementById('ch-detail-dates').textContent = (ch.startDate||'') + (ch.endDate?' – '+ch.endDate:'');
+  if (_chState.tab==='overview') renderChOverview(ch);
+  else renderChMyTasks(ch);
+}
+
+function switchChTab(tab) {
+  _chState.tab = tab;
+  document.getElementById('ch-tab-overview').classList.toggle('active', tab==='overview');
+  document.getElementById('ch-tab-mytasks').classList.toggle('active', tab==='mytasks');
+  const ch = db.challenges.find(c=>c.id===_chState.currentId);
+  if (!ch) return;
+  if (tab==='overview') renderChOverview(ch);
+  else renderChMyTasks(ch);
+}
+
+function renderChOverview(ch) {
+  const tasks = ch.tasks || [];
+  const pct = chPct(ch);
+  const blockers = tasks.filter(t=>t.blockers&&t.blockers.trim());
+  const done = tasks.filter(t=>(t.progress||0)>=100).length;
+
+  // Build member breakdown
+  const memberMap = {};
+  tasks.forEach(task=>{
+    const mids = task.assigneeIds || (task.assigneeId?[task.assigneeId]:[]);
+    mids.forEach(mid=>{
+      if (!memberMap[mid]) memberMap[mid] = { tasks:[], done:0 };
+      memberMap[mid].tasks.push(task);
+      if ((task.progress||0)>=100) memberMap[mid].done++;
+    });
+  });
+
+  let memberRows = '';
+  db.members.forEach(m=>{
+    const ms = memberMap[m.id];
+    if (!ms) return;
+    const mp = ms.tasks.length ? Math.round(ms.tasks.reduce((a,t)=>a+(t.progress||0),0)/ms.tasks.length) : 0;
+    memberRows += `<div class="ch-member-row">
+      <div class="avatar" style="background:${m.color}">${initials(m.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--gray-800)">${m.name}</div>
+        <div style="font-size:12px;color:var(--gray-400)">${ms.tasks.length} งาน · ${ms.done} เสร็จ</div>
+        <div class="ch-prog-bar" style="margin:6px 0 0"><div class="ch-prog-fill" style="width:${mp}%"></div></div>
+      </div>
+      <div style="font-size:15px;font-weight:700;color:var(--primary);min-width:40px;text-align:right">${mp}%</div>
+    </div>`;
+  });
+
+  let taskRows = tasks.map((t,i)=>{
+    const mids = t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]);
+    const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
+    const pct = t.progress||0;
+    return `<div class="ch-task-row">
+      <div class="ch-task-info" style="flex:1">
+        <div class="ch-task-title">${t.title}</div>
+        ${names?`<div class="ch-task-assign">${names}</div>`:''}
+        <div class="ch-prog-bar" style="margin:6px 0 2px"><div class="ch-prog-fill" style="width:${pct}%${pct>=100?';background:#10b981':''}"></div></div>
+        <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>
+        ${t.blockers&&t.blockers.trim()?`<div class="ch-task-blocker">⚠ ${t.blockers}</div>`:''}
+      </div>
+      <button class="ch-edit-btn" onclick="openChTaskEdit(${i})">แก้ไข</button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('ch-tab-content').innerHTML = `
+    <div class="ch-overview-grid">
+      <div class="ch-stat-box"><div class="ch-stat-num">${pct}%</div><div class="ch-stat-lbl">ภาพรวม</div></div>
+      <div class="ch-stat-box"><div class="ch-stat-num" style="color:#10b981">${done}/${tasks.length}</div><div class="ch-stat-lbl">งานเสร็จ</div></div>
+    </div>
+    ${blockers.length?`<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:8px">⚠ งานที่ติดขัด (${blockers.length} รายการ)</div>
+      ${blockers.map(t=>`<div style="font-size:13px;color:var(--gray-700);margin-bottom:4px">• <strong>${t.title}</strong>: ${t.blockers}</div>`).join('')}
+    </div>`:''}
+    ${memberRows ? `<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">ความคืบหน้ารายบุคคล</div></div>${memberRows}</div>` : ''}
+    <div class="card"><div class="card-header"><div class="card-title">รายการงานทั้งหมด</div></div>${taskRows||'<div style="padding:20px;text-align:center;color:var(--gray-400)">ไม่มีงานในชาเลนจ์นี้</div>'}</div>
+  `;
+}
+
+function renderChMyTasks(ch) {
+  const tasks = ch.tasks || [];
+  let select = `<select class="ch-mytasks-select" id="ch-my-person" onchange="renderChMyTasks(db.challenges.find(c=>c.id==='${ch.id}'))">
+    <option value="">-- เลือกสมาชิก --</option>
+    ${db.members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}
+  </select>`;
+
+  const sel = document.getElementById('ch-my-person');
+  const selectedId = sel ? sel.value : '';
+
+  let taskRows = '';
+  if (selectedId) {
+    const myTasks = tasks.filter(t=>{
+      const mids = t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]);
+      return mids.includes(selectedId);
+    });
+    if (myTasks.length) {
+      taskRows = myTasks.map((t,_)=>{
+        const idx = tasks.findIndex(x=>x.taskId===t.taskId);
+        const pct = t.progress||0;
+        return `<div class="ch-task-row">
+          <div class="ch-task-info" style="flex:1">
+            <div class="ch-task-title">${t.title}</div>
+            <div class="ch-prog-bar" style="margin:6px 0 2px"><div class="ch-prog-fill" style="width:${pct}%${pct>=100?';background:#10b981':''}"></div></div>
+            <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>
+            ${t.blockers&&t.blockers.trim()?`<div class="ch-task-blocker">⚠ ${t.blockers}</div>`:''}
+          </div>
+          <button class="ch-edit-btn" onclick="openChTaskEdit(${idx})">แก้ไข</button>
+        </div>`;
+      }).join('');
+    } else {
+      taskRows = '<div style="padding:30px;text-align:center;color:var(--gray-400)">ไม่มีงานในชาเลนจ์นี้สำหรับสมาชิกที่เลือก</div>';
+    }
+  } else {
+    taskRows = '<div style="padding:30px;text-align:center;color:var(--gray-400)">กรุณาเลือกสมาชิกเพื่อดูงาน</div>';
+  }
+
+  document.getElementById('ch-tab-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <label style="font-size:13px;font-weight:700;color:var(--gray-600)">เลือกสมาชิก:</label>
+      ${select}
+    </div>
+    <div class="card">${taskRows}</div>
+  `;
+  // Restore selection
+  const newSel = document.getElementById('ch-my-person');
+  if (newSel && selectedId) newSel.value = selectedId;
+}
+
+// Challenge Create Modal
+function openChCreate() {
+  document.getElementById('ch-f-name').value='';
+  document.getElementById('ch-f-desc').value='';
+  document.getElementById('ch-f-start').value='';
+  document.getElementById('ch-f-end').value='';
+  document.getElementById('ch-task-search').value='';
+  renderChTaskPicker();
+  document.getElementById('ch-create-overlay').classList.add('open');
+}
+function closChCreate(e) {
+  if (!e||e.target===document.getElementById('ch-create-overlay')) {
+    document.getElementById('ch-create-overlay').classList.remove('open');
+  }
+}
+
+function renderChTaskPicker() {
+  const q = (document.getElementById('ch-task-search').value||'').toLowerCase();
+  const list = document.getElementById('ch-task-pick-list');
+  const filtered = db.tasks.filter(t=>!q||t.title.toLowerCase().includes(q));
+  if (!filtered.length) { list.innerHTML='<div style="padding:16px;text-align:center;color:var(--gray-400)">ไม่พบงาน</div>'; return; }
+  list.innerHTML = filtered.map(t=>{
+    const mids = getTaskMemberIds(t);
+    const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
+    return `<label class="ch-task-pick-item">
+      <input type="checkbox" value="${t.id}" name="ch-pick">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--gray-800)">${t.title}</div>
+        ${names?`<div style="font-size:11px;color:var(--gray-400)">${names}</div>`:''}
+      </div>
+    </label>`;
+  }).join('');
+}
+
+async function saveChallenge() {
+  const name = document.getElementById('ch-f-name').value.trim();
+  if (!name) { toast('กรุณาระบุชื่อชาเลนจ์','error'); return; }
+  const checked = Array.from(document.querySelectorAll('input[name=ch-pick]:checked')).map(c=>c.value);
+  const chTasks = checked.map(tid=>{
+    const t = db.tasks.find(x=>x.id===tid);
+    if (!t) return null;
+    const mids = getTaskMemberIds(t);
+    return { taskId:tid, title:t.title, assigneeIds:mids, assigneeId:mids[0]||'', progress:0, blockers:'' };
+  }).filter(Boolean);
+  const ch = {
+    id: 'ch_'+Date.now(),
+    name,
+    desc: document.getElementById('ch-f-desc').value.trim(),
+    startDate: document.getElementById('ch-f-start').value,
+    endDate: document.getElementById('ch-f-end').value,
+    createdAt: new Date().toISOString(),
+    tasks: chTasks
+  };
+  try {
+    await saveChallengeFS(ch);
+    closChCreate();
+    toast('สร้างชาเลนจ์สำเร็จ','success');
+  } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
+}
+
+async function deleteCurrentChallenge() {
+  if (!_chState.currentId) return;
+  if (!confirm('ต้องการลบชาเลนจ์นี้?')) return;
+  try {
+    await removeChallengeFS(_chState.currentId);
+    _chState.currentId=null;
+    toast('ลบชาเลนจ์แล้ว','success');
+  } catch(e){ toast('เกิดข้อผิดพลาด','error'); }
+}
+
+// Challenge Task Edit Modal
+function openChTaskEdit(idx) {
+  _chState.editTaskIdx = idx;
+  const ch = db.challenges.find(c=>c.id===_chState.currentId);
+  if (!ch||!ch.tasks[idx]) return;
+  const t = ch.tasks[idx];
+  document.getElementById('ch-te-title').textContent = t.title;
+  document.getElementById('ch-te-progress').value = t.progress||0;
+  document.getElementById('ch-te-blockers').value = t.blockers||'';
+  document.getElementById('ch-task-edit-overlay').classList.add('open');
+}
+function closeChTaskEdit(e) {
+  if (!e||e.target===document.getElementById('ch-task-edit-overlay')) {
+    document.getElementById('ch-task-edit-overlay').classList.remove('open');
+  }
+}
+async function saveChTaskEdit() {
+  const ch = db.challenges.find(c=>c.id===_chState.currentId);
+  if (!ch) return;
+  const idx = _chState.editTaskIdx;
+  ch.tasks[idx].progress = Math.max(0,Math.min(100,parseInt(document.getElementById('ch-te-progress').value)||0));
+  ch.tasks[idx].blockers = document.getElementById('ch-te-blockers').value.trim();
+  try {
+    await saveChallengeFS(ch);
+    closeChTaskEdit();
+    toast('บันทึกแล้ว','success');
+  } catch(e){ toast('เกิดข้อผิดพลาด','error'); }
 }
 
 function exportData() {
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify({tasks:db.tasks,members:db.members},null,2)],{type:'application/json'}));
   a.download=`taskflow_backup_${new Date().toISOString().slice(0,10)}.json`;
-  a.click(); toast('Export JSON สำเร็จ 💾','success');
+  a.click(); toast('Export JSON สำเร็จ','success');
 }
 
 function importData(e) {
@@ -1264,7 +1783,7 @@ function importData(e) {
       imp.tasks.forEach(t=>batch.set(firestore.collection('tasks').doc(t.id),t));
       imp.members.forEach(m=>batch.set(firestore.collection('members').doc(m.id),m));
       await batch.commit();
-      toast('Import สำเร็จ 🎉','success');
+      toast('Import สำเร็จ','success');
     } catch(e){toast('ไฟล์ไม่ถูกต้อง','error');}
   };
   reader.readAsText(file); e.target.value='';
@@ -1357,7 +1876,7 @@ function exportExcel() {
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(memberRows.length?memberRows:[{}]),'Team Summary (รายบุคคล)');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(monthlyRows.length?monthlyRows:[{}]),'Monthly Report (รายเดือน)');
   XLSX.writeFile(wb,`TaskFlow-LUCK-${new Date().toISOString().slice(0,10)}.xlsx`);
-  toast('Export Excel สำเร็จ 📊','success');
+  toast('Export Excel สำเร็จ','success');
 }
 
 // ══════════════════════════════════════════════════════
