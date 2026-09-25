@@ -617,9 +617,8 @@
       <div style="font-size:16px;font-weight:700;color:var(--gray-800)" id="ch-te-title"></div>
       <button style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--gray-400)" onclick="closeChTaskEdit()">✕</button>
     </div>
-    <div class="form-group" style="margin-bottom:14px">
-      <label class="form-label">% ความคืบหน้า</label>
-      <input class="form-control" type="number" id="ch-te-progress" min="0" max="100" placeholder="0-100">
+    <div class="form-group" style="margin-bottom:8px">
+      <div id="ch-te-status-badge" style="font-size:13px;color:var(--gray-500);margin-bottom:8px"></div>
     </div>
     <div class="form-group" style="margin-bottom:16px">
       <label class="form-label">Blockers / ปัญหาที่ติดขัด</label>
@@ -1467,9 +1466,17 @@ function refreshCurrentView() {
 async function saveChallengeFS(ch) { await firestore.collection('challenges').doc(ch.id).set(ch); }
 async function removeChallengeFS(id) { await firestore.collection('challenges').doc(id).delete(); }
 
+function getTaskProgress(taskId) {
+  const t = db.tasks.find(x=>x.id===taskId);
+  if (!t) return 0;
+  if (t.status==='Done') return 100;
+  if (t.status==='In Progress') return 50;
+  return 0;
+}
+
 function chPct(ch) {
   if (!ch.tasks || !ch.tasks.length) return 0;
-  const sum = ch.tasks.reduce((a,t)=>a+(t.progress||0),0);
+  const sum = ch.tasks.reduce((a,t)=>a+getTaskProgress(t.taskId),0);
   return Math.round(sum / ch.tasks.length);
 }
 
@@ -1557,7 +1564,7 @@ function renderChOverview(ch) {
   const tasks = ch.tasks || [];
   const pct = chPct(ch);
   const blockers = tasks.filter(t=>t.blockers&&t.blockers.trim());
-  const done = tasks.filter(t=>(t.progress||0)>=100).length;
+  const done = tasks.filter(t=>getTaskProgress(t.taskId)>=100).length;
 
   // Build member breakdown
   const memberMap = {};
@@ -1566,7 +1573,7 @@ function renderChOverview(ch) {
     mids.forEach(mid=>{
       if (!memberMap[mid]) memberMap[mid] = { tasks:[], done:0 };
       memberMap[mid].tasks.push(task);
-      if ((task.progress||0)>=100) memberMap[mid].done++;
+      if (getTaskProgress(task.taskId)>=100) memberMap[mid].done++;
     });
   });
 
@@ -1574,7 +1581,7 @@ function renderChOverview(ch) {
   db.members.forEach(m=>{
     const ms = memberMap[m.id];
     if (!ms) return;
-    const mp = ms.tasks.length ? Math.round(ms.tasks.reduce((a,t)=>a+(t.progress||0),0)/ms.tasks.length) : 0;
+    const mp = ms.tasks.length ? Math.round(ms.tasks.reduce((a,t)=>a+getTaskProgress(t.taskId),0)/ms.tasks.length) : 0;
     memberRows += `<div class="ch-member-row">
       <div class="avatar" style="background:${m.color}">${initials(m.name)}</div>
       <div style="flex:1;min-width:0">
@@ -1589,12 +1596,15 @@ function renderChOverview(ch) {
   let taskRows = tasks.map((t,i)=>{
     const mids = t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]);
     const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
-    const pct = t.progress||0;
+    const pct = getTaskProgress(t.taskId);
+    const liveTask = db.tasks.find(x=>x.id===t.taskId);
+    const statusLabel = liveTask ? (liveTask.status||'') : '';
     return `<div class="ch-task-row">
       <div class="ch-task-info" style="flex:1">
         <div class="ch-task-title">${t.title}</div>
         ${names?`<div class="ch-task-assign">${names}</div>`:''}
-        <div class="ch-prog-bar" style="margin:6px 0 2px"><div class="ch-prog-fill" style="width:${pct}%${pct>=100?';background:#10b981':''}"></div></div>
+        ${statusLabel?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
+        <div class="ch-prog-bar" style="margin:4px 0 2px"><div class="ch-prog-fill" style="width:${pct}%${pct>=100?';background:#10b981':''}"></div></div>
         <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>
         ${t.blockers&&t.blockers.trim()?`<div class="ch-task-blocker">⚠ ${t.blockers}</div>`:''}
       </div>
@@ -1635,11 +1645,14 @@ function renderChMyTasks(ch) {
     if (myTasks.length) {
       taskRows = myTasks.map((t,_)=>{
         const idx = tasks.findIndex(x=>x.taskId===t.taskId);
-        const pct = t.progress||0;
+        const pct = getTaskProgress(t.taskId);
+        const liveTask = db.tasks.find(x=>x.id===t.taskId);
+        const statusLabel = liveTask ? (liveTask.status||'') : '';
         return `<div class="ch-task-row">
           <div class="ch-task-info" style="flex:1">
             <div class="ch-task-title">${t.title}</div>
-            <div class="ch-prog-bar" style="margin:6px 0 2px"><div class="ch-prog-fill" style="width:${pct}%${pct>=100?';background:#10b981':''}"></div></div>
+            ${statusLabel?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
+            <div class="ch-prog-bar" style="margin:4px 0 2px"><div class="ch-prog-fill" style="width:${pct}%${pct>=100?';background:#10b981':''}"></div></div>
             <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>
             ${t.blockers&&t.blockers.trim()?`<div class="ch-task-blocker">⚠ ${t.blockers}</div>`:''}
           </div>
@@ -1742,7 +1755,10 @@ function openChTaskEdit(idx) {
   if (!ch||!ch.tasks[idx]) return;
   const t = ch.tasks[idx];
   document.getElementById('ch-te-title').textContent = t.title;
-  document.getElementById('ch-te-progress').value = t.progress||0;
+  const liveTask = db.tasks.find(x=>x.id===t.taskId);
+  const pct = getTaskProgress(t.taskId);
+  const statusLabel = liveTask ? (liveTask.status||'-') : '-';
+  document.getElementById('ch-te-status-badge').innerHTML = `สถานะงาน: <strong>${statusLabel}</strong> &nbsp;·&nbsp; <span style="color:var(--primary);font-weight:700">${pct}%</span> <span style="font-size:11px;color:var(--gray-400)">(อัพเดทอัตโนมัติจากสถานะงาน)</span>`;
   document.getElementById('ch-te-blockers').value = t.blockers||'';
   document.getElementById('ch-task-edit-overlay').classList.add('open');
 }
@@ -1755,7 +1771,6 @@ async function saveChTaskEdit() {
   const ch = db.challenges.find(c=>c.id===_chState.currentId);
   if (!ch) return;
   const idx = _chState.editTaskIdx;
-  ch.tasks[idx].progress = Math.max(0,Math.min(100,parseInt(document.getElementById('ch-te-progress').value)||0));
   ch.tasks[idx].blockers = document.getElementById('ch-te-blockers').value.trim();
   try {
     await saveChallengeFS(ch);
