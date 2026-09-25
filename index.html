@@ -186,35 +186,36 @@
   .month-stat-label { font-size: 10px; color: var(--gray-400); margin-top: 3px; line-height: 1.3; }
 
   /* MY TASKS v2 */
-  .mt-page { display:flex; flex-direction:column; gap:16px; }
-  .mt-member-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .mt-mchip { display:flex; align-items:center; gap:7px; padding:6px 14px 6px 8px; border-radius:100px; background:var(--gray-100); border:1.5px solid transparent; cursor:pointer; font-size:13px; font-weight:600; color:var(--gray-600); transition:all .15s; white-space:nowrap; }
+  .mt-page { display:flex; flex-direction:column; gap:18px; }
+  .mt-member-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .mt-mchip { display:flex; align-items:center; gap:9px; padding:8px 16px 8px 10px; border-radius:100px; background:var(--gray-100); border:1.5px solid transparent; cursor:pointer; font-size:14px; font-weight:600; color:var(--gray-600); transition:all .15s; white-space:nowrap; }
   .mt-mchip:hover { background:var(--gray-200); }
   .mt-mchip.mt-active { background:var(--primary); color:#fff; border-color:var(--primary); }
-  .mt-mav { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#fff; flex-shrink:0; }
-  .mt-status-bar { display:flex; gap:6px; flex-wrap:wrap; }
-  .mt-sbtn { padding:5px 14px; border-radius:100px; border:1.5px solid var(--gray-200); background:#fff; font-size:12px; font-weight:600; color:var(--gray-500); cursor:pointer; transition:all .15s; }
+  .mt-mav { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+  .mt-status-bar { display:flex; gap:8px; flex-wrap:wrap; }
+  .mt-sbtn { padding:8px 18px; border-radius:100px; border:1.5px solid var(--gray-200); background:#fff; font-size:14px; font-weight:600; color:var(--gray-500); cursor:pointer; transition:all .15s; }
   .mt-sbtn:hover { border-color:var(--primary); color:var(--primary); }
   .mt-sbtn.mt-s-active { background:var(--primary); color:#fff; border-color:var(--primary); }
-  .mt-summary { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:4px; }
-  .mt-sum-chip { display:flex; align-items:center; gap:10px; background:#fff; border-radius:10px; padding:10px 16px; box-shadow:var(--shadow); flex:1; min-width:120px; }
-  .mt-sum-num { font-size:20px; font-weight:800; }
-  .mt-sum-label { font-size:11px; color:var(--gray-400); margin-top:1px; }
-  .mt-task-list { display:flex; flex-direction:column; gap:8px; }
-  .mt-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:var(--shadow); cursor:pointer; transition:all .15s; display:flex; gap:12px; align-items:flex-start; border-left:3px solid var(--gray-200); }
+  .mt-summary { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px; }
+  .mt-sum-chip { display:flex; align-items:center; gap:12px; background:#fff; border-radius:12px; padding:14px 18px; box-shadow:var(--shadow); }
+  .mt-sum-num { font-size:26px; font-weight:800; }
+  .mt-sum-label { font-size:13px; color:var(--gray-400); margin-top:2px; }
+  .mt-task-list { display:flex; flex-direction:column; gap:10px; }
+  .mt-card { background:#fff; border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); cursor:pointer; transition:all .15s; display:flex; gap:14px; align-items:flex-start; border-left:4px solid var(--gray-200); }
   .mt-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-1px); }
   .mt-card.pri-High { border-left-color:var(--danger); }
   .mt-card.pri-Medium { border-left-color:var(--warning); }
   .mt-card.pri-Low { border-left-color:var(--success); }
   .mt-card-body { flex:1; min-width:0; }
-  .mt-card-title { font-size:14px; font-weight:600; color:var(--gray-800); line-height:1.4; }
-  .mt-card-desc { font-size:12px; color:var(--gray-500); margin-top:3px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
-  .mt-card-foot { display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap; }
-  .mt-card-note { font-size:11px; color:var(--gray-400); margin-top:5px; display:flex; align-items:center; gap:4px; }
-  .mt-empty { text-align:center; padding:48px 24px; color:var(--gray-400); font-size:14px; }
-  .mt-count-label { font-size:11px; color:var(--gray-400); padding:6px 0 2px; font-weight:600; letter-spacing:.04em; }
-  @media(min-width:768px){ .mt-task-list { display:grid; grid-template-columns:1fr 1fr; gap:10px; } }
-  @media(max-width:420px){ .mt-mchip { font-size:12px; padding:5px 10px 5px 6px; } }
+  .mt-card-title { font-size:15px; font-weight:600; color:var(--gray-800); line-height:1.45; }
+  .mt-card-desc { font-size:13px; color:var(--gray-500); margin-top:5px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-height:1.5; }
+  .mt-card-foot { display:flex; align-items:center; gap:7px; margin-top:10px; flex-wrap:wrap; }
+  .mt-card-note { font-size:12px; color:var(--gray-400); margin-top:6px; display:flex; align-items:center; gap:4px; }
+  .mt-empty { text-align:center; padding:60px 24px; color:var(--gray-400); font-size:15px; }
+  .mt-count-label { font-size:12px; color:var(--gray-400); padding:6px 0 2px; font-weight:600; letter-spacing:.04em; }
+  .mt-card .badge { font-size:13px; padding:4px 11px; }
+  .mt-card .prio-dot { width:7px; height:7px; }
+  @media(min-width:768px){ .mt-task-list { display:grid; grid-template-columns:1fr 1fr; gap:12px; } .mt-summary { grid-template-columns:repeat(4,1fr); } }
 
   /* TEAM MEMBERS */
   .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 16px; }
@@ -1545,8 +1546,8 @@ function renderMyTasks() {
         <div class="mt-card-foot">
           ${statusBadge(t.status)}
           ${priorityBadge(t.priority)}
-          ${names?`<span style="font-size:11px;color:var(--gray-500)">${names}</span>`:''}
-          ${dateStr?`<span style="font-size:11px;color:${ov?'var(--danger)':'var(--gray-400)'}">${dateStr}</span>`:''}
+          ${names?`<span style="font-size:13px;color:var(--gray-500)">${names}</span>`:''}
+          ${dateStr?`<span style="font-size:13px;color:${ov?'var(--danger)':'var(--gray-400)'}">${dateStr}</span>`:''}
         </div>
         ${t.note?`<div class="mt-card-note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
       </div>
