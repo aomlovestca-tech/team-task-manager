@@ -534,8 +534,9 @@
   }
   .db-kpi {
     background: #16161a;
-    border: 1px solid rgba(255,255,255,.1);
-    border-top: 2px solid #cefb59;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     border-radius: 14px;
     padding: 20px 22px;
     cursor: default;
@@ -594,7 +595,9 @@
   /* Dark card */
   .db-card {
     background: #16161a;
-    border: 1px solid rgba(255,255,255,.1);
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     border-radius: 14px;
     padding: 22px;
   }
@@ -670,24 +673,36 @@
   .db-hp-sub { font-size:11px; color:rgba(230,229,234,.4); margin-top:2px; }
   /* Card งานล่าสุด — grey no border, dark green text */
   #card-recent { background: #e6e5ea !important; border: none !important; box-shadow: none !important; }
-  #card-recent .db-card-title { color: #0d3300 !important; }
-  #card-recent .db-table th { color: rgba(0,50,0,.5) !important; border-bottom-color: rgba(0,0,0,.1) !important; }
-  #card-recent .db-table td { color: #1a4400 !important; border-bottom-color: rgba(0,0,0,.07) !important; }
-  #card-recent .db-table tr:hover td { background: rgba(0,0,0,.05) !important; }
-  #card-recent .db-table-title { color: #0d3300 !important; }
-  #card-recent .db-overdue-pill { background: rgba(150,0,0,.12) !important; color: #8b0000 !important; }
-  #card-recent .db-btn-sm { background: rgba(0,80,0,.1) !important; color: #0d5500 !important; border-color: rgba(0,80,0,.25) !important; }
-  #card-recent .db-btn-sm:hover { background: rgba(0,80,0,.18) !important; }
+  /* card-recent: grey card, no borders, clear readable text */
+  #card-recent .db-card-title { color: #0d2200 !important; font-weight: 800; }
+  #card-recent .db-btn-sm { background: rgba(0,70,0,.12) !important; color: #0a4400 !important; border-color: rgba(0,70,0,.3) !important; font-weight: 700; }
+  #card-recent .db-btn-sm:hover { background: rgba(0,70,0,.2) !important; }
+  /* Remove ALL table borders */
+  #card-recent .db-table th { color: #1a2e05 !important; border-bottom: none !important; font-weight: 800; font-size: 11px !important; }
+  #card-recent .db-table td { color: #111 !important; border-bottom: none !important; }
+  #card-recent .db-table tr:hover td { background: rgba(0,0,0,.06) !important; }
+  #card-recent .db-table-title { color: #111 !important; font-weight: 700; font-size: 13px !important; }
+  #card-recent .db-overdue-pill { background: rgba(180,0,0,.15) !important; color: #900000 !important; font-weight: 800; }
+  /* Status badges — clear contrast on #e6e5ea grey bg */
+  #card-recent .badge-todo     { background: #d1d5db !important; color: #1f2937 !important; font-weight: 700; }
+  #card-recent .badge-progress { background: #93c5fd !important; color: #1e3a8a !important; font-weight: 700; }
+  #card-recent .badge-done     { background: #6ee7b7 !important; color: #064e3b !important; font-weight: 700; }
+  #card-recent .badge-hold     { background: #fcd34d !important; color: #78350f !important; font-weight: 700; }
+  #card-recent .badge-high     { background: #fca5a5 !important; color: #7f1d1d !important; font-weight: 700; }
+  #card-recent .badge-medium   { background: #fdba74 !important; color: #7c2d12 !important; font-weight: 700; }
+  #card-recent .badge-low      { background: #6ee7b7 !important; color: #064e3b !important; font-weight: 700; }
+  /* Date column */
+  #card-recent .db-table td:last-child { color: #374151 !important; font-variant-numeric: tabular-nums; font-weight: 600; }
 
   /* KPI GREY variant (งานทั้งหมด / กำลังดำเนินการ) */
-  .db-kpi-grey { background: #e6e5ea !important; border-color: rgba(0,0,0,.12) !important; border-top-color: #aaa !important; }
+  .db-kpi-grey { background: #e6e5ea !important; border: none !important; }
   .db-kpi-grey::after { display: none; }
   .db-kpi-grey .db-kpi-icon { background: rgba(0,0,0,.1); }
   .db-kpi-grey .db-kpi-num { color: #111 !important; }
   .db-kpi-grey .db-kpi-label { color: rgba(0,0,0,.5) !important; }
 
   /* KPI LIME variant (เสร็จสิ้น) */
-  .db-kpi-lime { background: #cefb59 !important; border-color: rgba(0,0,0,.12) !important; border-top-color: #8fcc00 !important; }
+  .db-kpi-lime { background: #cefb59 !important; border: none !important; }
   .db-kpi-lime::after { display: none; }
   .db-kpi-lime .db-kpi-icon { background: rgba(0,0,0,.12); }
   .db-kpi-lime .db-kpi-num { color: #0d2200 !important; }
@@ -695,7 +710,7 @@
   .db-kpi-lime .db-kpi-pct { color: #1a5c00 !important; font-weight: 900; }
 
   /* Card — สรุปสถานะ — lime green */
-  #card-status { background: #cefb59 !important; border-color: rgba(0,0,0,.12) !important; }
+  #card-status { background: #cefb59 !important; border: none !important; }
   #card-status .db-card-title { color: #0d2200 !important; }
   #card-status .donut-center .big { color: #0d2200 !important; }
   #card-status .donut-center .sm { color: rgba(0,0,0,.5) !important; }
@@ -705,7 +720,7 @@
   #card-status .db-legend-item { border-bottom-color: rgba(0,0,0,.12) !important; }
 
   /* Card — สถานะงานรายบุคคล — light grey */
-  #card-members { background: #e6e5ea !important; border-color: rgba(0,0,0,.1) !important; }
+  #card-members { background: #e6e5ea !important; border: none !important; }
   #card-members .db-card-title { color: #111 !important; }
   #card-members .db-card-sub { color: rgba(0,0,0,.45) !important; }
   #card-members .db-member-name { color: #111 !important; }
