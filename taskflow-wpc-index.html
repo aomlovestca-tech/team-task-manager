@@ -662,6 +662,32 @@
   .db-hp-row:hover { background:rgba(255,255,255,.03); border-radius:8px; padding-left:6px; }
   .db-hp-title { font-size:13px; font-weight:600; color:#e6e5ea; line-height:1.35; }
   .db-hp-sub { font-size:11px; color:rgba(230,229,234,.4); margin-top:2px; }
+  /* KPI GREY variant (งานทั้งหมด / กำลังดำเนินการ) */
+  .db-kpi-grey { background: #e6e5ea !important; border-color: rgba(0,0,0,.12) !important; border-top-color: #aaa !important; }
+  .db-kpi-grey::after { display: none; }
+  .db-kpi-grey .db-kpi-icon { background: rgba(0,0,0,.1); }
+  .db-kpi-grey .db-kpi-num { color: #111 !important; }
+  .db-kpi-grey .db-kpi-label { color: rgba(0,0,0,.5) !important; }
+
+  /* KPI LIME variant (เสร็จสิ้น) */
+  .db-kpi-lime { background: #cefb59 !important; border-color: rgba(0,0,0,.12) !important; border-top-color: #8fcc00 !important; }
+  .db-kpi-lime::after { display: none; }
+  .db-kpi-lime .db-kpi-icon { background: rgba(0,0,0,.12); }
+  .db-kpi-lime .db-kpi-num { color: #0d2200 !important; }
+  .db-kpi-lime .db-kpi-label { color: rgba(0,0,0,.55) !important; }
+  .db-kpi-lime .db-kpi-pct { color: #1a5c00 !important; font-weight: 900; }
+
+  /* Card — สถานะงานรายบุคคล — light grey */
+  #card-members { background: #e6e5ea !important; border-color: rgba(0,0,0,.1) !important; }
+  #card-members .db-card-title { color: #111 !important; }
+  #card-members .db-card-sub { color: rgba(0,0,0,.45) !important; }
+  #card-members .db-member-name { color: #111 !important; }
+  #card-members .db-member-role { color: rgba(0,0,0,.45) !important; }
+  #card-members .db-member-row { border-bottom-color: rgba(0,0,0,.1) !important; }
+  #card-members .db-prog-bar { background: rgba(0,0,0,.15) !important; }
+  #card-members .db-prog-pct { color: rgba(0,0,0,.4) !important; }
+  #card-members .db-prog-done { color: #111 !important; }
+
   /* Badge overrides inside dark dashboard */
   #view-dashboard .badge-todo     { background:rgba(156,163,175,.15); color:#9ca3af; }
   #view-dashboard .badge-progress { background:rgba(59,130,246,.2); color:#93c5fd; }
@@ -750,7 +776,7 @@
         <div class="db-main-grid">
           <div>
             <!-- Member progress -->
-            <div class="db-card" style="margin-bottom:16px">
+            <div class="db-card db-card-members" id="card-members" style="margin-bottom:16px">
               <div class="db-card-head">
                 <div>
                   <div class="db-card-title">สถานะงานรายบุคคล</div>
@@ -1323,13 +1349,13 @@ function renderDashboard() {
 
   // KPI tiles
   const kpis = [
-    { icon:`<svg viewBox="0 0 24 24" fill="none" stroke="#cefb59" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>`, num:total,   label:'งานทั้งหมด', extra:'' },
-    { icon:`<svg viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,  num:prog,    label:'กำลังดำเนินการ', extra:'' },
-    { icon:`<svg viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`, num:done,    label:'เสร็จสิ้น', extra:`${donePct}%` },
-    { icon:`<svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`, num:overdue, label:'เกินกำหนด', extra:'' },
+    { icon:`<svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>`, num:total,   label:'งานทั้งหมด', extra:'', variant:'grey' },
+    { icon:`<svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,  num:prog,    label:'กำลังดำเนินการ', extra:'', variant:'grey' },
+    { icon:`<svg viewBox="0 0 24 24" fill="none" stroke="#1a6600" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`, num:done,    label:'เสร็จสิ้น', extra:`${donePct}%`, variant:'lime' },
+    { icon:`<svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`, num:overdue, label:'เกินกำหนด', extra:'', variant:'' },
   ];
   document.getElementById('stat-grid').innerHTML = kpis.map(k=>`
-    <div class="db-kpi">
+    <div class="db-kpi${k.variant ? ' db-kpi-'+k.variant : ''}">
       <div class="db-kpi-icon">${k.icon}</div>
       <div class="db-kpi-num">${k.num}</div>
       <div class="db-kpi-label">${k.label}</div>
