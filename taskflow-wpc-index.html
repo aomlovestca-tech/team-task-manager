@@ -677,6 +677,16 @@
   .db-kpi-lime .db-kpi-label { color: rgba(0,0,0,.55) !important; }
   .db-kpi-lime .db-kpi-pct { color: #1a5c00 !important; font-weight: 900; }
 
+  /* Card — สรุปสถานะ — lime green */
+  #card-status { background: #cefb59 !important; border-color: rgba(0,0,0,.12) !important; }
+  #card-status .db-card-title { color: #0d2200 !important; }
+  #card-status .donut-center .big { color: #0d2200 !important; }
+  #card-status .donut-center .sm { color: rgba(0,0,0,.5) !important; }
+  #card-status .db-legend-label { color: rgba(0,0,0,.75) !important; }
+  #card-status .db-legend-count { color: #0d2200 !important; }
+  #card-status .db-legend-pct { color: rgba(0,0,0,.45) !important; }
+  #card-status .db-legend-item { border-bottom-color: rgba(0,0,0,.12) !important; }
+
   /* Card — สถานะงานรายบุคคล — light grey */
   #card-members { background: #e6e5ea !important; border-color: rgba(0,0,0,.1) !important; }
   #card-members .db-card-title { color: #111 !important; }
@@ -799,7 +809,7 @@
           </div>
           <div>
             <!-- Donut chart -->
-            <div class="db-card" style="margin-bottom:16px">
+            <div class="db-card" id="card-status" style="margin-bottom:16px">
               <div class="db-card-head"><div class="db-card-title">สรุปสถานะ</div></div>
               <div class="donut-wrap" id="donut-wrap">
                 <svg id="donut-svg" width="160" height="160" viewBox="0 0 160 160"></svg>
@@ -1405,10 +1415,10 @@ function renderDashboard() {
   // Donut chart
   const svg=document.getElementById('donut-svg'), center=document.getElementById('donut-center'), legend=document.getElementById('status-legend');
   const data=[
-    {label:'To Do · รอดำเนินการ',count:todo,color:'#6b7280'},
-    {label:'In Progress · กำลังทำ',count:prog,color:'#3b82f6'},
-    {label:'Done · เสร็จสิ้น',count:done,color:'#10b981'},
-    {label:'On Hold · รอพัก',count:hold,color:'#f59e0b'}
+    {label:'To Do · รอดำเนินการ',count:todo,color:'#78b800'},
+    {label:'In Progress · กำลังทำ',count:prog,color:'#4a9100'},
+    {label:'Done · เสร็จสิ้น',count:done,color:'#0d5900'},
+    {label:'On Hold · รอพัก',count:hold,color:'#b4f040'}
   ];
   const r=60,cx=80,cy=80,stroke=22,circ=2*Math.PI*r;
   let offset=0,paths='';
