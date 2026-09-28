@@ -668,6 +668,17 @@
   .db-hp-row:hover { background:rgba(255,255,255,.03); border-radius:8px; padding-left:6px; }
   .db-hp-title { font-size:13px; font-weight:600; color:#e6e5ea; line-height:1.35; }
   .db-hp-sub { font-size:11px; color:rgba(230,229,234,.4); margin-top:2px; }
+  /* Card งานล่าสุด — grey no border, dark green text */
+  #card-recent { background: #e6e5ea !important; border: none !important; box-shadow: none !important; }
+  #card-recent .db-card-title { color: #0d3300 !important; }
+  #card-recent .db-table th { color: rgba(0,50,0,.5) !important; border-bottom-color: rgba(0,0,0,.1) !important; }
+  #card-recent .db-table td { color: #1a4400 !important; border-bottom-color: rgba(0,0,0,.07) !important; }
+  #card-recent .db-table tr:hover td { background: rgba(0,0,0,.05) !important; }
+  #card-recent .db-table-title { color: #0d3300 !important; }
+  #card-recent .db-overdue-pill { background: rgba(150,0,0,.12) !important; color: #8b0000 !important; }
+  #card-recent .db-btn-sm { background: rgba(0,80,0,.1) !important; color: #0d5500 !important; border-color: rgba(0,80,0,.25) !important; }
+  #card-recent .db-btn-sm:hover { background: rgba(0,80,0,.18) !important; }
+
   /* KPI GREY variant (งานทั้งหมด / กำลังดำเนินการ) */
   .db-kpi-grey { background: #e6e5ea !important; border-color: rgba(0,0,0,.12) !important; border-top-color: #aaa !important; }
   .db-kpi-grey::after { display: none; }
@@ -802,7 +813,7 @@
               <div id="member-progress-list"></div>
             </div>
             <!-- Recent tasks -->
-            <div class="db-card">
+            <div class="db-card" id="card-recent">
               <div class="db-card-head">
                 <div class="db-card-title">งานล่าสุด (10 รายการ)</div>
                 <button class="db-btn-sm" onclick="showView('weekly')">ดูทั้งหมด →</button>
