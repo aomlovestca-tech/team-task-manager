@@ -678,9 +678,11 @@
   #card-recent .db-btn-sm { background: rgba(0,70,0,.12) !important; color: #0a4400 !important; border-color: rgba(0,70,0,.3) !important; font-weight: 700; }
   #card-recent .db-btn-sm:hover { background: rgba(0,70,0,.2) !important; }
   /* Remove ALL table borders */
-  #card-recent .db-table th { color: #1a2e05 !important; border-bottom: none !important; font-weight: 800; font-size: 11px !important; }
-  #card-recent .db-table td { color: #111 !important; border-bottom: none !important; }
-  #card-recent .db-table tr:hover td { background: rgba(0,0,0,.06) !important; }
+  #card-recent .db-table { border-collapse: collapse !important; width: 100%; }
+  #card-recent .db-table th { color: #6b7280 !important; border-bottom: 2px solid #e5e7eb !important; font-weight: 700; font-size: 11px !important; padding-bottom: 10px !important; }
+  #card-recent .db-table td { color: #111 !important; border-bottom: 1px solid #e5e7eb !important; padding: 11px 10px !important; }
+  #card-recent .db-table tr:last-child td { border-bottom: none !important; }
+  #card-recent .db-table tr:hover td { background: #f9fafb !important; }
   #card-recent .db-table-title { color: #111 !important; font-weight: 700; font-size: 13px !important; }
   #card-recent .db-overdue-pill { background: rgba(180,0,0,.15) !important; color: #900000 !important; font-weight: 800; }
   /* Status badges — clear contrast on #e6e5ea grey bg */
