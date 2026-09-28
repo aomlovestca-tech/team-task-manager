@@ -18,7 +18,7 @@
     --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI','Prompt',sans-serif; background: var(--gray-50); color: var(--gray-800); min-height: 100vh; }
+  body { font-family: 'Segoe UI','Prompt',sans-serif; background: #e8e8ed; color: var(--gray-800); min-height: 100vh; }
   .layout { display: flex; min-height: 100vh; }
 
   /* SIDEBAR */
@@ -672,7 +672,7 @@
   .db-hp-title { font-size:13px; font-weight:600; color:#e6e5ea; line-height:1.35; }
   .db-hp-sub { font-size:11px; color:rgba(230,229,234,.4); margin-top:2px; }
   /* Card งานล่าสุด — grey no border, dark green text */
-  #card-recent { background: #e6e5ea !important; border: none !important; box-shadow: none !important; }
+  #card-recent { background: #ffffff !important; border: none !important; box-shadow: none !important; }
   /* card-recent: grey card, no borders, clear readable text */
   #card-recent .db-card-title { color: #0d2200 !important; font-weight: 800; }
   #card-recent .db-btn-sm { background: rgba(0,70,0,.12) !important; color: #0a4400 !important; border-color: rgba(0,70,0,.3) !important; font-weight: 700; }
@@ -695,7 +695,7 @@
   #card-recent .db-table td:last-child { color: #374151 !important; font-variant-numeric: tabular-nums; font-weight: 600; }
 
   /* KPI GREY variant (งานทั้งหมด / กำลังดำเนินการ) */
-  .db-kpi-grey { background: #e6e5ea !important; border: none !important; }
+  .db-kpi-grey { background: #ffffff !important; border: none !important; }
   .db-kpi-grey::after { display: none; }
   .db-kpi-grey .db-kpi-icon { background: rgba(0,0,0,.1); }
   .db-kpi-grey .db-kpi-num { color: #111 !important; }
@@ -720,7 +720,7 @@
   #card-status .db-legend-item { border-bottom-color: rgba(0,0,0,.12) !important; }
 
   /* Card — สถานะงานรายบุคคล — light grey */
-  #card-members { background: #e6e5ea !important; border: none !important; }
+  #card-members { background: #ffffff !important; border: none !important; }
   #card-members .db-card-title { color: #111 !important; }
   #card-members .db-card-sub { color: rgba(0,0,0,.45) !important; }
   #card-members .db-member-name { color: #111 !important; }
@@ -834,7 +834,7 @@
                 <button class="db-btn-sm" onclick="showView('weekly')">ดูทั้งหมด →</button>
               </div>
               <table class="db-table">
-                <thead><tr><th>ชื่องาน</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th><th>Priority</th><th>กำหนด</th></tr></thead>
+                <thead><tr><th>ชื่องาน</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th></tr></thead>
                 <tbody id="recent-tasks-body"></tbody>
               </table>
             </div>
@@ -1342,7 +1342,7 @@ function showView(id) {
 //  STATUS / PRIORITY HELPERS
 // ══════════════════════════════════════════════════════
 const STATUS_BADGE_CLASS = { Todo:'badge-todo', 'In Progress':'badge-progress', Done:'badge-done', 'On Hold':'badge-hold' };
-const STATUS_LABEL = { Todo:'To Do · รอดำเนินการ', 'In Progress':'In Progress · กำลังทำ', Done:'Done · เสร็จสิ้น', 'On Hold':'On Hold · รอพัก' };
+const STATUS_LABEL = { Todo:'TO DO', 'In Progress':'IN PROGRESS', Done:'DONE', 'On Hold':'ON HOLD' };
 const PRIORITY_BADGE_CLASS = { High:'badge-high', Medium:'badge-medium', Low:'badge-low' };
 const PRIORITY_DOT_COLOR = { High:'#ef4444', Medium:'#f59e0b', Low:'#10b981' };
 
@@ -1431,26 +1431,23 @@ function renderDashboard() {
     const members = ids.map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
     const names = members.map(m=>m.name.split(' ')[0]).join(', ') || '—';
     const ov = isOverdue(t.due, t.status);
-    const avs = members.slice(0,3).map(m=>`<div class="avatar" style="background:${m.color};width:20px;height:20px;font-size:8px;margin-right:-5px;border:1.5px solid #1a1a1e;flex-shrink:0">${initials(m.name)}</div>`).join('');
     return `<tr onclick="openTaskModal('${t.id}')" style="cursor:pointer">
       <td>
         <div class="db-table-title">${t.title}</div>
         ${ov?`<div class="db-overdue-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>เกินกำหนด</div>`:''}
       </td>
-      <td><div style="display:flex;align-items:center;gap:2px">${avs}<span style="margin-left:8px;font-size:11.5px;color:rgba(230,229,234,.6)">${names}</span></div></td>
+      <td><span style="font-size:12px;color:#374151;font-weight:500">${names}</span></td>
       <td>${statusBadge(t.status)}</td>
-      <td>${priorityBadge(t.priority)}</td>
-      <td style="font-size:11.5px;color:${ov?'#f87171':'rgba(230,229,234,.4)'};white-space:nowrap">${formatDate(t.due)}</td>
     </tr>`;
-  }).join('') : `<tr><td colspan="5" style="text-align:center;color:rgba(230,229,234,.3);padding:24px;font-size:13px">ยังไม่มีงาน</td></tr>`;
+  }).join('') : `<tr><td colspan="3" style="text-align:center;color:rgba(230,229,234,.3);padding:24px;font-size:13px">ยังไม่มีงาน</td></tr>`;
 
   // Donut chart
   const svg=document.getElementById('donut-svg'), center=document.getElementById('donut-center'), legend=document.getElementById('status-legend');
   const data=[
-    {label:'To Do · รอดำเนินการ',count:todo,color:'#78b800'},
-    {label:'In Progress · กำลังทำ',count:prog,color:'#4a9100'},
-    {label:'Done · เสร็จสิ้น',count:done,color:'#0d5900'},
-    {label:'On Hold · รอพัก',count:hold,color:'#b4f040'}
+    {label:'TO DO',count:todo,color:'#78b800'},
+    {label:'IN PROGRESS',count:prog,color:'#4a9100'},
+    {label:'DONE',count:done,color:'#0d5900'},
+    {label:'ON HOLD',count:hold,color:'#b4f040'}
   ];
   const r=60,cx=80,cy=80,stroke=22,circ=2*Math.PI*r;
   let offset=0,paths='';
@@ -1480,10 +1477,10 @@ function renderDashboard() {
 //  RENDER WEEKLY PLANNER
 // ══════════════════════════════════════════════════════
 const STATUSES = [
-  { key:'Todo',        label:'To Do · รอดำเนินการ',   color:'#9ca3af' },
-  { key:'In Progress', label:'In Progress · กำลังทำ', color:'#3b82f6' },
-  { key:'Done',        label:'Done · เสร็จสิ้น',       color:'#10b981' },
-  { key:'On Hold',     label:'On Hold · รอพัก',        color:'#f59e0b' },
+  { key:'Todo',        label:'TO DO',        color:'#9ca3af' },
+  { key:'In Progress', label:'IN PROGRESS',  color:'#3b82f6' },
+  { key:'Done',        label:'DONE',         color:'#10b981' },
+  { key:'On Hold',     label:'ON HOLD',      color:'#f59e0b' },
 ];
 
 // ══ WEEKLY MEETING ══
