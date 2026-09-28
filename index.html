@@ -1760,8 +1760,10 @@ async function deleteCurrentMember() {
 // ══════════════════════════════════════════════════════
 function populateMemberDropdowns() {
   const opts = db.members.map(m=>`<option value="${m.id}">${m.name} (${m.role})</option>`).join('');
-  document.getElementById('filter-member').innerHTML='<option value="">ทุกคน</option>'+opts;
-  document.getElementById('month-member').innerHTML='<option value="">ทุกคนในทีม</option>'+opts;
+  const fm = document.getElementById('filter-member');
+  if (fm) fm.innerHTML='<option value="">ทุกคน</option>'+opts;
+  const mm = document.getElementById('month-member');
+  if (mm) mm.innerHTML='<option value="">ทุกคนในทีม</option>'+opts;
 }
 
 function updateBadge() {
