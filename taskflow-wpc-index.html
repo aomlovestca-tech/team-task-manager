@@ -687,8 +687,8 @@
   #card-recent .db-overdue-pill { background: rgba(180,0,0,.15) !important; color: #900000 !important; font-weight: 800; }
   /* Status badges — clear contrast on #e6e5ea grey bg */
   #card-recent .badge-todo     { background: #d1d5db !important; color: #1f2937 !important; font-weight: 700; }
-  #card-recent .badge-progress { background: #93c5fd !important; color: #1e3a8a !important; font-weight: 700; }
-  #card-recent .badge-done     { background: #6ee7b7 !important; color: #064e3b !important; font-weight: 700; }
+  #card-recent .badge-progress { background: #d1d5db !important; color: #1f2937 !important; font-weight: 700; }
+  #card-recent .badge-done     { background: #cefb59 !important; color: #1a4a00 !important; font-weight: 700; }
   #card-recent .badge-hold     { background: #fcd34d !important; color: #78350f !important; font-weight: 700; }
   #card-recent .badge-high     { background: #fca5a5 !important; color: #7f1d1d !important; font-weight: 700; }
   #card-recent .badge-medium   { background: #fdba74 !important; color: #7c2d12 !important; font-weight: 700; }
@@ -1413,13 +1413,13 @@ function renderDashboard() {
     const md = mt.filter(t => t.status==='Done').length;
     const pct = mt.length ? Math.round(md/mt.length*100) : 0;
     return `<div class="db-member-row">
-      <div class="avatar" style="background:${m.color};width:34px;height:34px;font-size:12px;flex-shrink:0">${initials(m.name)}</div>
+      <div class="avatar" style="background:#e5e7eb;width:34px;height:34px;font-size:12px;flex-shrink:0;color:#374151">${initials(m.name)}</div>
       <div style="flex:1;min-width:0">
         <div class="db-member-name">${m.name}</div>
         <div class="db-member-role">${m.role} · ${mt.length} งาน</div>
       </div>
       <div class="db-prog-wrap">
-        <div class="db-prog-bar"><div class="db-prog-fill" style="width:${pct}%;background:${m.color}"></div></div>
+        <div class="db-prog-bar"><div class="db-prog-fill" style="width:${pct}%;background:#cefb59"></div></div>
         <div class="db-prog-pct">${md}/${mt.length} Done</div>
       </div>
       <div class="db-prog-done">${pct}%</div>
