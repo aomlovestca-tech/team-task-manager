@@ -2441,7 +2441,7 @@ function renderChOverview(ch) {
 
     return `<div class="ch-task-row">
       <div class="ch-task-info" style="flex:1">
-        <div class="ch-task-title" onclick="openChTaskEdit(${i})" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px">${t.title}</div>
+        <div class="ch-task-title">${t.title}</div>
         ${names?`<div class="ch-task-assign">${names}</div>`:''}
         ${dateBadge}
         ${statusLabel?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
@@ -2451,7 +2451,7 @@ function renderChOverview(ch) {
       </div>
       <div style="display:flex;flex-direction:row;gap:6px;align-items:center">
         ${pct<100?`<button onclick="markChTaskDone(${i})" style="background:#cefb59;color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px">✓ Done</button>`:`<span style="background:#d1fae5;color:#065f46;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;white-space:nowrap">✅ เสร็จแล้ว</span>`}
-        <button class="ch-edit-btn" onclick="openChTaskEdit(${i})">แก้ไข</button>
+        <button onclick="openChTaskEdit(${i})" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">แจ้งปัญหา</button>
       </div>
     </div>`;
   }).join('');
