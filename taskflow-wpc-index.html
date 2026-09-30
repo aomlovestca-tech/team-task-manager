@@ -2441,7 +2441,7 @@ function renderChOverview(ch) {
 
     return `<div class="ch-task-row">
       <div class="ch-task-info" style="flex:1">
-        <div class="ch-task-title">${t.title}</div>
+        <div class="ch-task-title" onclick="openChTaskEdit(${i})" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px">${t.title}</div>
         ${names?`<div class="ch-task-assign">${names}</div>`:''}
         ${dateBadge}
         ${statusLabel?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
