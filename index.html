@@ -291,9 +291,10 @@
   .form-control { padding: 10px 12px; border: 1.5px solid var(--gray-200); border-radius: 9px; font-size: 13px; color: var(--gray-800); outline: none; transition: border-color .15s; font-family: inherit; min-height: 44px; }
   .form-control:focus { border-color: var(--primary); }
   textarea.form-control { resize: vertical; min-height: 80px; }
-  .color-picker-row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .color-option { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all .15s; }
-  .color-option.selected, .color-option:hover { border-color: var(--gray-800); transform: scale(1.1); }
+  .member-photo-preview { width:80px;height:80px;border-radius:50%;background:#9ca3af;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;overflow:hidden;cursor:pointer;position:relative;margin:0 auto 4px;flex-shrink:0; }
+  .member-photo-preview:hover .m-photo-overlay { opacity:1; }
+  .m-photo-overlay { position:absolute;inset:0;background:rgba(0,0,0,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:.15s; }
+  .m-photo-overlay svg { width:22px;height:22px; }
   .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-100); }
 
   /* MULTI MEMBER CHIPS */
@@ -1201,9 +1202,18 @@
     </div>
     <div class="modal-body">
       <div class="form-grid" style="grid-template-columns:1fr">
-        <div class="form-group"><label class="form-label">ชื่อ-นามสกุล *</label><input class="form-control" id="m-name" placeholder="เช่น นาย สมชาย ใจดี"></div>
+        <div class="form-group"><label class="form-label">ชื่อ-นามสกุล *</label><input class="form-control" id="m-name" placeholder="เช่น นาย สมชาย ใจดี" oninput="updateMemberPreviewInitials()"></div>
         <div class="form-group"><label class="form-label">ตำแหน่ง / แผนก *</label><input class="form-control" id="m-role" placeholder="เช่น Graphic Designer, Marketing"></div>
-        <div class="form-group"><label class="form-label">สีประจำตัว</label><div class="color-picker-row" id="color-picker-row"></div></div>
+        <div class="form-group" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+          <div class="member-photo-preview" id="m-avatar-preview" onclick="document.getElementById('m-photo-input').click()">
+            <span id="m-avatar-initials" style="position:relative;z-index:1">?</span>
+            <img id="m-avatar-img" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">
+            <div class="m-photo-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          </div>
+          <label style="font-size:12px;color:var(--gray-400);cursor:pointer" onclick="document.getElementById('m-photo-input').click()">คลิกเพื่ออัปโหลดรูปโปรไฟล์</label>
+          <input type="file" id="m-photo-input" accept="image/*" style="display:none" onchange="handleMemberPhotoUpload(event)">
+          <button type="button" class="btn btn-outline btn-sm" id="m-photo-remove" style="display:none;font-size:11px" onclick="removeMemberPhoto()">ลบรูปภาพ</button>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-danger" id="member-delete-btn" onclick="deleteCurrentMember()" style="display:none;margin-right:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> ลบสมาชิก</button>
@@ -1235,7 +1245,7 @@ const firestore = firebase.firestore();
 // ══════════════════════════════════════════════════════
 //  DATA STORE
 // ══════════════════════════════════════════════════════
-const COLORS = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ef4444','#14b8a6','#f97316','#84cc16'];
+const AVATAR_GRAY = '#9ca3af';
 let db = { tasks: [], members: [], challenges: [], currentWeekOffset: 0 };
 let _chState = { currentId: null, tab: 'overview', editTaskIdx: null };
 
@@ -1423,6 +1433,33 @@ function priorityBadge(p) {
 function initials(name) {
   return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
+// Build avatar HTML: shows profile photo if available, else gray initials circle
+function mkAvatar(m, opts={}) {
+  const { size='', fs='', extra='' } = opts;
+  const sizeStyle = size ? `width:${size};height:${size};` : '';
+  const fsStyle = fs ? `font-size:${fs};` : '';
+  const overflowStyle = (m && m.photo) ? 'overflow:hidden;' : '';
+  const style = `background:${AVATAR_GRAY};${sizeStyle}${fsStyle}${overflowStyle}${extra}`;
+  if (m && m.photo) {
+    return `<div class="avatar" style="${style}"><img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></div>`;
+  }
+  return `<div class="avatar" style="${style}">${initials(m ? m.name : '?')}</div>`;
+}
+// Resize uploaded image to JPEG ≤200×200 before storing
+function resizeImageBase64(dataUrl, maxW=200, maxH=200, q=0.82) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      let w=img.width, h=img.height;
+      if (w>maxW||h>maxH) { const r=Math.min(maxW/w,maxH/h); w=Math.round(w*r); h=Math.round(h*r); }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(c.toDataURL('image/jpeg',q));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
 
 // ══════════════════════════════════════════════════════
 //  RENDER DASHBOARD
@@ -1478,7 +1515,7 @@ function renderDashboard() {
     const md = mt.filter(t => t.status==='Done').length;
     const pct = mt.length ? Math.round(md/mt.length*100) : 0;
     return `<div class="db-member-row">
-      <div class="avatar" style="background:#e5e7eb;width:34px;height:34px;font-size:12px;flex-shrink:0;color:#374151">${initials(m.name)}</div>
+      ${mkAvatar(m,{size:'34px',fs:'12px',extra:'flex-shrink:0;'})}
       <div style="flex:1;min-width:0">
         <div class="db-member-name">${m.name}</div>
         <div class="db-member-role">${m.role} · ${mt.length} งาน</div>
@@ -1649,9 +1686,12 @@ function wmBuildMemberRow() {
   let html = members.map((m,i)=>{
     const active = i===wmCurrentMemberIdx ? 'wm-active' : '';
     const init = (m.name||'?').charAt(0).toUpperCase();
-    const col = m.color||'#7c3aed';
+    const avatarBg = active ? 'rgba(255,255,255,.25)' : AVATAR_GRAY;
+    const avatarContent = m.photo
+      ? `<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">`
+      : init;
     return `<div class="wm-chip ${active}" onclick="wmSelectMember(${i})">
-      <div class="wm-avatar" style="background:${active?'rgba(255,255,255,.25)':col}">${init}</div>
+      <div class="wm-avatar" style="background:${avatarBg};overflow:${m.photo?'hidden':'visible'}">${avatarContent}</div>
       ${m.name||'—'}
     </div>`;
   }).join('');
@@ -1701,7 +1741,6 @@ function wmRenderMemberReport() {
   if (!members.length) { area.innerHTML='<div class="empty-state" style="padding:40px;text-align:center;color:var(--gray-400)">ยังไม่มีสมาชิก</div>'; return; }
   const m = members[wmCurrentMemberIdx] || members[0];
   const mid = m.id;
-  const col = m.color||'#7c3aed';
   const init = (m.name||'?').charAt(0).toUpperCase();
 
   const myTasks = db.tasks.filter(t=>getTaskMemberIds(t).includes(mid));
@@ -1757,7 +1796,9 @@ function wmRenderMemberReport() {
   });
 
   const header = `<div class="wm-member-header">
-    <div class="wm-m-avatar" style="background:${col}">${init}</div>
+    <div class="wm-m-avatar" style="background:${AVATAR_GRAY};${m.photo?'overflow:hidden':''}">
+      ${m.photo ? `<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">` : init}
+    </div>
     <div><div class="wm-m-name">${m.name||'—'}</div><div class="wm-m-sub">รายงานสถานการณ์งานประจำสัปดาห์</div></div>
     <div class="wm-m-stats">
       <div class="wm-mstat"><div class="wm-mstat-num" style="color:#059669">${done.length}</div><div class="wm-mstat-label">Done</div></div>
@@ -1803,7 +1844,7 @@ function taskCard(t) {
   const members = ids.map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
   const ov = isOverdue(t.due, t.status);
   const borderColor = {High:'var(--danger)',Medium:'var(--warning)',Low:'var(--success)'}[t.priority]||'var(--gray-200)';
-  const avs = members.slice(0,3).map(m=>`<div class="avatar" style="background:${m.color};width:20px;height:20px;font-size:9px;margin-right:-4px;border:2px solid #fff">${initials(m.name)}</div>`).join('');
+  const avs = members.slice(0,3).map(m=>mkAvatar(m,{size:'20px',fs:'9px',extra:'margin-right:-4px;border:2px solid #fff;'})).join('');
   const names = members.map(m=>m.name.split(' ')[0]).join(', ');
   const dateRange = t.startDate ? `${formatDate(t.startDate)} – ${formatDate(t.due)}` : formatDate(t.due);
   return `<div class="task-card" style="border-left-color:${borderColor}" onclick="openTaskModal('${t.id}')">
@@ -1860,7 +1901,7 @@ function renderMonthly() {
     const notDone = mt.filter(t=>t.status!=='Done'&&!isOverdue(t.due,t.status)).length;
     return `<div class="month-card">
       <div class="month-card-header">
-        <div class="avatar" style="background:${m.color};width:40px;height:40px;font-size:15px">${initials(m.name)}</div>
+        ${mkAvatar(m,{size:'40px',fs:'15px'})}
         <div><div style="font-size:14px;font-weight:700">${m.name}</div><div style="font-size:12px;color:var(--gray-400)">${m.role}</div></div>
       </div>
       <div class="month-stats-grid">
@@ -1944,7 +1985,9 @@ function mtBuildMemberBar() {
   db.members.forEach(m => {
     const active = mtCurrentMemberId === m.id;
     all.push(`<div class="mt-mchip ${active?'mt-active':''}" onclick="mtSelectMember('${m.id}')">
-       <div class="mt-mav" style="background:${m.color||'var(--primary)'}">${(m.name||'?').charAt(0).toUpperCase()}</div>
+       <div class="mt-mav" style="background:${AVATAR_GRAY};${m.photo?'overflow:hidden':''}">
+         ${m.photo ? `<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">` : (m.name||'?').charAt(0).toUpperCase()}
+       </div>
        ${m.name.split(' ')[0]}
      </div>`);
   });
@@ -2049,7 +2092,7 @@ function renderMembers() {
     const md=mt.filter(t=>t.status==='Done').length;
     const mp=mt.filter(t=>t.status==='In Progress').length;
     return `<div class="member-card">
-      <div class="avatar" style="background:${m.color};width:60px;height:60px;font-size:22px">${initials(m.name)}</div>
+      ${mkAvatar(m,{size:'60px',fs:'22px'})}
       <div class="member-card-name">${m.name}</div>
       <div class="member-card-role">${m.role}</div>
       <div class="member-card-stats">
@@ -2078,7 +2121,7 @@ function renderMemberChips() {
   if (!db.members.length) { wrap.innerHTML='<span style="font-size:12px;color:var(--gray-400)">ยังไม่มีสมาชิก</span>'; return; }
   wrap.innerHTML = db.members.map(m=>
     `<div class="member-chip ${selectedMemberIds.includes(m.id)?'selected':''}" onclick="toggleMemberChip('${m.id}')">
-      <div class="avatar" style="background:${m.color};width:18px;height:18px;font-size:8px">${initials(m.name)}</div>
+      ${mkAvatar(m,{size:'18px',fs:'8px'})}
       ${m.name.split(' ')[0]}
     </div>`
   ).join('');
@@ -2210,36 +2253,70 @@ async function deleteCurrentTask() {
 // ══════════════════════════════════════════════════════
 //  MEMBER MODAL
 // ══════════════════════════════════════════════════════
-let editingMemberId=null, selectedColor=COLORS[0];
+let editingMemberId=null, memberPhotoBase64=null;
+
+function _setMemberAvatarPreview(photo, name) {
+  const initEl=document.getElementById('m-avatar-initials');
+  const imgEl=document.getElementById('m-avatar-img');
+  const removeBtn=document.getElementById('m-photo-remove');
+  if (photo) {
+    imgEl.src=photo; imgEl.style.display='block';
+    initEl.style.display='none';
+    removeBtn.style.display='';
+  } else {
+    imgEl.src=''; imgEl.style.display='none';
+    initEl.style.display='';
+    initEl.textContent = name ? initials(name) : '?';
+    removeBtn.style.display='none';
+  }
+}
 
 function openMemberModal(id=null) {
   editingMemberId=id;
-  renderColorPicker();
+  memberPhotoBase64=null;
+  document.getElementById('m-photo-input').value='';
   if (id) {
     const m=db.members.find(x=>x.id===id); if(!m)return;
     document.getElementById('member-modal-title').textContent='แก้ไขสมาชิก';
     document.getElementById('m-name').value=m.name||'';
     document.getElementById('m-role').value=m.role||'';
-    selectedColor=m.color||COLORS[0];
+    memberPhotoBase64=m.photo||null;
+    _setMemberAvatarPreview(m.photo||null, m.name||'');
     document.getElementById('member-delete-btn').style.display='inline-flex';
   } else {
     document.getElementById('member-modal-title').textContent='เพิ่มสมาชิกใหม่';
     document.getElementById('m-name').value='';
     document.getElementById('m-role').value='';
-    selectedColor=COLORS[Math.floor(Math.random()*COLORS.length)];
+    _setMemberAvatarPreview(null,'');
     document.getElementById('member-delete-btn').style.display='none';
   }
-  renderColorPicker();
   document.getElementById('member-modal-overlay').classList.add('open');
 }
 
-function renderColorPicker() {
-  document.getElementById('color-picker-row').innerHTML=COLORS.map(c=>
-    `<div class="color-option ${c===selectedColor?'selected':''}" style="background:${c}" onclick="selectColor('${c}')"></div>`
-  ).join('');
+function updateMemberPreviewInitials() {
+  const img=document.getElementById('m-avatar-img');
+  if (img && img.style.display==='block') return; // photo already shown
+  const name=document.getElementById('m-name').value.trim();
+  const initEl=document.getElementById('m-avatar-initials');
+  if (initEl) initEl.textContent = name ? initials(name) : '?';
 }
 
-function selectColor(c) { selectedColor=c; renderColorPicker(); }
+async function handleMemberPhotoUpload(e) {
+  const file=e.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const resized=await resizeImageBase64(ev.target.result);
+    memberPhotoBase64=resized;
+    _setMemberAvatarPreview(resized, document.getElementById('m-name').value.trim());
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeMemberPhoto() {
+  memberPhotoBase64=null;
+  document.getElementById('m-photo-input').value='';
+  _setMemberAvatarPreview(null, document.getElementById('m-name').value.trim());
+}
 
 function closeMemberModal(e) {
   if (e && e.target!==document.getElementById('member-modal-overlay')) return;
@@ -2252,7 +2329,9 @@ async function saveMember() {
   if (!name){toast('กรุณาระบุชื่อสมาชิก','error');return;}
   if (!role){toast('กรุณาระบุตำแหน่ง','error');return;}
   try {
-    await saveMemberFS({id:editingMemberId||uid(),name,role,color:selectedColor});
+    const memberData={id:editingMemberId||uid(),name,role,color:AVATAR_GRAY};
+    if (memberPhotoBase64) memberData.photo=memberPhotoBase64;
+    await saveMemberFS(memberData);
     document.getElementById('member-modal-overlay').classList.remove('open');
     toast(editingMemberId?'อัปเดตสมาชิกเรียบร้อย':'เพิ่มสมาชิกใหม่เรียบร้อย','success');
   } catch(e){toast('บันทึกไม่สำเร็จ','error');}
@@ -2425,7 +2504,7 @@ function renderChOverview(ch) {
     if (!ms) return;
     const mp = ms.tasks.length ? Math.round(ms.tasks.reduce((a,t)=>a+getTaskProgress(t.taskId),0)/ms.tasks.length) : 0;
     memberRows += `<div class="ch-member-row">
-      <div class="avatar" style="background:${m.color}">${initials(m.name)}</div>
+      ${mkAvatar(m)}
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600;color:var(--gray-800)">${m.name}</div>
         <div style="font-size:12px;color:var(--gray-400)">${ms.tasks.length} งาน · ${ms.done} เสร็จ</div>
