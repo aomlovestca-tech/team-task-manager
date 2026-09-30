@@ -2449,7 +2449,10 @@ function renderChOverview(ch) {
         <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>
         ${t.blockers&&t.blockers.trim()?`<div class="ch-task-blocker">⚠ ${t.blockers}</div>`:''}
       </div>
-      <button class="ch-edit-btn" onclick="openChTaskEdit(${i})">แก้ไข</button>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        ${pct<100?`<button onclick="markChTaskDone(${i})" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px">✓ Done</button>`:`<span style="background:#d1fae5;color:#065f46;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;white-space:nowrap">✅ เสร็จแล้ว</span>`}
+        <button class="ch-edit-btn" onclick="openChTaskEdit(${i})">แก้ไข</button>
+      </div>
     </div>`;
   }).join('');
 
@@ -2679,6 +2682,16 @@ async function saveChTaskEdit() {
     await saveChallengeFS(ch);
     closeChTaskEdit();
     toast('บันทึกแล้ว','success');
+  } catch(e){ toast('เกิดข้อผิดพลาด','error'); }
+}
+
+async function markChTaskDone(i) {
+  const ch = db.challenges.find(c=>c.id===_chState.currentId);
+  if (!ch||!ch.tasks[i]) return;
+  ch.tasks[i].progress = 100;
+  try {
+    await saveChallengeFS(ch);
+    toast('✅ ทำเครื่องหมายงานสำเร็จแล้ว','success');
   } catch(e){ toast('เกิดข้อผิดพลาด','error'); }
 }
 
