@@ -2161,8 +2161,31 @@ async function saveTask() {
   };
   try {
     await saveTaskFS(task);
+    // Immediately update local db.tasks so Challenge re-renders with new data right away
+    // (don't wait for Firestore onSnapshot which fires asynchronously)
+    const localIdx = db.tasks.findIndex(t => t.id === task.id);
+    if (localIdx >= 0) { db.tasks[localIdx] = task; } else { db.tasks.push(task); }
+    // Sync title + assignees into ch.tasks snapshot in every challenge that references this task
+    if (editingTaskId) {
+      const mids = task.memberIds || [];
+      for (const ch of db.challenges) {
+        if (!ch.tasks) continue;
+        const cidx = ch.tasks.findIndex(t => t.taskId === editingTaskId);
+        if (cidx >= 0) {
+          ch.tasks[cidx].title = title;
+          ch.tasks[cidx].assigneeIds = mids;
+          ch.tasks[cidx].assigneeId = mids[0] || '';
+          try { await saveChallengeFS(ch); } catch(e) {}
+        }
+      }
+    }
     document.getElementById('task-modal-overlay').classList.remove('open');
     toast(editingTaskId?'อัปเดตงานเรียบร้อย':'เพิ่มงานใหม่เรียบร้อย','success');
+    // Force immediate re-render of challenge page if open
+    if (_chState.currentId) {
+      const activeCh = db.challenges.find(c => c.id === _chState.currentId);
+      if (activeCh) renderChOverview(activeCh);
+    }
   } catch(e) { toast('บันทึกไม่สำเร็จ กรุณาลองใหม่','error'); }
 }
 
@@ -2170,7 +2193,15 @@ async function deleteCurrentTask() {
   if (!editingTaskId) return;
   if (!confirm('ต้องการลบงานนี้ใช่ไหม?')) return;
   try {
-    await removeTask(editingTaskId);
+    const deletedId = editingTaskId;
+    await removeTask(deletedId);
+    // Remove deleted task from all challenges that reference it
+    for (const ch of db.challenges) {
+      if (ch.tasks && ch.tasks.some(t => t.taskId === deletedId)) {
+        const updatedCh = { ...ch, tasks: ch.tasks.filter(t => t.taskId !== deletedId) };
+        try { await saveChallengeFS(updatedCh); } catch(e) {}
+      }
+    }
     document.getElementById('task-modal-overlay').classList.remove('open');
     toast('ลบงานเรียบร้อย','success');
   } catch(e) { toast('ลบไม่สำเร็จ','error'); }
@@ -2369,8 +2400,10 @@ function switchChTab(tab) {
 }
 
 function renderChOverview(ch) {
-  const tasks = ch.tasks || [];
-  const pct = chPct(ch);
+  // Only include tasks that still exist in db.tasks (excludes deleted tasks)
+  const allTasks = ch.tasks || [];
+  const tasks = allTasks.filter(t => db.tasks.find(x => x.id === t.taskId));
+  const pct = tasks.length ? Math.round(tasks.reduce((a,t)=>a+getTaskProgress(t.taskId),0)/tasks.length) : 0;
   const blockers = tasks.filter(t=>t.blockers&&t.blockers.trim());
   const done = tasks.filter(t=>getTaskProgress(t.taskId)>=100).length;
 
@@ -2411,10 +2444,12 @@ function renderChOverview(ch) {
 
   const buildTaskRow = (t, i, isDone) => {
     const liveTask = db.tasks.find(x=>x.id===t.taskId);
-    const mids = liveTask ? getTaskMemberIds(liveTask) : (t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]));
+    if (!liveTask) return ''; // task was deleted — skip
+    const displayTitle = liveTask.title || t.title;
+    const mids = getTaskMemberIds(liveTask);
     const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
     const pct = getTaskProgress(t.taskId);
-    const statusLabel = liveTask ? (liveTask.status||'') : '';
+    const statusLabel = liveTask.status||'';
 
     let dateBadge = '';
     if (liveTask && (liveTask.startDate || liveTask.due)) {
@@ -2440,7 +2475,7 @@ function renderChOverview(ch) {
 
     return `<div class="ch-task-row"${isDone?' style="opacity:0.85"':''}>
       <div class="ch-task-info" style="flex:1">
-        <div class="ch-task-title" onclick="openTaskModal('${t.taskId}')" style="cursor:pointer;display:inline-block;background:var(--gray-100,#f3f4f6);border-radius:6px;padding:4px 10px;margin-bottom:2px">${t.title}</div>
+        <div class="ch-task-title" onclick="openTaskModal('${t.taskId}')" style="cursor:pointer;display:inline-block;background:var(--gray-100,#f3f4f6);border-radius:6px;padding:4px 10px;margin-bottom:2px">${displayTitle}</div>
         ${names?`<div class="ch-task-assign">${names}</div>`:''}
         ${dateBadge}
         ${statusLabel&&!isDone?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
@@ -2458,8 +2493,10 @@ function renderChOverview(ch) {
     </div>`;
   };
 
-  const pendingRows = tasks.map((t,i)=>({t,i,pct:getTaskProgress(t.taskId)})).filter(x=>x.pct<100);
-  const doneRows    = tasks.map((t,i)=>({t,i,pct:getTaskProgress(t.taskId)})).filter(x=>x.pct>=100);
+  // Use allTasks indices so markChTaskDone(i) / openChTaskEdit(i) reference the correct ch.tasks[i]
+  const allEntries  = allTasks.map((t,i)=>({t,i})).filter(({t})=>db.tasks.find(x=>x.id===t.taskId));
+  const pendingRows = allEntries.filter(({t})=>getTaskProgress(t.taskId)<100);
+  const doneRows    = allEntries.filter(({t})=>getTaskProgress(t.taskId)>=100);
 
   const pendingHtml = pendingRows.length
     ? pendingRows.map(({t,i})=>buildTaskRow(t,i,false)).join('')
