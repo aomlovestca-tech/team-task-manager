@@ -421,7 +421,9 @@
   }
 
   /* ── CHALLENGE CALENDAR ── */
-  .cal-wrap { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+  .cal-wrap { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; width:100%; }
+  #ch-calendar-panel { width:100%; }
+  .cal-week-events { position:relative; overflow:visible; }
   .cal-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--gray-100); }
   .cal-nav-btn { background:none; border:1px solid var(--gray-200); border-radius:8px; width:34px; height:34px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--gray-600); font-size:18px; transition:all .15s; flex-shrink:0; }
   .cal-nav-btn:hover { background:var(--gray-100); }
@@ -435,8 +437,11 @@
   .cal-week-row { border-bottom:1px solid var(--gray-100); }
   .cal-week-row:last-child { border-bottom:none; }
   .cal-week-days { display:grid; grid-template-columns:repeat(7,1fr); }
-  .cal-day-num-cell { min-height:28px; border-right:1px solid var(--gray-100); padding:4px 4px 2px; display:flex; align-items:flex-start; }
+  .cal-day-num-cell { min-height:72px; border-right:1px solid var(--gray-100); padding:4px 4px 2px; display:flex; align-items:flex-start; cursor:pointer; transition:background .12s; }
   .cal-day-num-cell:last-child { border-right:none; }
+  .cal-day-num-cell:hover { background:var(--primary-faint); }
+  .cal-day-add-btn { display:none; margin-left:auto; font-size:14px; color:var(--primary); line-height:1; }
+  .cal-day-num-cell:hover .cal-day-add-btn { display:block; }
   .cal-day-num { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--gray-600); flex-shrink:0; }
   .cal-today .cal-day-num { background:var(--primary); color:#fff; }
   .cal-other-month .cal-day-num { color:var(--gray-300); }
@@ -1226,9 +1231,16 @@
           <label class="form-label">ผู้รับผิดชอบ (เลือกได้หลายคน)</label>
           <div class="member-chips-wrap" id="f-members-chips"><span style="font-size:12px;color:var(--gray-400)">กำลังโหลด...</span></div>
         </div>
+        <div class="form-group full">
+          <label class="form-label">Challenge <span style="color:var(--gray-400);font-weight:400">(ไม่บังคับ)</span></label>
+          <select class="form-control" id="f-challenge">
+            <option value="">— ไม่อยู่ใน Challenge —</option>
+          </select>
+        </div>
         <div class="form-group">
-          <label class="form-label">สถานะ</label>
+          <label class="form-label">สถานะ <span style="color:#ef4444">*</span></label>
           <select class="form-control" id="f-status">
+            <option value="">— เลือกสถานะ —</option>
             <option value="Todo">To Do · รอดำเนินการ</option>
             <option value="In Progress">In Progress · กำลังทำ</option>
             <option value="Done">Done · เสร็จสิ้น</option>
@@ -1244,11 +1256,11 @@
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">วันที่เริ่มต้น</label>
+          <label class="form-label">วันที่เริ่มต้น <span style="color:#ef4444">*</span></label>
           <input class="form-control" type="date" id="f-start-date">
         </div>
         <div class="form-group">
-          <label class="form-label">วันที่สิ้นสุด / กำหนดส่ง</label>
+          <label class="form-label">วันที่สิ้นสุด / กำหนดส่ง <span style="color:#ef4444">*</span></label>
           <input class="form-control" type="date" id="f-due">
         </div>
         <div class="form-group full">
@@ -2207,7 +2219,13 @@ function toggleMemberChip(id) {
   renderMemberChips();
 }
 
-function openTaskModal(id=null, defaultStatus='Todo') {
+function populateChallengeDropdown(selectedChId='') {
+  const sel = document.getElementById('f-challenge');
+  sel.innerHTML = '<option value="">— ไม่อยู่ใน Challenge —</option>' +
+    db.challenges.map(ch=>`<option value="${ch.id}"${ch.id===selectedChId?' selected':''}>${ch.name}</option>`).join('');
+}
+
+function openTaskModal(id=null, defaultStatus='Todo', defaultDate=null) {
   editingTaskId = id;
   const overlay = document.getElementById('task-modal-overlay');
   const deleteBtn = document.getElementById('task-delete-btn');
@@ -2216,29 +2234,37 @@ function openTaskModal(id=null, defaultStatus='Todo') {
     const t = db.tasks.find(x=>x.id===id);
     if (!t) return;
     selectedMemberIds = [...getTaskMemberIds(t)];
+    // Find which challenge owns this task
+    const ownerCh = db.challenges.find(ch => ch.tasks && ch.tasks.some(ct => ct.taskId === id));
     document.getElementById('task-modal-title').textContent = 'แก้ไขงาน';
     document.getElementById('f-title').value      = t.title||'';
     document.getElementById('f-desc').value       = t.desc||'';
-    document.getElementById('f-status').value     = t.status||'Todo';
+    document.getElementById('f-status').value     = t.status||'';
     document.getElementById('f-priority').value   = t.priority||'Medium';
     document.getElementById('f-start-date').value = t.startDate||'';
     document.getElementById('f-due').value        = t.due||'';
     document.getElementById('f-note').value       = t.note||'';
+    populateChallengeDropdown(ownerCh ? ownerCh.id : '');
     deleteBtn.style.display='inline-flex';
   } else {
     selectedMemberIds = [];
     document.getElementById('task-modal-title').textContent = 'เพิ่มงานใหม่';
     document.getElementById('f-title').value      = '';
     document.getElementById('f-desc').value       = '';
-    document.getElementById('f-status').value     = defaultStatus;
+    document.getElementById('f-status').value     = '';
     document.getElementById('f-priority').value   = 'Medium';
-    document.getElementById('f-start-date').value = '';
+    document.getElementById('f-start-date').value = defaultDate||'';
     document.getElementById('f-due').value        = '';
     document.getElementById('f-note').value       = '';
+    // Pre-select active challenge if viewing one
+    const preselect = _chState.currentId || '';
+    populateChallengeDropdown(preselect);
     deleteBtn.style.display='none';
   }
   renderMemberChips();
   overlay.classList.add('open');
+  // Focus title field
+  setTimeout(()=>{ const el=document.getElementById('f-title'); if(el) el.focus(); }, 200);
 }
 
 function closeTaskModal(e) {
@@ -2247,60 +2273,79 @@ function closeTaskModal(e) {
 }
 
 async function saveTask() {
-  const title = document.getElementById('f-title').value.trim();
-  if (!title) { toast('กรุณาระบุชื่องาน','error'); return; }
-  // Auto-compute week/year from dates; fallback to active week
+  const title      = document.getElementById('f-title').value.trim();
+  const fStatus    = document.getElementById('f-status').value;
   const fStartDate = document.getElementById('f-start-date').value;
   const fDueDate   = document.getElementById('f-due').value;
-  let wy, ww;
-  if (fStartDate || fDueDate) {
-    const dateRef = new Date((fStartDate || fDueDate) + 'T00:00:00');
-    ww = getISOWeek(dateRef);
-    wy = getISOWeekYear(dateRef);
-  } else {
-    ({ week: ww, year: wy } = getActiveWeek());
-  }
+  const fChallengeId = document.getElementById('f-challenge').value;
+
+  // ── Validation ──
+  if (!title)      { toast('กรุณาระบุชื่องาน','error'); document.getElementById('f-title').focus(); return; }
+  if (!fStatus)    { toast('กรุณาเลือกสถานะงาน','error'); document.getElementById('f-status').focus(); return; }
+  if (!fStartDate) { toast('กรุณาเลือกวันที่เริ่มต้น','error'); document.getElementById('f-start-date').focus(); return; }
+  if (!fDueDate)   { toast('กรุณาเลือกวันที่สิ้นสุด','error'); document.getElementById('f-due').focus(); return; }
+  if (fDueDate < fStartDate) { toast('วันสิ้นสุดต้องไม่ก่อนวันเริ่มต้น','error'); document.getElementById('f-due').focus(); return; }
+
+  // Auto-compute week/year from dates
+  const dateRef = new Date(fStartDate + 'T00:00:00');
+  const ww = getISOWeek(dateRef);
+  const wy = getISOWeekYear(dateRef);
+
+  const taskId = editingTaskId || uid();
   const task = {
-    id:         editingTaskId || uid(),
+    id:         taskId,
     title,
     desc:       document.getElementById('f-desc').value.trim(),
     memberIds:  [...selectedMemberIds],
     memberId:   selectedMemberIds[0]||'',
-    status:     document.getElementById('f-status').value,
+    status:     fStatus,
     priority:   document.getElementById('f-priority').value,
-    startDate:  document.getElementById('f-start-date').value,
-    due:        document.getElementById('f-due').value,
+    startDate:  fStartDate,
+    due:        fDueDate,
     week:       ww, year: wy,
     note:       document.getElementById('f-note').value.trim(),
     createdAt:  editingTaskId?(db.tasks.find(t=>t.id===editingTaskId)||{}).createdAt||Date.now():Date.now(),
     updatedAt:  Date.now()
   };
+
   try {
     await saveTaskFS(task);
-    // Immediately update local db.tasks so Challenge re-renders with new data right away
-    // (don't wait for Firestore onSnapshot which fires asynchronously)
+    // Update local cache immediately (don't wait for Firestore snapshot)
     const localIdx = db.tasks.findIndex(t => t.id === task.id);
     if (localIdx >= 0) { db.tasks[localIdx] = task; } else { db.tasks.push(task); }
-    // Sync title + assignees into ch.tasks snapshot in every challenge that references this task
-    if (editingTaskId) {
-      const mids = task.memberIds || [];
-      for (const ch of db.challenges) {
-        if (!ch.tasks) continue;
-        const cidx = ch.tasks.findIndex(t => t.taskId === editingTaskId);
-        if (cidx >= 0) {
-          ch.tasks[cidx].title = title;
-          ch.tasks[cidx].assigneeIds = mids;
-          ch.tasks[cidx].assigneeId = mids[0] || '';
-          try { await saveChallengeFS(ch); } catch(e) {}
-        }
+
+    const mids = task.memberIds || [];
+
+    // ── Challenge assignment ──
+    // Find which challenge CURRENTLY owns this task (before change)
+    const prevOwnerCh = db.challenges.find(ch => ch.tasks && ch.tasks.some(ct => ct.taskId === taskId));
+    const newChId = fChallengeId;
+
+    for (const ch of db.challenges) {
+      if (!ch.tasks) ch.tasks = [];
+      const cidx = ch.tasks.findIndex(ct => ct.taskId === taskId);
+      if (ch.id === newChId) {
+        // Add or update in this challenge
+        const entry = { taskId, title, assigneeIds: mids, assigneeId: mids[0]||'', blockers: cidx>=0 ? ch.tasks[cidx].blockers||'' : '' };
+        if (cidx >= 0) { ch.tasks[cidx] = entry; } else { ch.tasks.push(entry); }
+        try { await saveChallengeFS(ch); } catch(e) {}
+      } else if (cidx >= 0) {
+        // Remove from this challenge (task moved out)
+        ch.tasks.splice(cidx, 1);
+        try { await saveChallengeFS(ch); } catch(e) {}
       }
     }
+
     document.getElementById('task-modal-overlay').classList.remove('open');
     toast(editingTaskId?'อัปเดตงานเรียบร้อย':'เพิ่มงานใหม่เรียบร้อย','success');
     // Force immediate re-render of challenge page if open
     if (_chState.currentId) {
       const activeCh = db.challenges.find(c => c.id === _chState.currentId);
       if (activeCh) renderChOverview(activeCh);
+    }
+    // Re-render calendar if open
+    if (document.getElementById('ch-calendar-panel') && document.getElementById('ch-calendar-panel').style.display !== 'none') {
+      renderCalendar();
     }
   } catch(e) { toast('บันทึกไม่สำเร็จ กรุณาลองใหม่','error'); }
 }
@@ -2551,7 +2596,11 @@ function renderCalendar() {
       const isToday = day.getTime() === today.getTime();
       const isOther = day.getMonth() !== month;
       const cls = `cal-day-num-cell${isToday?' cal-today':''}${isOther?' cal-other-month':''}`;
-      dayNums += `<div class="${cls}"><div class="cal-day-num">${day.getDate()}</div></div>`;
+      const iso = `${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`;
+      dayNums += `<div class="${cls}" onclick="openTaskModal(null,'Todo','${iso}')" title="เพิ่มงาน ${day.getDate()}/${day.getMonth()+1}">
+        <div class="cal-day-num">${day.getDate()}</div>
+        <div class="cal-day-add-btn">＋</div>
+      </div>`;
     }
 
     // Events overlapping this week
