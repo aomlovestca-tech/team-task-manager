@@ -1098,7 +1098,10 @@
     </div>
     <div class="form-group" style="margin-bottom:16px">
       <label class="form-label">เลือกงาน (Tasks) ที่ต้องการติดตาม</label>
-      <div style="margin-bottom:8px"><input class="form-control" id="ch-task-search" placeholder="ค้นหางาน..." oninput="renderChTaskPickerKeep()"></div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input class="form-control" id="ch-task-search" placeholder="ค้นหางาน..." oninput="renderChTaskPickerKeep()" style="flex:1">
+        <input type="month" class="form-control" id="ch-task-month" oninput="renderChTaskPickerKeep()" style="width:160px" title="กรองตามเดือน">
+      </div>
       <div class="ch-task-pick-list" id="ch-task-pick-list"></div>
     </div>
     <button class="btn btn-primary" style="width:100%" id="ch-save-btn" onclick="saveChallenge()">บันทึกชาเลนจ์</button>
@@ -2487,6 +2490,7 @@ function openChCreate() {
   document.getElementById('ch-f-start').value='';
   document.getElementById('ch-f-end').value='';
   document.getElementById('ch-task-search').value='';
+  document.getElementById('ch-task-month').value='';
   document.getElementById('ch-modal-title').textContent='สร้างชาเลนจ์ใหม่';
   document.getElementById('ch-save-btn').textContent='บันทึกชาเลนจ์';
   renderChTaskPicker();
@@ -2501,6 +2505,7 @@ function openChEdit() {
   document.getElementById('ch-f-start').value = ch.startDate||'';
   document.getElementById('ch-f-end').value = ch.endDate||'';
   document.getElementById('ch-task-search').value='';
+  document.getElementById('ch-task-month').value='';
   document.getElementById('ch-modal-title').textContent='แก้ไขชาเลนจ์';
   document.getElementById('ch-save-btn').textContent='บันทึกการแก้ไข';
   const existingIds = (ch.tasks||[]).map(t=>t.taskId);
@@ -2519,18 +2524,32 @@ function renderChTaskPickerKeep() {
 }
 function renderChTaskPicker(preChecked=[]) {
   const q = (document.getElementById('ch-task-search').value||'').toLowerCase();
+  const monthVal = (document.getElementById('ch-task-month')||{}).value||'';
   const list = document.getElementById('ch-task-pick-list');
-  const filtered = db.tasks.filter(t=>!q||t.title.toLowerCase().includes(q));
+  let filtered = db.tasks.filter(t=>!q||t.title.toLowerCase().includes(q));
+  if (monthVal) {
+    const [fy, fm] = monthVal.split('-').map(Number);
+    const monthStart = new Date(fy, fm-1, 1);
+    const monthEnd = new Date(fy, fm, 0);
+    filtered = filtered.filter(t => {
+      const ts = t.startDate ? new Date(t.startDate) : null;
+      const te = t.endDate ? new Date(t.endDate) : ts;
+      if (!ts) return false;
+      return ts <= monthEnd && te >= monthStart;
+    });
+  }
   if (!filtered.length) { list.innerHTML='<div style="padding:16px;text-align:center;color:var(--gray-400)">ไม่พบงาน</div>'; return; }
   list.innerHTML = filtered.map(t=>{
     const mids = getTaskMemberIds(t);
     const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
     const chk = preChecked.includes(t.id) ? 'checked' : '';
+    const dateInfo = t.startDate ? `<div style="font-size:11px;color:var(--gray-400)">${t.startDate}${t.endDate&&t.endDate!==t.startDate?' – '+t.endDate:''}</div>` : '';
     return `<label class="ch-task-pick-item">
       <input type="checkbox" value="${t.id}" name="ch-pick" ${chk}>
       <div>
         <div style="font-size:13px;font-weight:600;color:var(--gray-800)">${t.title}</div>
         ${names?`<div style="font-size:11px;color:var(--gray-400)">${names}</div>`:''}
+        ${dateInfo}
       </div>
     </label>`;
   }).join('');
