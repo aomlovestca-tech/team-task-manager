@@ -2427,7 +2427,7 @@ function renderChOverview(ch) {
       if (daysLeft !== null && !isDone) {
         if (daysLeft <= 2) {
           const d = Math.max(0, daysLeft);
-          countdownBadge = `<span style="background:#fee2e2;color:#dc2626;font-weight:700;font-size:13px;padding:3px 10px;border-radius:20px;margin-left:6px">🔴 ด่วน เหลือเวลาอีก ${d} วัน</span>`;
+          countdownBadge = `<span style="background:#fee2e2;color:#dc2626;font-weight:700;font-size:13px;padding:3px 10px;border-radius:20px;margin-left:6px">ด่วน · เหลืออีก ${d} วัน</span>`;
         } else {
           countdownBadge = `<span style="background:#dcfce7;color:#166534;font-weight:700;font-size:13px;padding:3px 10px;border-radius:20px;margin-left:6px">เหลืออีก ${daysLeft} วัน</span>`;
         }
@@ -2713,7 +2713,7 @@ async function markChTaskDone(i) {
   try {
     await saveChallengeFS(ch);
     renderChOverview(ch);
-    toast('✅ ทำเครื่องหมายงานสำเร็จแล้ว','success');
+    toast('งานเสร็จสมบูรณ์','success');
   } catch(e){ toast('เกิดข้อผิดพลาด','error'); }
 }
 
