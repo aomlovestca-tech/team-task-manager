@@ -1020,7 +1020,8 @@
               <div id="ch-detail-name" style="font-size:18px;font-weight:700;color:var(--gray-800)"></div>
               <div id="ch-detail-dates" style="font-size:12px;color:var(--gray-400)"></div>
             </div>
-            <button class="btn btn-outline btn-sm" onclick="deleteCurrentChallenge()" style="margin-left:auto;color:#dc2626;border-color:#fca5a5">ลบ</button>
+            <button class="btn btn-outline btn-sm" onclick="openChEdit()" style="margin-left:auto">แก้ไข</button>
+            <button class="btn btn-outline btn-sm" onclick="deleteCurrentChallenge()" style="color:#dc2626;border-color:#fca5a5">ลบ</button>
           </div>
           <div class="ch-tabs">
             <div class="ch-tab active" id="ch-tab-overview" onclick="switchChTab('overview')">ภาพรวมทีม</div>
@@ -1074,7 +1075,7 @@
   <div class="ch-modal">
     <div class="ch-modal-handle"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div class="ch-modal-title">สร้างชาเลนจ์ใหม่</div>
+      <div class="ch-modal-title" id="ch-modal-title">สร้างชาเลนจ์ใหม่</div>
       <button style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--gray-400)" onclick="closChCreate()">✕</button>
     </div>
     <div class="form-group" style="margin-bottom:14px">
@@ -1097,10 +1098,10 @@
     </div>
     <div class="form-group" style="margin-bottom:16px">
       <label class="form-label">เลือกงาน (Tasks) ที่ต้องการติดตาม</label>
-      <div style="margin-bottom:8px"><input class="form-control" id="ch-task-search" placeholder="ค้นหางาน..." oninput="renderChTaskPicker()"></div>
+      <div style="margin-bottom:8px"><input class="form-control" id="ch-task-search" placeholder="ค้นหางาน..." oninput="renderChTaskPickerKeep()"></div>
       <div class="ch-task-pick-list" id="ch-task-pick-list"></div>
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="saveChallenge()">บันทึกชาเลนจ์</button>
+    <button class="btn btn-primary" style="width:100%" id="ch-save-btn" onclick="saveChallenge()">บันทึกชาเลนจ์</button>
   </div>
 </div>
 
@@ -2480,12 +2481,30 @@ function renderChMyTasks(ch) {
 
 // Challenge Create Modal
 function openChCreate() {
+  _chState.editMode = false;
   document.getElementById('ch-f-name').value='';
   document.getElementById('ch-f-desc').value='';
   document.getElementById('ch-f-start').value='';
   document.getElementById('ch-f-end').value='';
   document.getElementById('ch-task-search').value='';
+  document.getElementById('ch-modal-title').textContent='สร้างชาเลนจ์ใหม่';
+  document.getElementById('ch-save-btn').textContent='บันทึกชาเลนจ์';
   renderChTaskPicker();
+  document.getElementById('ch-create-overlay').classList.add('open');
+}
+function openChEdit() {
+  const ch = db.challenges.find(c=>c.id===_chState.currentId);
+  if (!ch) return;
+  _chState.editMode = true;
+  document.getElementById('ch-f-name').value = ch.name||'';
+  document.getElementById('ch-f-desc').value = ch.desc||'';
+  document.getElementById('ch-f-start').value = ch.startDate||'';
+  document.getElementById('ch-f-end').value = ch.endDate||'';
+  document.getElementById('ch-task-search').value='';
+  document.getElementById('ch-modal-title').textContent='แก้ไขชาเลนจ์';
+  document.getElementById('ch-save-btn').textContent='บันทึกการแก้ไข';
+  const existingIds = (ch.tasks||[]).map(t=>t.taskId);
+  renderChTaskPicker(existingIds);
   document.getElementById('ch-create-overlay').classList.add('open');
 }
 function closChCreate(e) {
@@ -2494,7 +2513,11 @@ function closChCreate(e) {
   }
 }
 
-function renderChTaskPicker() {
+function renderChTaskPickerKeep() {
+  const current = Array.from(document.querySelectorAll('input[name=ch-pick]:checked')).map(c=>c.value);
+  renderChTaskPicker(current);
+}
+function renderChTaskPicker(preChecked=[]) {
   const q = (document.getElementById('ch-task-search').value||'').toLowerCase();
   const list = document.getElementById('ch-task-pick-list');
   const filtered = db.tasks.filter(t=>!q||t.title.toLowerCase().includes(q));
@@ -2502,8 +2525,9 @@ function renderChTaskPicker() {
   list.innerHTML = filtered.map(t=>{
     const mids = getTaskMemberIds(t);
     const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
+    const chk = preChecked.includes(t.id) ? 'checked' : '';
     return `<label class="ch-task-pick-item">
-      <input type="checkbox" value="${t.id}" name="ch-pick">
+      <input type="checkbox" value="${t.id}" name="ch-pick" ${chk}>
       <div>
         <div style="font-size:13px;font-weight:600;color:var(--gray-800)">${t.title}</div>
         ${names?`<div style="font-size:11px;color:var(--gray-400)">${names}</div>`:''}
@@ -2516,26 +2540,48 @@ async function saveChallenge() {
   const name = document.getElementById('ch-f-name').value.trim();
   if (!name) { toast('กรุณาระบุชื่อชาเลนจ์','error'); return; }
   const checked = Array.from(document.querySelectorAll('input[name=ch-pick]:checked')).map(c=>c.value);
-  const chTasks = checked.map(tid=>{
-    const t = db.tasks.find(x=>x.id===tid);
-    if (!t) return null;
-    const mids = getTaskMemberIds(t);
-    return { taskId:tid, title:t.title, assigneeIds:mids, assigneeId:mids[0]||'', progress:0, blockers:'' };
-  }).filter(Boolean);
-  const ch = {
-    id: 'ch_'+Date.now(),
-    name,
-    desc: document.getElementById('ch-f-desc').value.trim(),
-    startDate: document.getElementById('ch-f-start').value,
-    endDate: document.getElementById('ch-f-end').value,
-    createdAt: new Date().toISOString(),
-    tasks: chTasks
-  };
-  try {
-    await saveChallengeFS(ch);
-    closChCreate();
-    toast('สร้างชาเลนจ์สำเร็จ','success');
-  } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
+  if (_chState.editMode && _chState.currentId) {
+    // Edit existing challenge
+    const existing = db.challenges.find(c=>c.id===_chState.currentId);
+    if (!existing) { toast('ไม่พบชาเลนจ์','error'); return; }
+    const existingTaskMap = {};
+    (existing.tasks||[]).forEach(t=>{ existingTaskMap[t.taskId]=t; });
+    const chTasks = checked.map(tid=>{
+      if (existingTaskMap[tid]) return existingTaskMap[tid]; // preserve progress/blockers
+      const t = db.tasks.find(x=>x.id===tid);
+      if (!t) return null;
+      const mids = getTaskMemberIds(t);
+      return { taskId:tid, title:t.title, assigneeIds:mids, assigneeId:mids[0]||'', progress:0, blockers:'' };
+    }).filter(Boolean);
+    const ch = { ...existing, name, desc: document.getElementById('ch-f-desc').value.trim(), startDate: document.getElementById('ch-f-start').value, endDate: document.getElementById('ch-f-end').value, tasks: chTasks };
+    try {
+      await saveChallengeFS(ch);
+      closChCreate();
+      toast('บันทึกการแก้ไขสำเร็จ','success');
+    } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
+  } else {
+    // Create new challenge
+    const chTasks = checked.map(tid=>{
+      const t = db.tasks.find(x=>x.id===tid);
+      if (!t) return null;
+      const mids = getTaskMemberIds(t);
+      return { taskId:tid, title:t.title, assigneeIds:mids, assigneeId:mids[0]||'', progress:0, blockers:'' };
+    }).filter(Boolean);
+    const ch = {
+      id: 'ch_'+Date.now(),
+      name,
+      desc: document.getElementById('ch-f-desc').value.trim(),
+      startDate: document.getElementById('ch-f-start').value,
+      endDate: document.getElementById('ch-f-end').value,
+      createdAt: new Date().toISOString(),
+      tasks: chTasks
+    };
+    try {
+      await saveChallengeFS(ch);
+      closChCreate();
+      toast('สร้างชาเลนจ์สำเร็จ','success');
+    } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
+  }
 }
 
 async function deleteCurrentChallenge() {
