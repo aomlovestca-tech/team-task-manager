@@ -1099,9 +1099,12 @@
     <div class="form-group" style="margin-bottom:16px">
       <label class="form-label">เลือกงาน (Tasks) ที่ต้องการติดตาม</label>
       <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px">💡 เลือกเดือนทางขวาเพื่อกรองงานตามช่วงเวลา หรือค้นหาชื่องานได้เลย</div>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-end">
         <input class="form-control" id="ch-task-search" placeholder="ค้นหางาน..." oninput="renderChTaskPickerKeep()" style="flex:1">
-        <input type="month" class="form-control" id="ch-task-month" oninput="renderChTaskPickerKeep()" style="width:160px" title="กรองตามเดือน">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span style="font-size:10px;color:var(--gray-400);white-space:nowrap">📅 กรองตามเดือน</span>
+          <input type="month" class="form-control" id="ch-task-month" oninput="renderChTaskPickerKeep()" style="width:160px">
+        </div>
       </div>
       <div class="ch-task-pick-list" id="ch-task-pick-list"></div>
     </div>
