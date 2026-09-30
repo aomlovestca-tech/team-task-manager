@@ -2418,9 +2418,9 @@ function renderChOverview(ch) {
 
     // Date badge from live task
     let dateBadge = '';
-    if (liveTask && (liveTask.startDate || liveTask.endDate)) {
+    if (liveTask && (liveTask.startDate || liveTask.due)) {
       const sd = liveTask.startDate || '';
-      const ed = liveTask.endDate || sd;
+      const ed = liveTask.due || sd;
       const endObj = ed ? new Date(ed) : null;
       if (endObj) endObj.setHours(0,0,0,0);
       const daysLeft = endObj ? Math.ceil((endObj - today) / 86400000) : null;
@@ -2571,7 +2571,7 @@ function renderChTaskPicker(preChecked=[]) {
     const monthEnd = new Date(fy, fm, 0);
     filtered = filtered.filter(t => {
       const ts = t.startDate ? new Date(t.startDate) : null;
-      const te = t.endDate ? new Date(t.endDate) : ts;
+      const te = t.due ? new Date(t.due) : ts;
       if (!ts) return false;
       return ts <= monthEnd && te >= monthStart;
     });
@@ -2581,7 +2581,7 @@ function renderChTaskPicker(preChecked=[]) {
     const mids = getTaskMemberIds(t);
     const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
     const chk = preChecked.includes(t.id) ? 'checked' : '';
-    const dateInfo = t.startDate ? `<div style="font-size:11px;color:var(--gray-400)">${t.startDate}${t.endDate&&t.endDate!==t.startDate?' – '+t.endDate:''}</div>` : '';
+    const dateInfo = t.startDate ? `<div style="font-size:11px;color:var(--gray-400)">${t.startDate}${t.due&&t.due!==t.startDate?' – '+t.due:''}</div>` : '';
     return `<label class="ch-task-pick-item">
       <input type="checkbox" value="${t.id}" name="ch-pick" ${chk}>
       <div>
