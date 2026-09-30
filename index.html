@@ -2568,43 +2568,35 @@ function renderCalendar() {
     (ch.tasks || []).forEach(ct => { taskChMap[ct.taskId] = { ci, ch }; });
   });
 
-  // ── Gather events ────────────────────────────────────────────────────
+  // ── Gather events — only tasks that belong to a challenge ────────────
   const events = [];
   const seenIds = new Set();
 
-  // 1) All db.tasks that have at least one date
-  db.tasks.forEach(task => {
-    const hasDue   = task.due       && task.due.trim();
-    const hasStart = task.startDate && task.startDate.trim();
-    if (!hasDue && !hasStart) return;
-    const sStr = hasStart ? task.startDate : task.due;
-    const eStr = hasDue   ? task.due       : task.startDate;
-    const s = new Date(sStr + 'T00:00:00'); s.setHours(0,0,0,0);
-    const e = new Date(eStr + 'T00:00:00'); e.setHours(0,0,0,0);
-    if (isNaN(s.getTime()) || isNaN(e.getTime())) return;
-    const info  = taskChMap[task.id];
-    const ci    = info ? info.ci : -1;
-    const color = ci >= 0 ? CH_CAL_COLORS[ci % CH_CAL_COLORS.length] : '#9ca3af';
-    const chName = info ? info.ch.name : '';
-    seenIds.add(task.id);
-    events.push({ id: task.id, title: task.title || '(ไม่มีชื่อ)',
-                  start: s, end: e, color, chName, status: task.status||'', priority: task.priority||'' });
-  });
-
-  // 2) ch.tasks entries whose task is NOT in db.tasks → use challenge date range as fallback
   db.challenges.forEach((ch, ci) => {
-    const color = CH_CAL_COLORS[ci % CH_CAL_COLORS.length];
+    const baseColor = CH_CAL_COLORS[ci % CH_CAL_COLORS.length];
     (ch.tasks || []).forEach(ct => {
-      if (seenIds.has(ct.taskId)) return; // already included above
-      const sStr = ch.startDate || ch.endDate;
-      const eStr = ch.endDate   || ch.startDate;
+      if (seenIds.has(ct.taskId)) return;
+      // Look up live task data from db.tasks for accurate dates & status
+      const live = db.tasks.find(t => t.id === ct.taskId);
+      const hasDue   = live && live.due       && live.due.trim();
+      const hasStart = live && live.startDate && live.startDate.trim();
+      // Fallback: use challenge date range if task has no dates
+      const sStr = hasStart ? live.startDate : (hasDue ? live.due : (ch.startDate || ch.endDate));
+      const eStr = hasDue   ? live.due       : (hasStart ? live.startDate : (ch.endDate || ch.startDate));
       if (!sStr) return;
       const s = new Date(sStr + 'T00:00:00'); s.setHours(0,0,0,0);
       const e = new Date(eStr + 'T00:00:00'); e.setHours(0,0,0,0);
       if (isNaN(s.getTime())) return;
       seenIds.add(ct.taskId);
-      events.push({ id: ct.taskId, title: ct.title || '(ไม่มีชื่อ)',
-                    start: s, end: e, color, chName: ch.name, status: 'Todo', priority: '' });
+      events.push({
+        id:       ct.taskId,
+        title:    (live ? live.title : ct.title) || '(ไม่มีชื่อ)',
+        start:    s, end: e,
+        color:    baseColor,
+        chName:   ch.name,
+        status:   (live ? live.status : '') || '',
+        priority: (live ? live.priority : '') || ''
+      });
     });
   });
 
@@ -2675,7 +2667,7 @@ function renderCalendar() {
       const prioIcon = ev.priority==='High' ? '🔴 ' : ev.priority==='Medium' ? '🟡 ' : '';
 
       evBarsHTML += `<div class="cal-evt-bar"
-        style="left:${left}%;width:calc(${widthPct}% - 3px);top:${top}px;background:${ev.color};border-radius:${br};${fade}"
+        style="left:${left}%;width:calc(${widthPct}% - 3px);top:${top}px;background:${ev.color};opacity:.72;border-radius:${br};${fade}"
         title="${ev.title}\n${ev.chName}\n${ev.start.toLocaleDateString('th-TH')} – ${ev.end.toLocaleDateString('th-TH')}"
         onclick="openTaskModal('${ev.id}')">
         <span style="${strike}font-size:10px">${prioIcon}${label}</span>
