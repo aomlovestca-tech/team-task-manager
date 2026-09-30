@@ -2409,14 +2409,13 @@ function renderChOverview(ch) {
   };
   const today = new Date(); today.setHours(0,0,0,0);
 
-  let taskRows = tasks.map((t,i)=>{
+  const buildTaskRow = (t, i, isDone) => {
     const liveTask = db.tasks.find(x=>x.id===t.taskId);
     const mids = liveTask ? getTaskMemberIds(liveTask) : (t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]));
     const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
     const pct = getTaskProgress(t.taskId);
     const statusLabel = liveTask ? (liveTask.status||'') : '';
 
-    // Date badge from live task
     let dateBadge = '';
     if (liveTask && (liveTask.startDate || liveTask.due)) {
       const sd = liveTask.startDate || '';
@@ -2425,7 +2424,7 @@ function renderChOverview(ch) {
       if (endObj) endObj.setHours(0,0,0,0);
       const daysLeft = endObj ? Math.ceil((endObj - today) / 86400000) : null;
       let countdownBadge = '';
-      if (daysLeft !== null && pct < 100) {
+      if (daysLeft !== null && !isDone) {
         if (daysLeft <= 2) {
           const d = Math.max(0, daysLeft);
           countdownBadge = `<span style="background:#fee2e2;color:#dc2626;font-weight:700;font-size:13px;padding:3px 10px;border-radius:20px;margin-left:6px">🔴 ด่วน เหลือเวลาอีก ${d} วัน</span>`;
@@ -2439,22 +2438,36 @@ function renderChOverview(ch) {
       </div>`;
     }
 
-    return `<div class="ch-task-row">
+    return `<div class="ch-task-row"${isDone?' style="opacity:0.85"':''}>
       <div class="ch-task-info" style="flex:1">
         <div class="ch-task-title" onclick="openTaskModal('${t.taskId}')" style="cursor:pointer;display:inline-block;background:var(--gray-100,#f3f4f6);border-radius:6px;padding:4px 10px;margin-bottom:2px">${t.title}</div>
         ${names?`<div class="ch-task-assign">${names}</div>`:''}
         ${dateBadge}
-        ${statusLabel?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
-        <div class="ch-prog-bar" style="margin:4px 0 2px"><div class="ch-prog-fill" style="width:${pct}%${pct>=100?';background:#10b981':''}"></div></div>
-        <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>
+        ${statusLabel&&!isDone?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
+        ${!isDone?`<div class="ch-prog-bar" style="margin:4px 0 2px"><div class="ch-prog-fill" style="width:${pct}%"></div></div>
+        <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>`:''}
         ${t.blockers&&t.blockers.trim()?`<div class="ch-task-blocker">⚠ ${t.blockers}</div>`:''}
       </div>
       <div style="display:flex;flex-direction:row;gap:6px;align-items:center">
-        ${pct<100?`<button onclick="markChTaskDone(${i})" style="background:#cefb59;color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px">✓ Done</button>`:`<span style="background:#d1fae5;color:#065f46;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;white-space:nowrap">✅ เสร็จแล้ว</span>`}
+        ${isDone
+          ? `<span style="background:#cefb59;color:#1a2a00;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;letter-spacing:0.3px">คุณทำสำเร็จ</span>`
+          : `<button onclick="markChTaskDone(${i})" style="background:#cefb59;color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">✓ Done</button>`
+        }
         <button onclick="openChTaskEdit(${i})" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">แจ้งปัญหา</button>
       </div>
     </div>`;
-  }).join('');
+  };
+
+  const pendingRows = tasks.map((t,i)=>({t,i,pct:getTaskProgress(t.taskId)})).filter(x=>x.pct<100);
+  const doneRows    = tasks.map((t,i)=>({t,i,pct:getTaskProgress(t.taskId)})).filter(x=>x.pct>=100);
+
+  const pendingHtml = pendingRows.length
+    ? pendingRows.map(({t,i})=>buildTaskRow(t,i,false)).join('')
+    : '<div style="padding:20px;text-align:center;color:var(--gray-400)">ไม่มีงานที่รอดำเนินการ</div>';
+
+  const doneHtml = doneRows.length
+    ? doneRows.map(({t,i})=>buildTaskRow(t,i,true)).join('')
+    : '<div style="padding:20px;text-align:center;color:var(--gray-400)">ยังไม่มีงานที่เสร็จแล้ว</div>';
 
   document.getElementById('ch-tab-content').innerHTML = `
     <div class="ch-overview-grid">
@@ -2466,7 +2479,8 @@ function renderChOverview(ch) {
       ${blockers.map(t=>`<div style="font-size:13px;color:var(--gray-700);margin-bottom:4px">• <strong>${t.title}</strong>: ${t.blockers}</div>`).join('')}
     </div>`:''}
     ${memberRows ? `<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">ความคืบหน้ารายบุคคล</div></div>${memberRows}</div>` : ''}
-    <div class="card"><div class="card-header"><div class="card-title">รายการงานทั้งหมด</div></div>${taskRows||'<div style="padding:20px;text-align:center;color:var(--gray-400)">ไม่มีงานในชาเลนจ์นี้</div>'}</div>
+    <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">รายการงานทั้งหมด</div></div>${pendingHtml}</div>
+    <div class="card" style="border:1.5px solid #cefb59"><div class="card-header" style="background:#f7fde8;border-radius:12px 12px 0 0;border-bottom:1px solid #e5f7a0"><div class="card-title" style="color:#3d5000;font-weight:700">รายการงานที่เสร็จแล้ว <span style="font-size:13px;font-weight:600;color:#6b8a00;margin-left:4px">${doneRows.length} รายการ</span></div></div>${doneHtml}</div>
   `;
 }
 
