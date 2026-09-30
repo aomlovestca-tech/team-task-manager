@@ -2441,7 +2441,7 @@ function renderChOverview(ch) {
 
     return `<div class="ch-task-row">
       <div class="ch-task-info" style="flex:1">
-        <div class="ch-task-title">${t.title}</div>
+        <div class="ch-task-title" onclick="openChTaskEdit(${i})" style="cursor:pointer;display:inline-block;background:var(--gray-100,#f3f4f6);border-radius:6px;padding:4px 10px;margin-bottom:2px">${t.title}</div>
         ${names?`<div class="ch-task-assign">${names}</div>`:''}
         ${dateBadge}
         ${statusLabel?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
@@ -2689,8 +2689,16 @@ async function markChTaskDone(i) {
   const ch = db.challenges.find(c=>c.id===_chState.currentId);
   if (!ch||!ch.tasks[i]) return;
   ch.tasks[i].progress = 100;
+  // Also update the actual task's status to Done
+  const taskId = ch.tasks[i].taskId;
+  const actualTask = db.tasks.find(t=>t.id===taskId);
+  if (actualTask) {
+    actualTask.status = 'Done';
+    try { await saveTaskFS(actualTask); } catch(e) {}
+  }
   try {
     await saveChallengeFS(ch);
+    renderChOverview(ch);
     toast('✅ ทำเครื่องหมายงานสำเร็จแล้ว','success');
   } catch(e){ toast('เกิดข้อผิดพลาด','error'); }
 }
