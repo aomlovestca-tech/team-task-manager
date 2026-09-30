@@ -2562,18 +2562,49 @@ function renderCalendar() {
   const calStart = new Date(year, month, 1-startOffset);
   const totalWeeks = Math.ceil((startOffset + lastDay.getDate()) / 7);
 
-  // Gather events from all challenges
+  // ── Build task→challenge map ──────────────────────────────────────────
+  const taskChMap = {}; // taskId → { ci, ch }
+  db.challenges.forEach((ch, ci) => {
+    (ch.tasks || []).forEach(ct => { taskChMap[ct.taskId] = { ci, ch }; });
+  });
+
+  // ── Gather events ────────────────────────────────────────────────────
   const events = [];
+  const seenIds = new Set();
+
+  // 1) All db.tasks that have at least one date
+  db.tasks.forEach(task => {
+    const hasDue   = task.due       && task.due.trim();
+    const hasStart = task.startDate && task.startDate.trim();
+    if (!hasDue && !hasStart) return;
+    const sStr = hasStart ? task.startDate : task.due;
+    const eStr = hasDue   ? task.due       : task.startDate;
+    const s = new Date(sStr + 'T00:00:00'); s.setHours(0,0,0,0);
+    const e = new Date(eStr + 'T00:00:00'); e.setHours(0,0,0,0);
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return;
+    const info  = taskChMap[task.id];
+    const ci    = info ? info.ci : -1;
+    const color = ci >= 0 ? CH_CAL_COLORS[ci % CH_CAL_COLORS.length] : '#9ca3af';
+    const chName = info ? info.ch.name : '';
+    seenIds.add(task.id);
+    events.push({ id: task.id, title: task.title || '(ไม่มีชื่อ)',
+                  start: s, end: e, color, chName, status: task.status||'', priority: task.priority||'' });
+  });
+
+  // 2) ch.tasks entries whose task is NOT in db.tasks → use challenge date range as fallback
   db.challenges.forEach((ch, ci) => {
     const color = CH_CAL_COLORS[ci % CH_CAL_COLORS.length];
-    (ch.tasks || []).forEach(t => {
-      const live = db.tasks.find(x => x.id === t.taskId);
-      if (!live || !live.due) return;
-      const s = new Date(live.startDate || live.due); s.setHours(0,0,0,0);
-      const e = new Date(live.due);                   e.setHours(0,0,0,0);
-      if (s > e) return;
-      events.push({ id: t.taskId, title: live.title, start: s, end: e,
-                    color, chName: ch.name, status: live.status, priority: live.priority });
+    (ch.tasks || []).forEach(ct => {
+      if (seenIds.has(ct.taskId)) return; // already included above
+      const sStr = ch.startDate || ch.endDate;
+      const eStr = ch.endDate   || ch.startDate;
+      if (!sStr) return;
+      const s = new Date(sStr + 'T00:00:00'); s.setHours(0,0,0,0);
+      const e = new Date(eStr + 'T00:00:00'); e.setHours(0,0,0,0);
+      if (isNaN(s.getTime())) return;
+      seenIds.add(ct.taskId);
+      events.push({ id: ct.taskId, title: ct.title || '(ไม่มีชื่อ)',
+                    start: s, end: e, color, chName: ch.name, status: 'Todo', priority: '' });
     });
   });
 
