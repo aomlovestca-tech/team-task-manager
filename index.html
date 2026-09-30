@@ -2374,10 +2374,11 @@ function renderChOverview(ch) {
   const blockers = tasks.filter(t=>t.blockers&&t.blockers.trim());
   const done = tasks.filter(t=>getTaskProgress(t.taskId)>=100).length;
 
-  // Build member breakdown
+  // Build member breakdown (use live task assignees, not snapshot)
   const memberMap = {};
   tasks.forEach(task=>{
-    const mids = task.assigneeIds || (task.assigneeId?[task.assigneeId]:[]);
+    const liveT = db.tasks.find(x=>x.id===task.taskId);
+    const mids = liveT ? getTaskMemberIds(liveT) : (task.assigneeIds || (task.assigneeId?[task.assigneeId]:[]));
     mids.forEach(mid=>{
       if (!memberMap[mid]) memberMap[mid] = { tasks:[], done:0 };
       memberMap[mid].tasks.push(task);
@@ -2402,10 +2403,10 @@ function renderChOverview(ch) {
   });
 
   let taskRows = tasks.map((t,i)=>{
-    const mids = t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]);
+    const liveTask = db.tasks.find(x=>x.id===t.taskId);
+    const mids = liveTask ? getTaskMemberIds(liveTask) : (t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]));
     const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
     const pct = getTaskProgress(t.taskId);
-    const liveTask = db.tasks.find(x=>x.id===t.taskId);
     const statusLabel = liveTask ? (liveTask.status||'') : '';
     return `<div class="ch-task-row">
       <div class="ch-task-info" style="flex:1">
@@ -2447,7 +2448,8 @@ function renderChMyTasks(ch) {
   let taskRows = '';
   if (selectedId) {
     const myTasks = tasks.filter(t=>{
-      const mids = t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]);
+      const liveT = db.tasks.find(x=>x.id===t.taskId);
+      const mids = liveT ? getTaskMemberIds(liveT) : (t.assigneeIds||(t.assigneeId?[t.assigneeId]:[]));
       return mids.includes(selectedId);
     });
     if (myTasks.length) {
