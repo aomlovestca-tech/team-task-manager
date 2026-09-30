@@ -420,6 +420,38 @@
     .ch-overview-grid { grid-template-columns:1fr; }
   }
 
+  /* ── CHALLENGE CALENDAR ── */
+  .cal-wrap { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+  .cal-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--gray-100); }
+  .cal-nav-btn { background:none; border:1px solid var(--gray-200); border-radius:8px; width:34px; height:34px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--gray-600); font-size:18px; transition:all .15s; flex-shrink:0; }
+  .cal-nav-btn:hover { background:var(--gray-100); }
+  .cal-title-group { text-align:center; }
+  .cal-month-title { font-size:17px; font-weight:800; color:var(--gray-800); }
+  .cal-year-sub { font-size:11px; color:var(--gray-400); margin-top:1px; }
+  .cal-dow-row { display:grid; grid-template-columns:repeat(7,1fr); background:var(--gray-50); border-bottom:1px solid var(--gray-100); }
+  .cal-dow { text-align:center; font-size:10px; font-weight:700; color:var(--gray-400); padding:7px 0; letter-spacing:.04em; }
+  .cal-dow:first-child { color:#dc2626; }
+  .cal-dow:last-child  { color:#2563eb; }
+  .cal-week-row { border-bottom:1px solid var(--gray-100); }
+  .cal-week-row:last-child { border-bottom:none; }
+  .cal-week-days { display:grid; grid-template-columns:repeat(7,1fr); }
+  .cal-day-num-cell { min-height:28px; border-right:1px solid var(--gray-100); padding:4px 4px 2px; display:flex; align-items:flex-start; }
+  .cal-day-num-cell:last-child { border-right:none; }
+  .cal-day-num { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--gray-600); flex-shrink:0; }
+  .cal-today .cal-day-num { background:var(--primary); color:#fff; }
+  .cal-other-month .cal-day-num { color:var(--gray-300); }
+  .cal-day-num-cell:first-child .cal-day-num { color:#dc2626; }
+  .cal-day-num-cell:first-child.cal-today .cal-day-num,
+  .cal-day-num-cell:last-child.cal-today .cal-day-num { background:var(--primary); color:#fff; }
+  .cal-day-num-cell:last-child .cal-day-num { color:#2563eb; }
+  .cal-week-events { position:relative; overflow:hidden; }
+  .cal-evt-bar { position:absolute; height:18px; display:flex; align-items:center; padding:0 7px; font-size:10px; font-weight:600; color:#fff; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:filter .12s; box-shadow:0 1px 3px rgba(0,0,0,.12); }
+  .cal-evt-bar:hover { filter:brightness(.88); z-index:10; }
+  .cal-legend { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+  .cal-legend-item { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--gray-700); }
+  .cal-legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .cal-today-btn { font-size:12px; font-weight:700; padding:5px 14px; border-radius:8px; border:1px solid var(--gray-200); background:#fff; color:var(--gray-700); cursor:pointer; transition:all .15s; }
+  .cal-today-btn:hover { background:var(--gray-50); }
 
   /* ── WEEKLY MEETING ── */
   .wm-header { background: linear-gradient(135deg,#5b21b6 0%,#7c3aed 60%,#8b5cf6 100%); color:#fff; padding: 0 20px; border-radius: var(--radius) var(--radius) 0 0; margin: -20px -20px 0 -20px; }
@@ -1010,9 +1042,50 @@
         <div id="ch-list-panel">
           <div class="ch-header">
             <div><h2 style="font-size:18px;font-weight:700;color:var(--gray-800)">Challenge</h2><div style="font-size:13px;color:var(--gray-400)">ติดตามชาเลนจ์ของทีม</div></div>
-            <button class="btn btn-primary" onclick="openChCreate()">+ สร้างชาเลนจ์</button>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn btn-outline" onclick="openCalendarView()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                ปฏิทินงาน
+              </button>
+              <button class="btn btn-primary" onclick="openChCreate()">+ สร้างชาเลนจ์</button>
+            </div>
           </div>
           <div class="ch-list" id="ch-list-items"></div>
+        </div>
+
+        <!-- CHALLENGE CALENDAR PANEL -->
+        <div id="ch-calendar-panel" style="display:none">
+          <div class="ch-header" style="margin-bottom:16px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--gray-800)">ปฏิทินงานทั้งหมด</h2>
+              <div style="font-size:13px;color:var(--gray-400)">งานจากทุก Challenge แสดงตามระยะเวลา</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="closeCalendarView()">← กลับ</button>
+          </div>
+          <div class="cal-wrap">
+            <div class="cal-header">
+              <div style="display:flex;align-items:center;gap:8px">
+                <button class="cal-nav-btn" onclick="calPrevMonth()">&#8249;</button>
+                <button class="cal-today-btn" onclick="calGoToday()">วันนี้</button>
+                <button class="cal-nav-btn" onclick="calNextMonth()">&#8250;</button>
+              </div>
+              <div class="cal-title-group">
+                <div class="cal-month-title" id="cal-month-title">—</div>
+              </div>
+              <div style="width:90px"></div>
+            </div>
+            <div class="cal-dow-row">
+              <div class="cal-dow">อา</div>
+              <div class="cal-dow">จ</div>
+              <div class="cal-dow">อ</div>
+              <div class="cal-dow">พ</div>
+              <div class="cal-dow">พฤ</div>
+              <div class="cal-dow">ศ</div>
+              <div class="cal-dow">ส</div>
+            </div>
+            <div id="cal-body"></div>
+          </div>
+          <div class="cal-legend" id="cal-legend"></div>
         </div>
         <div id="ch-detail-panel" style="display:none">
           <div class="ch-detail-header">
@@ -2411,9 +2484,153 @@ function renderChallenge() {
   }
 }
 
+// ══════════════════════════════════════════════════════
+//  CHALLENGE CALENDAR VIEW
+// ══════════════════════════════════════════════════════
+let calDate = new Date();
+const CH_CAL_COLORS = ['#7c3aed','#0891b2','#059669','#d97706','#dc2626','#db2777','#4f46e5','#65a30d','#c2410c','#0369a1'];
+const MONTHS_TH = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+function openCalendarView() {
+  calDate = new Date();
+  document.getElementById('ch-list-panel').style.display='none';
+  document.getElementById('ch-detail-panel').style.display='none';
+  document.getElementById('ch-calendar-panel').style.display='';
+  renderCalendar();
+}
+function closeCalendarView() {
+  document.getElementById('ch-calendar-panel').style.display='none';
+  renderChList();
+}
+function calPrevMonth() { calDate.setDate(1); calDate.setMonth(calDate.getMonth()-1); renderCalendar(); }
+function calNextMonth() { calDate.setDate(1); calDate.setMonth(calDate.getMonth()+1); renderCalendar(); }
+function calGoToday()   { calDate = new Date(); renderCalendar(); }
+
+function renderCalendar() {
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth();
+
+  // Calendar grid start: Sunday of the week containing month's first day
+  const firstDay = new Date(year, month, 1);
+  const lastDay  = new Date(year, month+1, 0);
+  const startOffset = firstDay.getDay(); // 0=Sun … 6=Sat
+  const calStart = new Date(year, month, 1-startOffset);
+  const totalWeeks = Math.ceil((startOffset + lastDay.getDate()) / 7);
+
+  // Gather events from all challenges
+  const events = [];
+  db.challenges.forEach((ch, ci) => {
+    const color = CH_CAL_COLORS[ci % CH_CAL_COLORS.length];
+    (ch.tasks || []).forEach(t => {
+      const live = db.tasks.find(x => x.id === t.taskId);
+      if (!live || !live.due) return;
+      const s = new Date(live.startDate || live.due); s.setHours(0,0,0,0);
+      const e = new Date(live.due);                   e.setHours(0,0,0,0);
+      if (s > e) return;
+      events.push({ id: t.taskId, title: live.title, start: s, end: e,
+                    color, chName: ch.name, status: live.status, priority: live.priority });
+    });
+  });
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const EVT_H   = 20; // px height per lane
+  const EVT_GAP = 2;  // px gap between lanes
+  const EVT_TOP = 2;  // px padding top in events area
+
+  let weeksHTML = '';
+
+  for (let w = 0; w < totalWeeks; w++) {
+    const weekStart = new Date(calStart); weekStart.setDate(calStart.getDate() + w*7);
+    weekStart.setHours(0,0,0,0);
+    const weekEnd   = new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6); weekEnd.setHours(23,59,59,999);
+
+    // Day number cells
+    let dayNums = '';
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(weekStart); day.setDate(weekStart.getDate()+d);
+      const isToday = day.getTime() === today.getTime();
+      const isOther = day.getMonth() !== month;
+      const cls = `cal-day-num-cell${isToday?' cal-today':''}${isOther?' cal-other-month':''}`;
+      dayNums += `<div class="${cls}"><div class="cal-day-num">${day.getDate()}</div></div>`;
+    }
+
+    // Events overlapping this week
+    const weekEvts = events.filter(e => e.end >= weekStart && e.start <= weekEnd);
+    weekEvts.sort((a,b) => a.start - b.start || (b.end-b.start)-(a.end-a.start));
+
+    // Greedy lane assignment
+    const laneEnds = []; // laneEnds[lane] = last event end time in that lane
+    const lanes = weekEvts.map(ev => {
+      const evS = ev.start < weekStart ? weekStart : ev.start;
+      const lane = laneEnds.findIndex(endTs => endTs < evS.getTime());
+      if (lane === -1) { laneEnds.push(ev.end.getTime()); return laneEnds.length-1; }
+      laneEnds[lane] = ev.end.getTime(); return lane;
+    });
+
+    const numLanes = laneEnds.length;
+    const evAreaH = numLanes > 0 ? (numLanes*(EVT_H+EVT_GAP)+EVT_TOP) : 6;
+
+    let evBarsHTML = '';
+    weekEvts.forEach((ev, i) => {
+      const lane = lanes[i];
+      const evS = ev.start < weekStart ? weekStart : ev.start;
+      const evE = ev.end   > weekEnd   ? weekEnd   : ev.end;
+      const startCol = Math.round((evS.getTime()-weekStart.getTime())/86400000);
+      const endCol   = Math.round((evE.getTime()-weekStart.getTime())/86400000);
+      const left   = (startCol/7*100).toFixed(3);
+      const widthPct = ((endCol-startCol+1)/7*100).toFixed(3);
+      const top    = EVT_TOP + lane*(EVT_H+EVT_GAP);
+
+      const startsHere = ev.start >= weekStart;
+      const endsHere   = ev.end   <= weekEnd;
+      let br = '3px';
+      if (startsHere && endsHere) br = '99px';
+      else if (startsHere)        br = '99px 3px 3px 99px';
+      else if (endsHere)          br = '3px 99px 99px 3px';
+
+      const isDone = ev.status === 'Done';
+      const fade   = isDone ? 'opacity:.5;' : '';
+      const strike = isDone ? 'text-decoration:line-through;' : '';
+      const label  = (startsHere ? '' : '↳ ') + ev.title;
+      const prioIcon = ev.priority==='High' ? '🔴 ' : ev.priority==='Medium' ? '🟡 ' : '';
+
+      evBarsHTML += `<div class="cal-evt-bar"
+        style="left:${left}%;width:calc(${widthPct}% - 3px);top:${top}px;background:${ev.color};border-radius:${br};${fade}"
+        title="${ev.title}\n${ev.chName}\n${ev.start.toLocaleDateString('th-TH')} – ${ev.end.toLocaleDateString('th-TH')}"
+        onclick="openTaskModal('${ev.id}')">
+        <span style="${strike}font-size:10px">${prioIcon}${label}</span>
+      </div>`;
+    });
+
+    weeksHTML += `
+      <div class="cal-week-row">
+        <div class="cal-week-days">${dayNums}</div>
+        <div class="cal-week-events" style="height:${evAreaH}px">${evBarsHTML}</div>
+      </div>`;
+  }
+
+  // Title
+  const be = year + 543;
+  document.getElementById('cal-month-title').textContent = `${MONTHS_TH[month]} ${be}`;
+
+  // Grid
+  document.getElementById('cal-body').innerHTML = weeksHTML;
+
+  // Legend
+  const legendEl = document.getElementById('cal-legend');
+  if (db.challenges.length) {
+    legendEl.innerHTML = db.challenges.map((ch,i)=>
+      `<div class="cal-legend-item"><div class="cal-legend-dot" style="background:${CH_CAL_COLORS[i%CH_CAL_COLORS.length]}"></div>${ch.name}</div>`
+    ).join('');
+  } else {
+    legendEl.innerHTML = '';
+  }
+}
+
 function renderChList() {
   document.getElementById('ch-list-panel').style.display='';
   document.getElementById('ch-detail-panel').style.display='none';
+  document.getElementById('ch-calendar-panel').style.display='none';
   const el = document.getElementById('ch-list-items');
   if (!db.challenges || !db.challenges.length) {
     el.innerHTML = '<div class="ch-empty">ยังไม่มีชาเลนจ์ · กดปุ่ม "+ สร้างชาเลนจ์" เพื่อเริ่ม</div>';
