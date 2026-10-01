@@ -547,6 +547,7 @@
   .wm-todo .wm-sec-head { background:#f9fafb; border-bottom-color:var(--gray-200); } .wm-todo .wm-sec-title { color:var(--gray-600); } .wm-todo .wm-sec-count { background:var(--gray-500); color:#fff; }
   .wm-hold .wm-sec-head { background:#fffbeb; border-bottom-color:#fde68a; } .wm-hold .wm-sec-title { color:#d97706; } .wm-hold .wm-sec-count { background:#d97706; color:#fff; }
   .wm-next .wm-sec-head { background:#f5f3ff; border-bottom-color:#ddd6fe; } .wm-next .wm-sec-title { color:#7c3aed; } .wm-next .wm-sec-count { background:#7c3aed; color:#fff; }
+  .wm-upcoming .wm-sec-head { background:#ecfeff; border-bottom-color:#a5f3fc; } .wm-upcoming .wm-sec-title { color:#0891b2; } .wm-upcoming .wm-sec-count { background:#0891b2; color:#fff; }
   .wm-overdue .wm-sec-head { background:#fef2f2; border-bottom-color:#fca5a5; } .wm-overdue .wm-sec-title { color:#dc2626; } .wm-overdue .wm-sec-count { background:#dc2626; color:#fff; }
 
   .wm-task-list { padding:8px 10px; }
@@ -1873,13 +1874,8 @@ function wmRenderMemberReport() {
   const prevMonStr = prevMon.toISOString().slice(0,10);
   const prevSunStr = prevSun.toISOString().slice(0,10);
 
-  // Done: this week + last week (show tasks whose date range overlaps prevMon–thisSun)
-  // Tasks with no date → include (can't determine when, assume relevant)
-  const done = myTasks.filter(t=>{
-    if (t.status!=='Done') return false;
-    if (!t.due && !t.startDate) return true;
-    return wmDateInRange(t.startDate, t.due, prevMon, sun);
-  });
+  // Done: ALL done tasks (regardless of date) — user wants cross-page sync
+  const done = myTasks.filter(t=> t.status==='Done');
 
   // In Progress: this week only
   const inprog = myTasks.filter(t=>{
@@ -1918,6 +1914,18 @@ function wmRenderMemberReport() {
     return inNext && !inThis;
   });
 
+  // Upcoming = status Todo AND dates beyond next week (future challenges, etc.)
+  const upcoming = myTasks.filter(t=>{
+    if (t.status!=='Todo') return false;
+    if (!t.due && !t.startDate) return false;
+    const inThis = wmDateInRange(t.startDate, t.due, mon, sun);
+    const inNext = wmDateInRange(t.startDate, t.due, nextMon, nextSun);
+    if (inThis || inNext) return false;
+    // Only show truly future tasks (start after next week's end)
+    const tStart = t.startDate || t.due || '';
+    return tStart > nextSun.toISOString().slice(0,10);
+  });
+
   const header = `<div class="wm-member-header">
     <div class="wm-m-avatar" style="background:${AVATAR_GRAY};${m.photo?'overflow:hidden':''}">
       ${m.photo ? `<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">` : init}
@@ -1929,6 +1937,7 @@ function wmRenderMemberReport() {
       <div class="wm-mstat"><div class="wm-mstat-num">${todoThisWeek.length}</div><div class="wm-mstat-label">รอทำ</div></div>
       ${hold.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#6b7280">${hold.length}</div><div class="wm-mstat-label">รอพัก</div></div>`:''}
       ${nextWeek.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#7c3aed">${nextWeek.length}</div><div class="wm-mstat-label">สัปดาห์หน้า</div></div>`:''}
+      ${upcoming.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#0891b2">${upcoming.length}</div><div class="wm-mstat-label">กำลังจะมาถึง</div></div>`:''}
       ${overdue.length?`<div class="wm-mstat"><div class="wm-mstat-num" style="color:#dc2626">${overdue.length}</div><div class="wm-mstat-label">เกินกำหนด</div></div>`:''}
     </div>
   </div>`;
@@ -1939,6 +1948,7 @@ function wmRenderMemberReport() {
     ${wmSection('wm-todo',   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/></svg>','รอดำเนินการสัปดาห์นี้ · To Do', todoThisWeek,'— ไม่มีงานรอดำเนินการ —')}
     ${wmSection('wm-hold',   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>','รอพัก · On Hold',               hold,         '— ไม่มีงานรอพัก —')}
     ${nextWeek.length?wmSection('wm-next wm-full','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>','งานสัปดาห์หน้า · Up Next', nextWeek, '', true):''}
+    ${upcoming.length?wmSection('wm-upcoming wm-full','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/></svg>','งานที่กำลังจะมาถึง · Upcoming', upcoming, '— ไม่มีงานในอนาคต —'):''}
     ${overdue.length?wmSection('wm-overdue wm-full','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>','งานเกินกำหนด · Overdue', overdue, ''):''}
   </div>`;
 
@@ -2201,6 +2211,7 @@ function renderMyTasks() {
     const names   = members.map(m=>m.name.split(' ')[0]).join(', ');
     const ov      = isOverdue(t.due, t.status);
     const dateStr = t.startDate ? `${formatDate(t.startDate)} – ${formatDate(t.due)}` : formatDate(t.due);
+    const mtSubs = t.subtasks||[]; const mtSubDone=mtSubs.filter(s=>s.status==='Done').length; const mtSubPct=mtSubs.length?Math.round(mtSubDone/mtSubs.length*100):0;
     return `<div class="mt-card pri-${t.priority||'Medium'}" onclick="openTaskModal('${t.id}')">
       <div class="mt-card-body">
         <div class="mt-card-top">
@@ -2210,6 +2221,7 @@ function renderMyTasks() {
         </div>
         <div class="mt-card-title">${t.title||'—'}</div>
         ${t.desc?`<div class="mt-card-desc">${t.desc}</div>`:''}
+        ${mtSubs.length?`<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--gray-500);margin:3px 0 1px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>งานย่อย ${mtSubDone}/${mtSubs.length}<span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px">${mtSubPct}%</span></div>`:''}
         ${names?`<div class="mt-card-member"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${names}</div>`:''}
         ${t.note?`<div class="mt-card-note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
       </div>
