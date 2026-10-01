@@ -1824,11 +1824,17 @@ function wmTaskCard(t, showNextBadge) {
   if (t.startDate && t.due && t.startDate!==t.due) due = t.startDate.slice(5)+' – '+t.due.slice(5);
   else if (t.due) due = t.due.slice(5);
   else if (t.startDate) due = t.startDate.slice(5);
+  const wmSubs = t.subtasks||[]; const wmSubDone=wmSubs.filter(s=>s.status==='Done').length;
   return `<div class="wm-task-card" onclick="openTaskModal('${t.id}')" style="cursor:pointer">
     <div class="wm-task-num">·</div>
     <div class="wm-task-body">
       <div class="wm-task-title">${t.title||'—'}</div>
       ${t.desc?`<div class="wm-task-desc">${t.desc}</div>`:''}
+      ${wmSubs.length?`<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--gray-500);margin:3px 0 1px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        งานย่อย ${wmSubDone}/${wmSubs.length}
+        <div style="flex:1;height:2px;background:var(--gray-200);border-radius:99px;overflow:hidden"><div style="width:${wmSubs.length?Math.round(wmSubDone/wmSubs.length*100):0}%;height:100%;background:var(--success);border-radius:99px"></div></div>
+      </div>`:''}
       ${t.note?`<div class="wm-task-note"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
       <div class="wm-task-meta">
         <span class="wm-pri ${wmPriClass(t.priority)}">${t.priority||'—'}</span>
@@ -2620,6 +2626,11 @@ function getTaskProgress(taskId) {
   const t = db.tasks.find(x=>x.id===taskId);
   if (!t) return 0;
   if (t.status==='Done') return 100;
+  // If task has subtasks → derive progress from them
+  if (t.subtasks && t.subtasks.length) {
+    const done = t.subtasks.filter(s=>s.status==='Done').length;
+    return Math.round(done / t.subtasks.length * 100);
+  }
   if (t.status==='In Progress') return 50;
   return 0;
 }
@@ -2932,6 +2943,10 @@ function renderChOverview(ch) {
     const names = mids.map(id=>db.members.find(m=>m.id===id)).filter(Boolean).map(m=>m.name).join(', ');
     const pct = getTaskProgress(t.taskId);
     const statusLabel = liveTask.status||'';
+    const subs = liveTask.subtasks || [];
+    const subTotal = subs.length;
+    const subDone  = subs.filter(s=>s.status==='Done').length;
+    const subPct   = subTotal ? Math.round(subDone/subTotal*100) : 0;
 
     let dateBadge = '';
     if (liveTask && (liveTask.startDate || liveTask.due)) {
@@ -2961,6 +2976,12 @@ function renderChOverview(ch) {
         ${names?`<div class="ch-task-assign">${names}</div>`:''}
         ${dateBadge}
         ${statusLabel&&!isDone?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
+        ${subTotal&&!isDone?`<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-500);margin-bottom:6px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          งานย่อย <strong>${subDone}/${subTotal}</strong>
+          <div style="flex:1;height:3px;background:var(--gray-200);border-radius:99px;overflow:hidden"><div style="width:${subPct}%;height:100%;background:var(--success);border-radius:99px"></div></div>
+          <span style="color:var(--gray-400)">${subPct}%</span>
+        </div>`:''}
         ${!isDone?`<div class="ch-prog-bar" style="margin:4px 0 2px"><div class="ch-prog-fill" style="width:${pct}%"></div></div>
         <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>`:''}
         ${t.blockers&&t.blockers.trim()?`<div class="ch-task-blocker">⚠ ${t.blockers}</div>`:''}
