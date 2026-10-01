@@ -2850,7 +2850,11 @@ function renderChList() {
     el.innerHTML = '<div class="ch-empty">ยังไม่มีชาเลนจ์ · กดปุ่ม "+ สร้างชาเลนจ์" เพื่อเริ่ม</div>';
     return;
   }
-  const sorted = [...db.challenges].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+  const sorted = [...db.challenges].sort((a,b)=>{
+    const ea = a.endDate || a.startDate || '9999-12-31';
+    const eb = b.endDate || b.startDate || '9999-12-31';
+    return ea.localeCompare(eb);
+  });
   el.innerHTML = sorted.map(ch=>{
     const pct = chPct(ch);
     const blockers = chBlockerCount(ch);
