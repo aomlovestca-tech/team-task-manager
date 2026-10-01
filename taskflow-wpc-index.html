@@ -1924,8 +1924,20 @@ function wmRenderMemberReport() {
   const prevMonStr = prevMon.toISOString().slice(0,10);
   const prevSunStr = prevSun.toISOString().slice(0,10);
 
-  // Done: ALL done tasks (regardless of date) — user wants cross-page sync
-  const done = myTasks.filter(t=> t.status==='Done');
+  // Done: tasks completed (status==='Done') within the CURRENT week only
+  const monStr = mon.toISOString().slice(0, 10);
+  const sunStr = sun.toISOString().slice(0, 10);
+  const done = myTasks.filter(t => {
+    if (t.status !== 'Done') return false;
+    // Use updatedAt (ms timestamp) if available — most reliable completion indicator
+    if (t.updatedAt) {
+      const d = new Date(t.updatedAt).toISOString().slice(0, 10);
+      return d >= monStr && d <= sunStr;
+    }
+    // Fall back to due date
+    if (t.due) return t.due >= monStr && t.due <= sunStr;
+    return false; // no date info → cannot determine week, exclude
+  });
 
   // In Progress: this week only
   const inprog = myTasks.filter(t=>{
@@ -3020,23 +3032,27 @@ function renderChBoard() {
     return;
   }
 
-  // ── ROAD MAP CONSTANTS ─────────────────────────────────────────────
-  const PER_ROW = 4;      // nodes per row
-  const CELL_W  = 170;    // horizontal distance between node centres
-  const ROW_H   = 200;    // vertical distance between rows
-  const PAD_X   = 90;     // side padding
-  const PAD_Y   = 110;    // top padding (labels + trophy area)
-  const NODE_R  = 30;     // node radius
-  const ROAD_W  = 58;     // road stroke width (wider = more visible)
+  // ── INFOGRAPHIC ROAD MAP CONSTANTS ──────────────────────────────────
+  const PER_ROW  = 4;
+  const CELL_W   = 180;   // horizontal distance between node centres
+  const ROW_H    = 270;   // vertical distance between rows (extra room for arch + cards)
+  const PAD_X    = 90;    // side padding
+  const PAD_Y    = 160;   // top/bottom padding (accommodates pin + card above row 0)
+  const ROAD_W   = 56;    // road stroke width
+  const PIN_H    = 44;    // pin circle centre offset from road centre
+  const PIN_R    = 16;    // pin circle radius
+  const CARD_W   = 162;   // info card width
+  const WAVE_AMP = 30;    // arch amplitude within each row (makes road curved, not straight)
+  // Infographic pin colours — cycle by challenge index
+  const PIN_COLORS = ['#ef4444','#f59e0b','#22c55e','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#06b6d4'];
 
   const n = filtered.length;
-  const numRows = Math.ceil(n / PER_ROW);
-  // Canvas wide enough for the row with the most nodes
-  const maxRowLen = Math.min(n, PER_ROW);
+  const numRows  = Math.ceil(n / PER_ROW);
+  const maxRowLen= Math.min(n, PER_ROW);
   const svgW = PAD_X * 2 + (maxRowLen - 1) * CELL_W;
   const svgH = PAD_Y + (numRows - 1) * ROW_H + PAD_Y;
 
-  // Node centre positions (snake pattern, same as original road map)
+  // Node centre positions (snake pattern + sine arch within each row)
   const pos = filtered.map((ch, i) => {
     const row    = Math.floor(i / PER_ROW);
     const col    = i % PER_ROW;
@@ -3044,74 +3060,105 @@ function renderChBoard() {
     const x = row % 2 === 0
       ? PAD_X + col * CELL_W
       : PAD_X + (rowLen - 1 - col) * CELL_W;
-    const y = PAD_Y + row * ROW_H;
-    return { x, y };
+    const yBase = PAD_Y + row * ROW_H;
+    // Arch: sine wave peaks at middle of row; 0 at both endpoints
+    const t = rowLen > 2 ? col / (rowLen - 1) : 0.5;
+    const archDir = row % 2 === 0 ? -1 : 1;  // up for even rows, down for odd
+    const yArch = rowLen > 2 ? Math.sin(t * Math.PI) * WAVE_AMP * archDir : 0;
+    return { x, y: yBase + yArch };
   });
 
-  // ── SVG road path (road surface + dashed centre + sheen) ──────────
-  let roadD = '';
-  for (let i = 0; i < n; i++) {
-    const p = pos[i];
-    if (i === 0) {
-      roadD += `M ${p.x} ${p.y}`;
-    } else {
-      const prev    = pos[i - 1];
-      const prevRow = Math.floor((i - 1) / PER_ROW);
-      const curRow  = Math.floor(i / PER_ROW);
-      if (curRow === prevRow) {
-        roadD += ` L ${p.x} ${p.y}`;
-      } else {
-        // Smooth bezier turn between rows
-        const cx1 = prev.x, cy1 = prev.y + ROW_H * 0.48;
-        const cx2 = p.x,    cy2 = p.y   - ROW_H * 0.48;
-        roadD += ` C ${cx1} ${cy1} ${cx2} ${cy2} ${p.x} ${p.y}`;
-      }
+  // Smooth Catmull-Rom spline through ALL node positions — curves everywhere, not just at turns
+  function catmullRomD(pts, alpha) {
+    if (pts.length < 2) return '';
+    let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const cx1 = p1.x + (p2.x - p0.x) / 6 * alpha;
+      const cy1 = p1.y + (p2.y - p0.y) / 6 * alpha;
+      const cx2 = p2.x - (p3.x - p1.x) / 6 * alpha;
+      const cy2 = p2.y - (p3.y - p1.y) / 6 * alpha;
+      d += ` C ${cx1.toFixed(1)} ${cy1.toFixed(1)} ${cx2.toFixed(1)} ${cy2.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
     }
+    return d;
   }
+  const roadD = catmullRomD(pos, 1.0);
 
-  // Trophy: above first node (top-left of the path from user's view)
-  // The LAST challenge by date is visually at pos[n-1]
-  // Place trophy above pos[n-1] (the final destination)
-  const lastPos = pos[n - 1];
-  const trophySVG = `
-    <text x="${lastPos.x}" y="${lastPos.y - NODE_R - 36}" text-anchor="middle" font-size="42">🏆</text>
-    <text x="${lastPos.x}" y="${lastPos.y - NODE_R - 6}" text-anchor="middle" font-size="11" font-weight="700" fill="#d97706">เส้นชัย!</text>`;
-
-  // ── HTML: node circles + labels ───────────────────────────────────
-  let nodesHTML = '', labelsHTML = '';
-  let doneCnt = 0, activeCnt = 0, todoCnt = 0;
+  // ── Build SVG pins + HTML cards ───────────────────────────────────
+  let pinsSVG  = '';
+  let cardsHTML= '';
+  let doneCnt  = 0, activeCnt = 0, todoCnt = 0;
 
   filtered.forEach((ch, i) => {
-    const pct = chPct(ch);
-    const { x, y } = pos[i];
-    const isDone   = pct >= 100;
-    const isActive = !isDone && pct > 0;
-    if (isDone) doneCnt++;
-    else if (isActive) activeCnt++;
-    else todoCnt++;
+    const pct     = chPct(ch);
+    const { x, y }= pos[i];
+    const row     = Math.floor(i / PER_ROW);
+    const isDone  = pct >= 100;
+    const isActive= !isDone && pct > 0;
+    if (isDone) doneCnt++; else if (isActive) activeCnt++; else todoCnt++;
 
-    const cls = isDone   ? 'rm-node rm-node-done'
-              : isActive ? 'rm-node rm-node-active rm-node-pulse'
-              :            'rm-node rm-node-todo';
-    const icon  = isDone ? '✓' : (i + 1);
-    const chip  = isDone   ? `<span class="rm-done-chip">✓ Done</span>`
-                : isActive ? `<span class="rm-pct-chip">${pct}%</span>` : '';
+    // Pin colour: green=done, amber=active, else cycle colour
+    const baseColor= PIN_COLORS[i % PIN_COLORS.length];
+    const pinFill  = isDone ? '#22c55e' : isActive ? '#f59e0b' : baseColor;
+    const pinIcon  = isDone ? '✓' : (i + 1);
+
+    // Pin direction: up (-1) for even rows, down (+1) for odd rows
+    const pinDir = (row % 2 === 0) ? -1 : 1;
+    const pcy    = y + pinDir * PIN_H;             // pin circle centre
+    const stemEnd= pcy + (-pinDir) * PIN_R;        // stem end (toward road)
+    const stemY  = y + pinDir * 3;                 // stem touches road surface
+
+    // SVG: stem line + circle + number/tick
+    pinsSVG += `
+      <line x1="${x}" y1="${stemY}" x2="${x}" y2="${stemEnd}" stroke="${pinFill}" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="${x}" cy="${pcy}" r="${PIN_R + 2}" fill="${pinFill}" opacity=".18"/>
+      <circle cx="${x}" cy="${pcy}" r="${PIN_R}" fill="${pinFill}"/>
+      <circle cx="${x}" cy="${pcy}" r="${PIN_R}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+      <text x="${x}" y="${pcy + 5}" text-anchor="middle" font-size="${isDone?15:13}" font-weight="900" fill="#fff" font-family="'Segoe UI',sans-serif">${pinIcon}</text>
+    `;
+    // Pulse ring for active pins
+    if (isActive) pinsSVG += `<circle cx="${x}" cy="${pcy}" r="${PIN_R + 8}" fill="none" stroke="${pinFill}" stroke-width="2" opacity=".35"><animate attributeName="r" values="${PIN_R+4};${PIN_R+14};${PIN_R+4}" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".4;0;.4" dur="2s" repeatCount="indefinite"/></circle>`;
+
+    // Date string for card
     const dateStr = ch.endDate
       ? ch.endDate.slice(5).replace('-','/')
       : ch.startDate ? ch.startDate.slice(5).replace('-','/') : '';
 
-    nodesHTML += `<div class="${cls}" style="left:${x}px;top:${y}px;width:60px;height:60px;font-size:18px" onclick="openChDetail('${ch.id}')" title="${ch.name}">${icon}</div>`;
+    // Status chip colours
+    const chipBg   = isDone ? '#dcfce7' : isActive ? '#fef3c7' : '#f1f5f9';
+    const chipColor= isDone ? '#059669' : isActive ? '#b45309' : '#64748b';
+    const chipLabel= isDone ? '✓ Done'  : isActive ? `${pct}%` : 'รอดำเนินการ';
 
-    // Labels: alternate above/below per row to reduce overlap
-    const row = Math.floor(i / PER_ROW);
-    const lblAbove = row % 2 === 0;
-    const lblY  = lblAbove ? y - NODE_R - 12 : y + NODE_R + 12;
-    const trans = lblAbove ? 'translate(-50%,-100%)' : 'translate(-50%,0)';
+    // Card positioning: always on the far side of pin from road
+    const cardAnchorY = pcy + pinDir * (PIN_R + 6);
+    const cardTrans   = (pinDir === -1) ? 'translate(-50%,-100%)' : 'translate(-50%,0)';
 
-    labelsHTML += `<div style="position:absolute;left:${x}px;top:${lblY}px;transform:${trans};text-align:center;width:${CELL_W - 10}px;pointer-events:none;z-index:6">
-      <div style="font-size:11px;font-weight:700;color:var(--gray-800);line-height:1.4;word-break:break-word">${ch.name}</div>
-      ${dateStr?`<div style="font-size:9.5px;color:var(--gray-400);margin-top:2px">ถึง ${dateStr}</div>`:''}
-      ${chip}
+    cardsHTML += `<div onclick="openChDetail('${ch.id}')" style="
+        position:absolute;
+        left:${x}px;
+        top:${cardAnchorY}px;
+        transform:${cardTrans};
+        width:${CARD_W}px;
+        background:#fff;
+        border-radius:10px;
+        box-shadow:0 3px 14px rgba(0,0,0,.14);
+        border-left:4px solid ${pinFill};
+        padding:9px 10px 9px 11px;
+        cursor:pointer;
+        z-index:10;
+        text-align:left;
+      ">
+      <div style="display:flex;align-items:flex-start;gap:7px">
+        <span style="width:19px;height:19px;min-width:19px;border-radius:50%;background:${pinFill};color:#fff;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;margin-top:1px">${pinIcon}</span>
+        <div style="font-size:11px;font-weight:700;color:#1f2937;line-height:1.4;word-break:break-word;flex:1">${ch.name}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:5px;padding-left:26px">
+        ${dateStr?`<span style="font-size:9px;color:#9ca3af">ถึง ${dateStr}</span>`:''}
+        <span style="display:inline-block;background:${chipBg};color:${chipColor};font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px">${chipLabel}</span>
+      </div>
     </div>`;
   });
 
@@ -3122,19 +3169,18 @@ function renderChBoard() {
   </div>`;
 
   panel.innerHTML = `
-    <div class="rm-outer">
-      <div class="rm-container" style="width:${svgW}px;height:${svgH + 60}px">
+    <div class="rm-outer" style="background:#eef2f7">
+      <div class="rm-container" style="width:${svgW}px;height:${svgH}px">
         <svg width="${svgW}" height="${svgH}" style="position:absolute;top:0;left:0;overflow:visible">
           <!-- Road surface -->
           <path d="${roadD}" fill="none" stroke="#1e293b" stroke-width="${ROAD_W}" stroke-linecap="round" stroke-linejoin="round"/>
           <!-- Dashed centre line -->
-          <path d="${roadD}" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="20 15" stroke-linejoin="round"/>
-          <!-- Subtle top sheen -->
-          <path d="${roadD}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="${ROAD_W - 6}" stroke-linecap="round" stroke-linejoin="round"/>
-          ${trophySVG}
+          <path d="${roadD}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="3" stroke-linecap="round" stroke-dasharray="18 12" stroke-linejoin="round"/>
+          <!-- Subtle sheen -->
+          <path d="${roadD}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="${ROAD_W - 8}" stroke-linecap="round" stroke-linejoin="round"/>
+          ${pinsSVG}
         </svg>
-        ${nodesHTML}
-        ${labelsHTML}
+        ${cardsHTML}
       </div>
       ${legend}
     </div>`;
