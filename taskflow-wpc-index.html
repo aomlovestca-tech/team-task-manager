@@ -2983,17 +2983,35 @@ function renderChList() {
     const pct = chPct(ch);
     const blockers = chBlockerCount(ch);
     const taskCount = ch.tasks ? ch.tasks.length : 0;
+    // Unique members from all tasks in this challenge (use assigneeIds stored on challenge entry)
+    const chMemberIds = [...new Set((ch.tasks||[]).flatMap(ct => {
+      // ct.assigneeIds is saved directly on the challenge task entry
+      if (ct.assigneeIds && ct.assigneeIds.length) return ct.assigneeIds;
+      // fallback: look up live task memberIds
+      const t = db.tasks.find(x => x.id === ct.taskId);
+      return t ? (t.memberIds || []) : [];
+    }))];
+    const chMembers = chMemberIds.map(id => db.members.find(m => m.id === id)).filter(Boolean);
+    const membersHTML = chMembers.length ? `
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center">
+        ${chMembers.map(m => `
+          <div style="display:flex;align-items:center;gap:8px">
+            ${mkAvatar(m, {size:'40px', fs:'15px'})}
+            <span style="font-size:13px;font-weight:600;color:var(--gray-700)">${m.name}</span>
+          </div>`).join('')}
+      </div>` : '';
     return `<div class="ch-card" onclick="openChDetail('${ch.id}')">
       <div class="ch-card-header">
         <div>
           <div class="ch-card-name">${ch.name}</div>
-          ${ch.startDate||ch.endDate ? `<div class="ch-card-dates">${ch.startDate||''} ${ch.endDate?' – '+ch.endDate:''}</div>` : ''}
+          ${ch.startDate||ch.endDate ? `<div class="ch-card-dates">${formatDate(ch.startDate)||''} ${ch.endDate?' – '+formatDate(ch.endDate):''}</div>` : ''}
         </div>
         <div class="ch-card-badges">
           ${blockers ? `<span class="ch-blocker-badge">⚠ ${blockers} ติดขัด</span>` : ''}
         </div>
       </div>
       ${ch.desc ? `<div style="font-size:13px;color:var(--gray-500);margin-bottom:10px">${ch.desc}</div>` : ''}
+      ${membersHTML}
       <div class="ch-prog-bar"><div class="ch-prog-fill" style="width:${pct}%"></div></div>
       <div style="display:flex;justify-content:space-between">
         <div class="ch-prog-label">${pct}% เสร็จสิ้น</div>
