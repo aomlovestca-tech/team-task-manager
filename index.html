@@ -3002,8 +3002,15 @@ function renderChOverview(ch) {
 
   // Use allTasks indices so markChTaskDone(i) / openChTaskEdit(i) reference the correct ch.tasks[i]
   const allEntries  = allTasks.map((t,i)=>({t,i})).filter(({t})=>db.tasks.find(x=>x.id===t.taskId));
-  const pendingRows = allEntries.filter(({t})=>getTaskProgress(t.taskId)<100);
-  const doneRows    = allEntries.filter(({t})=>getTaskProgress(t.taskId)>=100);
+  const sortByDue = (a, b) => {
+    const la = db.tasks.find(x=>x.id===a.t.taskId);
+    const lb = db.tasks.find(x=>x.id===b.t.taskId);
+    const da = (la&&la.due) ? la.due : (la&&la.startDate ? la.startDate : '9999');
+    const db_ = (lb&&lb.due) ? lb.due : (lb&&lb.startDate ? lb.startDate : '9999');
+    return da.localeCompare(db_);
+  };
+  const pendingRows = allEntries.filter(({t})=>getTaskProgress(t.taskId)<100).sort(sortByDue);
+  const doneRows    = allEntries.filter(({t})=>getTaskProgress(t.taskId)>=100).sort(sortByDue);
 
   const pendingHtml = pendingRows.length
     ? pendingRows.map(({t,i})=>buildTaskRow(t,i,false)).join('')
