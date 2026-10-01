@@ -1515,7 +1515,11 @@ function getActiveWeek() {
 
 function formatDate(str) {
   if (!str) return '—';
-  return new Date(str + 'T00:00:00').toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit' });
+  const d = new Date(str + 'T00:00:00');
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
 }
 
 function isOverdue(dueStr, status) {
@@ -1834,7 +1838,11 @@ function wmBuildWeekStrip() {
   // Week range label
   const {sun} = wmGetWeekBounds(0);
   const wr = document.getElementById('wm-week-range');
-  if (wr) wr.textContent = mon.getDate()+' '+WM_TH_SHORT[mon.getMonth()]+' – '+sun.getDate()+' '+WM_TH_SHORT[sun.getMonth()]+' '+wmBEYear(now);
+  if (wr) {
+    const pad = n => String(n).padStart(2,'0');
+    const fmtD = d => pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+    wr.textContent = fmtD(mon)+' – '+fmtD(sun);
+  }
 }
 
 function wmUpdateStats() {
@@ -1876,9 +1884,9 @@ function wmPriClass(p) { return p==='High'?'wm-pri-high':p==='Low'?'wm-pri-low':
 function wmTaskCard(t, showNextBadge) {
   const ov = isOverdue(t.due, t.status);
   let due = '';
-  if (t.startDate && t.due && t.startDate!==t.due) due = t.startDate.slice(5)+' – '+t.due.slice(5);
-  else if (t.due) due = t.due.slice(5);
-  else if (t.startDate) due = t.startDate.slice(5);
+  if (t.startDate && t.due && t.startDate!==t.due) due = formatDate(t.startDate)+' – '+formatDate(t.due);
+  else if (t.due) due = formatDate(t.due);
+  else if (t.startDate) due = formatDate(t.startDate);
   const wmSubs = t.subtasks||[]; const wmSubDone=wmSubs.filter(s=>s.status==='Done').length;
   return `<div class="wm-task-card" onclick="openTaskModal('${t.id}')" style="cursor:pointer">
     <div class="wm-task-num">·</div>
@@ -3116,8 +3124,8 @@ function renderChBoard() {
 
     // Date string for card
     const dateStr = ch.endDate
-      ? ch.endDate.slice(5).replace('-','/')
-      : ch.startDate ? ch.startDate.slice(5).replace('-','/') : '';
+      ? formatDate(ch.endDate)
+      : ch.startDate ? formatDate(ch.startDate) : '';
 
     // Status chip colours
     const chipBg   = isDone ? '#dcfce7' : isActive ? '#fef3c7' : '#f1f5f9';
