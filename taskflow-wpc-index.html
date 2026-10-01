@@ -163,6 +163,27 @@
   .task-card-assignees { display: flex; align-items: center; gap: 2px; font-size: 11px; color: var(--gray-500); }
   .task-card-note { display: flex; align-items: flex-start; gap: 4px; font-size: 11px; color: var(--gray-400); margin-top: 6px; font-style: italic; line-height: 1.4; }
   .task-card-note svg { width: 12px; height: 12px; flex-shrink: 0; margin-top: 1px; }
+  .task-card-subtasks { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 11px; color: var(--gray-500); }
+  .subtask-bar { flex: 1; height: 3px; background: var(--gray-200); border-radius: 99px; overflow: hidden; }
+  .subtask-bar-fill { height: 100%; background: var(--success); border-radius: 99px; }
+  /* Subtask section in modal */
+  .subtask-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .subtask-add-btn { font-size: 12px; color: var(--primary); background: none; border: 1px dashed var(--primary); border-radius: 6px; padding: 3px 10px; cursor: pointer; transition: background .12s; }
+  .subtask-add-btn:hover { background: var(--primary-faint); }
+  .subtask-row { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+  .subtask-row-top { display: flex; align-items: center; gap: 8px; }
+  .subtask-check { width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+  .subtask-title-input { flex: 1; border: none; border-bottom: 1px solid transparent; background: transparent; font-size: 13px; color: var(--gray-800); outline: none; padding: 1px 0; font-family: inherit; }
+  .subtask-title-input:focus { border-bottom-color: var(--primary); }
+  .subtask-title-input.done { text-decoration: line-through; color: var(--gray-400); }
+  .subtask-remove-btn { border: none; background: none; color: var(--gray-400); cursor: pointer; font-size: 14px; padding: 2px 4px; line-height: 1; border-radius: 4px; }
+  .subtask-remove-btn:hover { color: var(--danger); background: var(--danger-light); }
+  .subtask-row-meta { margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .subtask-members-mini { display: flex; gap: 3px; flex-wrap: wrap; }
+  .subtask-member-chip { display: flex; align-items: center; gap: 3px; padding: 2px 7px 2px 4px; border-radius: 99px; border: 1px solid var(--gray-200); font-size: 11px; cursor: pointer; background: #fff; transition: all .12s; user-select: none; }
+  .subtask-member-chip.selected { background: var(--primary-light); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+  .subtask-dates { display: flex; align-items: center; gap: 4px; font-size: 11px; margin-left: auto; }
+  .subtask-date-input { border: 1px solid var(--gray-200); border-radius: 5px; padding: 2px 5px; font-size: 11px; color: var(--gray-700); background: #fff; font-family: inherit; }
   .overdue-icon { display: inline-flex; align-items: center; gap: 2px; color: var(--danger); }
   .overdue-icon svg { width: 12px; height: 12px; }
 
@@ -1267,6 +1288,13 @@
           <label class="form-label">หมายเหตุ</label>
           <textarea class="form-control" id="f-note" placeholder="หมายเหตุเพิ่มเติม..." style="min-height:60px"></textarea>
         </div>
+        <div class="form-group full">
+          <div class="subtask-section-header">
+            <label class="form-label" style="margin-bottom:0">งานย่อย</label>
+            <button type="button" class="subtask-add-btn" onclick="addSubtask()">＋ เพิ่มงานย่อย</button>
+          </div>
+          <div id="subtask-list"></div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-danger" id="task-delete-btn" onclick="deleteCurrentTask()" style="display:none;margin-right:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> ลบงาน</button>
@@ -1932,6 +1960,17 @@ function taskCard(t) {
   const avs = members.slice(0,3).map(m=>mkAvatar(m,{size:'20px',fs:'9px',extra:'margin-right:-4px;border:2px solid #fff;'})).join('');
   const names = members.map(m=>m.name.split(' ')[0]).join(', ');
   const dateRange = t.startDate ? `${formatDate(t.startDate)} – ${formatDate(t.due)}` : formatDate(t.due);
+  // Subtask progress
+  const subs = t.subtasks||[];
+  const subTotal = subs.length;
+  const subDone  = subs.filter(s=>s.status==='Done').length;
+  const subPct   = subTotal ? Math.round(subDone/subTotal*100) : 0;
+  const subHTML  = subTotal ? `<div class="task-card-subtasks">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>${subDone}/${subTotal} งานย่อย</span>
+    <div class="subtask-bar"><div class="subtask-bar-fill" style="width:${subPct}%"></div></div>
+    <span style="color:var(--gray-400)">${subPct}%</span>
+  </div>` : '';
   return `<div class="task-card" style="border-left-color:${borderColor}" onclick="openTaskModal('${t.id}')">
     <div class="task-card-title">${t.title}</div>
     ${t.desc?`<div class="task-card-desc">${t.desc}</div>`:''}
@@ -1940,6 +1979,7 @@ function taskCard(t) {
       ${members.length?`<div class="task-card-assignees">${avs}<span style="margin-left:6px">${names}</span></div>`:''}
       <div class="task-card-date" style="color:${ov?'var(--danger)':'var(--gray-400)'}">${ov?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>':''}${dateRange}</div>
     </div>
+    ${subHTML}
     ${t.note?`<div class="task-card-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
   </div>`;
 }
@@ -2200,6 +2240,68 @@ function filterToMember(id) { showView('mytasks'); mtCurrentMemberId=id; mtCurre
 // ══════════════════════════════════════════════════════
 let editingTaskId = null;
 let selectedMemberIds = [];
+let subtaskList = []; // [{ id, title, assigneeIds, startDate, due, status }]
+
+function renderSubtasks() {
+  const container = document.getElementById('subtask-list');
+  if (!container) return;
+  if (!subtaskList.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:10px 0;border:1px dashed var(--gray-200);border-radius:7px">ยังไม่มีงานย่อย — คลิก "＋ เพิ่มงานย่อย" เพื่อเริ่ม</div>';
+    return;
+  }
+  container.innerHTML = subtaskList.map((st, i) => {
+    const memberChips = db.members.map(m => {
+      const sel = st.assigneeIds.includes(m.id);
+      return `<div class="subtask-member-chip ${sel?'selected':''}" onclick="toggleSubtaskMember(${i},'${m.id}')">
+        ${mkAvatar(m,{size:'14px',fs:'7px'})}
+        ${m.name.split(' ')[0]}
+      </div>`;
+    }).join('');
+    const done = st.status === 'Done';
+    const safeTitle = (st.title||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    return `<div class="subtask-row">
+      <div class="subtask-row-top">
+        <input type="checkbox" class="subtask-check" ${done?'checked':''} onchange="toggleSubtaskDone(${i},this.checked)">
+        <input class="subtask-title-input${done?' done':''}" value="${safeTitle}" placeholder="ชื่องานย่อย..." oninput="subtaskList[${i}].title=this.value">
+        <button class="subtask-remove-btn" onclick="removeSubtask(${i})" title="ลบงานย่อย">✕</button>
+      </div>
+      <div class="subtask-row-meta">
+        ${db.members.length ? `<div class="subtask-members-mini">${memberChips}</div>` : ''}
+        <div class="subtask-dates">
+          <input type="date" class="subtask-date-input" value="${st.startDate||''}" onchange="subtaskList[${i}].startDate=this.value" title="วันเริ่มต้น">
+          <span style="color:var(--gray-400)">–</span>
+          <input type="date" class="subtask-date-input" value="${st.due||''}" onchange="subtaskList[${i}].due=this.value" title="วันสิ้นสุด">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addSubtask() {
+  subtaskList.push({ id: uid(), title: '', assigneeIds: [], startDate: '', due: '', status: 'Todo' });
+  renderSubtasks();
+  const inputs = document.querySelectorAll('.subtask-title-input');
+  if (inputs.length) inputs[inputs.length-1].focus();
+}
+
+function removeSubtask(i) {
+  subtaskList.splice(i, 1);
+  renderSubtasks();
+}
+
+function toggleSubtaskDone(i, checked) {
+  if (!subtaskList[i]) return;
+  subtaskList[i].status = checked ? 'Done' : 'Todo';
+  renderSubtasks();
+}
+
+function toggleSubtaskMember(i, memberId) {
+  if (!subtaskList[i]) return;
+  const ids = subtaskList[i].assigneeIds;
+  const idx = ids.indexOf(memberId);
+  if (idx === -1) ids.push(memberId); else ids.splice(idx, 1);
+  renderSubtasks();
+}
 
 function renderMemberChips() {
   const wrap = document.getElementById('f-members-chips');
@@ -2244,10 +2346,12 @@ function openTaskModal(id=null, defaultStatus='Todo', defaultDate=null) {
     document.getElementById('f-start-date').value = t.startDate||'';
     document.getElementById('f-due').value        = t.due||'';
     document.getElementById('f-note').value       = t.note||'';
+    subtaskList = (t.subtasks||[]).map(s=>({...s, assigneeIds:[...(s.assigneeIds||[])]}));
     populateChallengeDropdown(ownerCh ? ownerCh.id : '');
     deleteBtn.style.display='inline-flex';
   } else {
     selectedMemberIds = [];
+    subtaskList = [];
     document.getElementById('task-modal-title').textContent = 'เพิ่มงานใหม่';
     document.getElementById('f-title').value      = '';
     document.getElementById('f-desc').value       = '';
@@ -2262,6 +2366,7 @@ function openTaskModal(id=null, defaultStatus='Todo', defaultDate=null) {
     deleteBtn.style.display='none';
   }
   renderMemberChips();
+  renderSubtasks();
   overlay.classList.add('open');
   // Focus title field
   setTimeout(()=>{ const el=document.getElementById('f-title'); if(el) el.focus(); }, 200);
@@ -2292,6 +2397,9 @@ async function saveTask() {
   const wy = getISOWeekYear(dateRef);
 
   const taskId = editingTaskId || uid();
+  // Snapshot subtask data (collect any in-flight title edits from DOM)
+  const inputs = document.querySelectorAll('.subtask-title-input');
+  inputs.forEach((el, i) => { if (subtaskList[i]) subtaskList[i].title = el.value; });
   const task = {
     id:         taskId,
     title,
@@ -2304,6 +2412,12 @@ async function saveTask() {
     due:        fDueDate,
     week:       ww, year: wy,
     note:       document.getElementById('f-note').value.trim(),
+    subtasks:   subtaskList.filter(s=>s.title.trim()).map(s=>({
+                  id: s.id||uid(), title: s.title.trim(),
+                  assigneeIds: [...(s.assigneeIds||[])],
+                  startDate: s.startDate||'', due: s.due||'',
+                  status: s.status||'Todo'
+                })),
     createdAt:  editingTaskId?(db.tasks.find(t=>t.id===editingTaskId)||{}).createdAt||Date.now():Date.now(),
     updatedAt:  Date.now()
   };
