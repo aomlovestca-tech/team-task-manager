@@ -1924,19 +1924,21 @@ function wmRenderMemberReport() {
   const prevMonStr = prevMon.toISOString().slice(0,10);
   const prevSunStr = prevSun.toISOString().slice(0,10);
 
-  // Done: tasks completed (status==='Done') within the CURRENT week only
-  const monStr = mon.toISOString().slice(0, 10);
-  const sunStr = sun.toISOString().slice(0, 10);
+  // Done: tasks completed within the last 5 days (rolling, from today back 4 days)
+  const today = new Date(); today.setHours(23,59,59,999);
+  const fiveDaysAgo = new Date(); fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 4); fiveDaysAgo.setHours(0,0,0,0);
+  const todayStr     = today.toISOString().slice(0, 10);
+  const fiveDaysStr  = fiveDaysAgo.toISOString().slice(0, 10);
   const done = myTasks.filter(t => {
     if (t.status !== 'Done') return false;
     // Use updatedAt (ms timestamp) if available — most reliable completion indicator
     if (t.updatedAt) {
       const d = new Date(t.updatedAt).toISOString().slice(0, 10);
-      return d >= monStr && d <= sunStr;
+      return d >= fiveDaysStr && d <= todayStr;
     }
     // Fall back to due date
-    if (t.due) return t.due >= monStr && t.due <= sunStr;
-    return false; // no date info → cannot determine week, exclude
+    if (t.due) return t.due >= fiveDaysStr && t.due <= todayStr;
+    return false; // no date info → exclude
   });
 
   // In Progress: this week only
@@ -3042,7 +3044,7 @@ function renderChBoard() {
   const PIN_H    = 44;    // pin circle centre offset from road centre
   const PIN_R    = 16;    // pin circle radius
   const CARD_W   = 162;   // info card width
-  const WAVE_AMP = 30;    // arch amplitude within each row (makes road curved, not straight)
+  // straight-line road — no arch
   // Infographic pin colours — cycle by challenge index
   const PIN_COLORS = ['#ef4444','#f59e0b','#22c55e','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#06b6d4'];
 
@@ -3052,7 +3054,7 @@ function renderChBoard() {
   const svgW = PAD_X * 2 + (maxRowLen - 1) * CELL_W;
   const svgH = PAD_Y + (numRows - 1) * ROW_H + PAD_Y;
 
-  // Node centre positions (snake pattern + sine arch within each row)
+  // Node centre positions — snake pattern, flat y (straight road)
   const pos = filtered.map((ch, i) => {
     const row    = Math.floor(i / PER_ROW);
     const col    = i % PER_ROW;
@@ -3060,32 +3062,13 @@ function renderChBoard() {
     const x = row % 2 === 0
       ? PAD_X + col * CELL_W
       : PAD_X + (rowLen - 1 - col) * CELL_W;
-    const yBase = PAD_Y + row * ROW_H;
-    // Arch: sine wave peaks at middle of row; 0 at both endpoints
-    const t = rowLen > 2 ? col / (rowLen - 1) : 0.5;
-    const archDir = row % 2 === 0 ? -1 : 1;  // up for even rows, down for odd
-    const yArch = rowLen > 2 ? Math.sin(t * Math.PI) * WAVE_AMP * archDir : 0;
-    return { x, y: yBase + yArch };
+    const y = PAD_Y + row * ROW_H;
+    return { x, y };
   });
 
-  // Smooth Catmull-Rom spline through ALL node positions — curves everywhere, not just at turns
-  function catmullRomD(pts, alpha) {
-    if (pts.length < 2) return '';
-    let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[Math.max(0, i - 1)];
-      const p1 = pts[i];
-      const p2 = pts[i + 1];
-      const p3 = pts[Math.min(pts.length - 1, i + 2)];
-      const cx1 = p1.x + (p2.x - p0.x) / 6 * alpha;
-      const cy1 = p1.y + (p2.y - p0.y) / 6 * alpha;
-      const cx2 = p2.x - (p3.x - p1.x) / 6 * alpha;
-      const cy2 = p2.y - (p3.y - p1.y) / 6 * alpha;
-      d += ` C ${cx1.toFixed(1)} ${cy1.toFixed(1)} ${cx2.toFixed(1)} ${cy2.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
-    }
-    return d;
-  }
-  const roadD = catmullRomD(pos, 1.0);
+  // Simple polyline path (straight segments)
+  const roadD = pos.length < 2 ? '' :
+    pos.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
 
   // ── Build SVG pins + HTML cards ───────────────────────────────────
   let pinsSVG  = '';
