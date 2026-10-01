@@ -1648,10 +1648,12 @@ function renderDashboard() {
     const members = ids.map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
     const names = members.map(m=>m.name.split(' ')[0]).join(', ') || '—';
     const ov = isOverdue(t.due, t.status);
+    const dbSubs=t.subtasks||[]; const dbSubDone=dbSubs.filter(s=>s.status==='Done').length; const dbSubPct=dbSubs.length?Math.round(dbSubDone/dbSubs.length*100):0;
     return `<tr onclick="openTaskModal('${t.id}')" style="cursor:pointer">
       <td>
         <div class="db-table-title">${t.title}</div>
         ${ov?`<div class="db-overdue-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>เกินกำหนด</div>`:''}
+        ${dbSubs.length?`<div style="margin-top:3px;display:flex;align-items:center;gap:4px;font-size:10px;color:#9ca3af"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:9px;height:9px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>งานย่อย ${dbSubDone}/${dbSubs.length}<span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px">${dbSubPct}%</span></div>`:''}
       </td>
       <td><span style="font-size:12px;color:#374151;font-weight:500">${names}</span></td>
       <td>${statusBadge(t.status)}</td>
@@ -1678,10 +1680,12 @@ function renderDashboard() {
   const hp=tasks.filter(t=>t.priority==='High'&&t.status!=='Done').slice(0,6);
   document.getElementById('high-priority-list').innerHTML=hp.length?hp.map(t=>{
     const names=getTaskMemberIds(t).map(id=>db.members.find(x=>x.id===id)?.name?.split(' ')[0]).filter(Boolean).join(', ')||'—';
+    const hpSubs=t.subtasks||[]; const hpSubDone=hpSubs.filter(s=>s.status==='Done').length; const hpSubPct=hpSubs.length?Math.round(hpSubDone/hpSubs.length*100):0;
     return `<div class="db-hp-row" onclick="openTaskModal('${t.id}')">
       <div style="flex:1;min-width:0">
         <div class="db-hp-title">${t.title}</div>
         <div class="db-hp-sub">${names} · ${formatDate(t.due)}</div>
+        ${hpSubs.length?`<div style="margin-top:3px;display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(230,229,234,.5)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:9px;height:9px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>งานย่อย ${hpSubDone}/${hpSubs.length}<span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px">${hpSubPct}%</span></div>`:''}
       </div>
       ${statusBadge(t.status)}
     </div>`;
@@ -1833,7 +1837,7 @@ function wmTaskCard(t, showNextBadge) {
       ${wmSubs.length?`<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--gray-500);margin:3px 0 1px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         งานย่อย ${wmSubDone}/${wmSubs.length}
-        <div style="flex:1;height:2px;background:var(--gray-200);border-radius:99px;overflow:hidden"><div style="width:${wmSubs.length?Math.round(wmSubDone/wmSubs.length*100):0}%;height:100%;background:var(--success);border-radius:99px"></div></div>
+        <span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px">${wmSubs.length?Math.round(wmSubDone/wmSubs.length*100):0}%</span>
       </div>`:''}
       ${t.note?`<div class="wm-task-note"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
       <div class="wm-task-meta">
@@ -1974,8 +1978,7 @@ function taskCard(t) {
   const subHTML  = subTotal ? `<div class="task-card-subtasks">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
     <span>${subDone}/${subTotal} งานย่อย</span>
-    <div class="subtask-bar"><div class="subtask-bar-fill" style="width:${subPct}%"></div></div>
-    <span style="color:var(--gray-400)">${subPct}%</span>
+    <span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px">${subPct}%</span>
   </div>` : '';
   return `<div class="task-card" style="border-left-color:${borderColor}" onclick="openTaskModal('${t.id}')">
     <div class="task-card-title">${t.title}</div>
@@ -2052,8 +2055,10 @@ function renderMonthly() {
     const names = members.map(m=>m.name.split(' ')[0]).join(', ')||'—';
     const ov = isOverdue(t.due, t.status);
     const dateRange = t.startDate ? `${formatDate(t.startDate)} – ${formatDate(t.due)}` : formatDate(t.due);
+    const mSubs=t.subtasks||[]; const mSubDone=mSubs.filter(s=>s.status==='Done').length; const mSubPct=mSubs.length?Math.round(mSubDone/mSubs.length*100):0;
     return `<tr onclick="openTaskModal('${t.id}')" style="cursor:pointer">
-      <td><div style="font-weight:600">${t.title}</div>${ov?'<div class="overdue-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>เกินกำหนด</div>':''}</td>
+      <td><div style="font-weight:600">${t.title}</div>${ov?'<div class="overdue-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>เกินกำหนด</div>':''}${mSubs.length?`<div style="margin-top:3px;display:flex;align-items:center;gap:4px;font-size:10px;color:var(--gray-500)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:9px;height:9px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>งานย่อย ${mSubDone}/${mSubs.length}<span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px">${mSubPct}%</span></div>`:''}
+      </td>
       <td style="font-size:12px">${names}</td>
       <td>${statusBadge(t.status)}</td><td>${priorityBadge(t.priority)}</td>
       <td style="font-size:12px">${dateRange}</td>
@@ -2979,8 +2984,7 @@ function renderChOverview(ch) {
         ${subTotal&&!isDone?`<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-500);margin-bottom:6px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           งานย่อย <strong>${subDone}/${subTotal}</strong>
-          <div style="flex:1;height:3px;background:var(--gray-200);border-radius:99px;overflow:hidden"><div style="width:${subPct}%;height:100%;background:var(--success);border-radius:99px"></div></div>
-          <span style="color:var(--gray-400)">${subPct}%</span>
+          <span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px">${subPct}%</span>
         </div>`:''}
         ${!isDone?`<div class="ch-prog-bar" style="margin:4px 0 2px"><div class="ch-prog-fill" style="width:${pct}%"></div></div>
         <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>`:''}
