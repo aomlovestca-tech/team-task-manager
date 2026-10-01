@@ -1093,6 +1093,7 @@
             </div>
             <button class="btn btn-outline btn-sm" onclick="closeCalendarView()">← กลับ</button>
           </div>
+          <div id="ch-cal-filter-bar" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 14px 0"></div>
           <div class="cal-wrap">
             <div class="cal-header">
               <div style="display:flex;align-items:center;gap:8px">
@@ -1367,6 +1368,7 @@ const AVATAR_GRAY = '#9ca3af';
 let db = { tasks: [], members: [], challenges: [], currentWeekOffset: 0 };
 let _chState = { currentId: null, tab: 'overview', editTaskIdx: null };
 let chListFilter = ''; // active filter prefix for challenge list
+let calFilter = '';    // active filter prefix for calendar view
 
 // Backward compat: tasks may have memberId (string) or memberIds (array)
 function getTaskMemberIds(t) {
@@ -2747,6 +2749,24 @@ function renderCalendar() {
     });
   });
 
+  // ── Build cal filter bar ─────────────────────────────────────────────
+  const calPrefixes = [...new Set(db.challenges.map(ch=>{
+    const m = ch.name.match(/^([A-Z][A-Z0-9\s]*?)\s*[:\-]/);
+    return m ? m[1].trim() : '';
+  }).filter(Boolean))].sort();
+  const calFilterBarEl = document.getElementById('ch-cal-filter-bar');
+  if (calFilterBarEl) {
+    const chips = [{ label:'ทั้งหมด', val:'' }, ...calPrefixes.map(p=>({ label:p, val:p }))];
+    calFilterBarEl.innerHTML = chips.map(c=>
+      `<span class="ch-filter-chip${calFilter===c.val?' active':''}" onclick="calSetFilter('${c.val}')">${c.label}</span>`
+    ).join('');
+  }
+  // Apply filter to events
+  const visibleEvents = calFilter ? events.filter(ev=>{
+    const m = ev.chName.match(/^([A-Z][A-Z0-9\s]*?)\s*[:\-]/);
+    return m && m[1].trim() === calFilter;
+  }) : events;
+
   const today = new Date(); today.setHours(0,0,0,0);
   const EVT_H   = 20; // px height per lane
   const EVT_GAP = 2;  // px gap between lanes
@@ -2774,7 +2794,7 @@ function renderCalendar() {
     }
 
     // Events overlapping this week
-    const weekEvts = events.filter(e => e.end >= weekStart && e.start <= weekEnd);
+    const weekEvts = visibleEvents.filter(e => e.end >= weekStart && e.start <= weekEnd);
     weekEvts.sort((a,b) => a.start - b.start || (b.end-b.start)-(a.end-a.start));
 
     // Greedy lane assignment
@@ -2835,12 +2855,17 @@ function renderCalendar() {
   // Grid
   document.getElementById('cal-body').innerHTML = weeksHTML;
 
-  // Legend
+  // Legend (filtered to match calFilter)
   const legendEl = document.getElementById('cal-legend');
-  if (db.challenges.length) {
-    legendEl.innerHTML = db.challenges.map((ch,i)=>
-      `<div class="cal-legend-item"><div class="cal-legend-dot" style="background:${CH_CAL_COLORS[i%CH_CAL_COLORS.length]}"></div>${ch.name}</div>`
-    ).join('');
+  const legendChs = calFilter ? db.challenges.filter(ch => {
+    const m = ch.name.match(/^([A-Z][A-Z0-9\s]*?)\s*[:\-]/);
+    return m && m[1].trim() === calFilter;
+  }) : db.challenges;
+  if (legendChs.length) {
+    legendEl.innerHTML = legendChs.map(ch => {
+      const idx = db.challenges.indexOf(ch);
+      return `<div class="cal-legend-item"><div class="cal-legend-dot" style="background:${CH_CAL_COLORS[idx%CH_CAL_COLORS.length]}"></div>${ch.name}</div>`;
+    }).join('');
   } else {
     legendEl.innerHTML = '';
   }
@@ -2903,6 +2928,7 @@ function renderChList() {
 }
 
 function chSetFilter(val) { chListFilter = val; renderChList(); }
+function calSetFilter(val) { calFilter = val; renderCalendar(); }
 
 function showChList() {
   _chState.currentId = null;
