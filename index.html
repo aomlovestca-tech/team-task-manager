@@ -1924,19 +1924,19 @@ function wmRenderMemberReport() {
   const prevMonStr = prevMon.toISOString().slice(0,10);
   const prevSunStr = prevSun.toISOString().slice(0,10);
 
-  // Done: tasks completed within the last 5 days (rolling, from today back 4 days)
+  // Done: tasks completed within the last 5 days (rolling: today back 4 days)
   const today = new Date(); today.setHours(23,59,59,999);
   const fiveDaysAgo = new Date(); fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 4); fiveDaysAgo.setHours(0,0,0,0);
-  const todayStr     = today.toISOString().slice(0, 10);
-  const fiveDaysStr  = fiveDaysAgo.toISOString().slice(0, 10);
+  const todayStr    = today.toISOString().slice(0, 10);
+  const fiveDaysStr = fiveDaysAgo.toISOString().slice(0, 10);
   const done = myTasks.filter(t => {
     if (t.status !== 'Done') return false;
-    // Use updatedAt (ms timestamp) if available — most reliable completion indicator
-    if (t.updatedAt) {
-      const d = new Date(t.updatedAt).toISOString().slice(0, 10);
+    // 1. completedAt — exact stamp of when status changed to Done (most reliable)
+    if (t.completedAt) {
+      const d = new Date(t.completedAt).toISOString().slice(0, 10);
       return d >= fiveDaysStr && d <= todayStr;
     }
-    // Fall back to due date
+    // 2. due date — proxy for older tasks that pre-date completedAt field
     if (t.due) return t.due >= fiveDaysStr && t.due <= todayStr;
     return false; // no date info → exclude
   });
@@ -2506,7 +2506,16 @@ async function saveTask() {
                   status: s.status||'Todo'
                 })),
     createdAt:  editingTaskId?(db.tasks.find(t=>t.id===editingTaskId)||{}).createdAt||Date.now():Date.now(),
-    updatedAt:  Date.now()
+    updatedAt:  Date.now(),
+    // completedAt: set ONLY when status first changes to Done; preserved on subsequent edits
+    completedAt: (() => {
+      const prev = editingTaskId ? db.tasks.find(t=>t.id===editingTaskId) : null;
+      if (fStatus === 'Done') {
+        // already Done → keep old completedAt; newly Done → stamp now
+        return (prev && prev.status === 'Done' && prev.completedAt) ? prev.completedAt : Date.now();
+      }
+      return null; // task is NOT Done → clear completedAt
+    })()
   };
 
   try {
