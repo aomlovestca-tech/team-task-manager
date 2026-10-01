@@ -422,6 +422,31 @@
   .ch-filter-chip { display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-200);background:var(--bg);color:var(--gray-500);transition:all .15s; }
   .ch-filter-chip:hover { border-color:var(--primary);color:var(--primary); }
   .ch-filter-chip.active { background:var(--primary);border-color:var(--primary);color:#fff; }
+
+  /* ── ROAD MAP BOARD ── */
+  .rm-outer { background:#fff; border-radius:var(--radius); border:1px solid var(--gray-200); padding:24px; overflow-x:auto; }
+  .rm-container { position:relative; margin:0 auto; }
+  /* Node circles */
+  .rm-node { position:absolute; transform:translate(-50%,-50%); width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; cursor:pointer; z-index:10; transition:transform .18s, box-shadow .18s; box-shadow:0 4px 12px rgba(0,0,0,.22); border:4px solid #fff; }
+  .rm-node:hover { transform:translate(-50%,-50%) scale(1.14); box-shadow:0 6px 18px rgba(0,0,0,.28); }
+  .rm-node-done { background:#22c55e; color:#fff; }
+  .rm-node-active { background:#f59e0b; color:#fff; }
+  .rm-node-todo { background:#f1f5f9; color:#64748b; border-color:#cbd5e1; }
+  .rm-node-pulse { animation:rm-pulse 2s ease-in-out infinite; }
+  @keyframes rm-pulse { 0%,100%{box-shadow:0 4px 12px rgba(0,0,0,.22),0 0 0 0 rgba(245,158,11,.45)} 50%{box-shadow:0 4px 12px rgba(0,0,0,.22),0 0 0 14px rgba(245,158,11,0)} }
+  /* Labels */
+  .rm-lbl { position:absolute; transform:translateX(-50%); text-align:center; width:154px; pointer-events:none; z-index:6; }
+  .rm-lbl-top { /* set translateY via inline style */ }
+  .rm-lbl-name { font-size:11px; font-weight:700; color:var(--gray-800); line-height:1.35; }
+  .rm-lbl-date { font-size:9px; color:var(--gray-400); margin-top:2px; }
+  .rm-done-chip { display:inline-block; background:#dcfce7; color:#15803d; font-size:9px; font-weight:700; padding:2px 8px; border-radius:99px; margin-top:3px; }
+  .rm-pct-chip { display:inline-block; background:#fef3c7; color:#92400e; font-size:9px; font-weight:700; padding:2px 8px; border-radius:99px; margin-top:3px; }
+  /* Legend */
+  .rm-legend { display:flex; gap:12px; justify-content:center; margin-top:24px; flex-wrap:wrap; }
+  .rm-leg { font-size:12px; font-weight:600; padding:5px 14px; border-radius:99px; }
+  .rm-leg-done { background:#dcfce7; color:#15803d; }
+  .rm-leg-active { background:#fef3c7; color:#92400e; }
+  .rm-leg-todo { background:var(--gray-100); color:var(--gray-500); }
   .ch-create-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
   .ch-create-overlay.open { opacity:1; pointer-events:auto; }
   .ch-modal { background:#fff; border-radius:20px 20px 0 0; width:100%; max-width:640px; max-height:90vh; overflow-y:auto; padding:24px; }
@@ -1072,7 +1097,11 @@
         <div id="ch-list-panel">
           <div class="ch-header">
             <div><h2 style="font-size:18px;font-weight:700;color:var(--gray-800)">Challenge</h2><div style="font-size:13px;color:var(--gray-400)">ติดตามชาเลนจ์ของทีม</div></div>
-            <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-outline" onclick="openBoardView()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                บอร์ดงาน
+              </button>
               <button class="btn btn-outline" onclick="openCalendarView()">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 ปฏิทินงาน
@@ -1119,6 +1148,20 @@
           </div>
           <div class="cal-legend" id="cal-legend"></div>
         </div>
+
+        <!-- MISSION BOARD PANEL -->
+        <div id="ch-board-panel" style="display:none">
+          <div class="ch-header" style="margin-bottom:16px">
+            <div>
+              <h2 style="font-size:18px;font-weight:700;color:var(--gray-800)">🗺️ บอร์ดงาน</h2>
+              <div style="font-size:13px;color:var(--gray-400)">ด่านงานของแต่ละชาเลนจ์ · เดินไปให้ถึงเส้นชัย!</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="closeBoardView()">← กลับ</button>
+          </div>
+          <div id="ch-board-filter-bar" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 14px 0"></div>
+          <div class="ch-board-wrap" id="ch-board-content"></div>
+        </div>
+
         <div id="ch-detail-panel" style="display:none">
           <div class="ch-detail-header">
             <button class="ch-back-btn" onclick="showChList()">← กลับ</button>
@@ -2690,6 +2733,7 @@ function openCalendarView() {
   document.getElementById('ch-list-panel').style.display='none';
   document.getElementById('ch-detail-panel').style.display='none';
   document.getElementById('ch-calendar-panel').style.display='';
+  document.getElementById('ch-board-panel').style.display='none';
   renderCalendar();
 }
 function closeCalendarView() {
@@ -2875,6 +2919,7 @@ function renderChList() {
   document.getElementById('ch-list-panel').style.display='';
   document.getElementById('ch-detail-panel').style.display='none';
   document.getElementById('ch-calendar-panel').style.display='none';
+  document.getElementById('ch-board-panel').style.display='none';
   const el = document.getElementById('ch-list-items');
   if (!db.challenges || !db.challenges.length) {
     el.innerHTML = '<div class="ch-empty">ยังไม่มีชาเลนจ์ · กดปุ่ม "+ สร้างชาเลนจ์" เพื่อเริ่ม</div>';
@@ -2929,6 +2974,171 @@ function renderChList() {
 
 function chSetFilter(val) { chListFilter = val; renderChList(); }
 function calSetFilter(val) { calFilter = val; renderCalendar(); }
+function boardSetFilter(val) { chListFilter = val; renderChBoard(); }
+
+function openBoardView() {
+  document.getElementById('ch-list-panel').style.display='none';
+  document.getElementById('ch-detail-panel').style.display='none';
+  document.getElementById('ch-calendar-panel').style.display='none';
+  document.getElementById('ch-board-panel').style.display='';
+  renderChBoard();
+}
+function closeBoardView() {
+  document.getElementById('ch-board-panel').style.display='none';
+  renderChList();
+}
+
+function renderChBoard() {
+  const panel = document.getElementById('ch-board-content');
+  if (!panel) return;
+
+  // Filter chips
+  const allPfx = [...new Set(db.challenges.map(ch=>{
+    const m = ch.name.match(/^([A-Z][A-Z0-9\s]*?)\s*[:\-]/);
+    return m ? m[1].trim() : '';
+  }).filter(Boolean))].sort();
+  const boardBar = document.getElementById('ch-board-filter-bar');
+  if (boardBar) {
+    const chips = [{label:'ทั้งหมด',val:''},...allPfx.map(p=>({label:p,val:p}))];
+    boardBar.innerHTML = chips.map(c=>
+      `<span class="ch-filter-chip${chListFilter===c.val?' active':''}" onclick="boardSetFilter('${c.val}')">${c.label}</span>`
+    ).join('');
+  }
+
+  const sorted = [...db.challenges].sort((a,b)=>{
+    const ea = a.endDate||a.startDate||'9999-12-31';
+    const eb = b.endDate||b.startDate||'9999-12-31';
+    return ea.localeCompare(eb);
+  });
+  const filtered = chListFilter ? sorted.filter(ch=>{
+    const m = ch.name.match(/^([A-Z][A-Z0-9\s]*?)\s*[:\-]/);
+    return m && m[1].trim() === chListFilter;
+  }) : sorted;
+
+  if (!filtered.length) {
+    panel.innerHTML = '<div class="ch-empty">ยังไม่มีชาเลนจ์</div>';
+    return;
+  }
+
+  // ── ROAD MAP CONSTANTS ─────────────────────────────────────────────
+  const PER_ROW = 4;      // nodes per row
+  const CELL_W  = 170;    // horizontal distance between node centres
+  const ROW_H   = 200;    // vertical distance between rows
+  const PAD_X   = 90;     // side padding
+  const PAD_Y   = 110;    // top padding (labels + trophy area)
+  const NODE_R  = 30;     // node radius
+  const ROAD_W  = 58;     // road stroke width (wider = more visible)
+
+  const n = filtered.length;
+  const numRows = Math.ceil(n / PER_ROW);
+  // Canvas wide enough for the row with the most nodes
+  const maxRowLen = Math.min(n, PER_ROW);
+  const svgW = PAD_X * 2 + (maxRowLen - 1) * CELL_W;
+  const svgH = PAD_Y + (numRows - 1) * ROW_H + PAD_Y;
+
+  // Node centre positions (snake pattern, same as original road map)
+  const pos = filtered.map((ch, i) => {
+    const row    = Math.floor(i / PER_ROW);
+    const col    = i % PER_ROW;
+    const rowLen = Math.min(n - row * PER_ROW, PER_ROW);
+    const x = row % 2 === 0
+      ? PAD_X + col * CELL_W
+      : PAD_X + (rowLen - 1 - col) * CELL_W;
+    const y = PAD_Y + row * ROW_H;
+    return { x, y };
+  });
+
+  // ── SVG road path (road surface + dashed centre + sheen) ──────────
+  let roadD = '';
+  for (let i = 0; i < n; i++) {
+    const p = pos[i];
+    if (i === 0) {
+      roadD += `M ${p.x} ${p.y}`;
+    } else {
+      const prev    = pos[i - 1];
+      const prevRow = Math.floor((i - 1) / PER_ROW);
+      const curRow  = Math.floor(i / PER_ROW);
+      if (curRow === prevRow) {
+        roadD += ` L ${p.x} ${p.y}`;
+      } else {
+        // Smooth bezier turn between rows
+        const cx1 = prev.x, cy1 = prev.y + ROW_H * 0.48;
+        const cx2 = p.x,    cy2 = p.y   - ROW_H * 0.48;
+        roadD += ` C ${cx1} ${cy1} ${cx2} ${cy2} ${p.x} ${p.y}`;
+      }
+    }
+  }
+
+  // Trophy: above first node (top-left of the path from user's view)
+  // The LAST challenge by date is visually at pos[n-1]
+  // Place trophy above pos[n-1] (the final destination)
+  const lastPos = pos[n - 1];
+  const trophySVG = `
+    <text x="${lastPos.x}" y="${lastPos.y - NODE_R - 36}" text-anchor="middle" font-size="42">🏆</text>
+    <text x="${lastPos.x}" y="${lastPos.y - NODE_R - 6}" text-anchor="middle" font-size="11" font-weight="700" fill="#d97706">เส้นชัย!</text>`;
+
+  // ── HTML: node circles + labels ───────────────────────────────────
+  let nodesHTML = '', labelsHTML = '';
+  let doneCnt = 0, activeCnt = 0, todoCnt = 0;
+
+  filtered.forEach((ch, i) => {
+    const pct = chPct(ch);
+    const { x, y } = pos[i];
+    const isDone   = pct >= 100;
+    const isActive = !isDone && pct > 0;
+    if (isDone) doneCnt++;
+    else if (isActive) activeCnt++;
+    else todoCnt++;
+
+    const cls = isDone   ? 'rm-node rm-node-done'
+              : isActive ? 'rm-node rm-node-active rm-node-pulse'
+              :            'rm-node rm-node-todo';
+    const icon  = isDone ? '✓' : (i + 1);
+    const chip  = isDone   ? `<span class="rm-done-chip">✓ Done</span>`
+                : isActive ? `<span class="rm-pct-chip">${pct}%</span>` : '';
+    const dateStr = ch.endDate
+      ? ch.endDate.slice(5).replace('-','/')
+      : ch.startDate ? ch.startDate.slice(5).replace('-','/') : '';
+
+    nodesHTML += `<div class="${cls}" style="left:${x}px;top:${y}px;width:60px;height:60px;font-size:18px" onclick="openChDetail('${ch.id}')" title="${ch.name}">${icon}</div>`;
+
+    // Labels: alternate above/below per row to reduce overlap
+    const row = Math.floor(i / PER_ROW);
+    const lblAbove = row % 2 === 0;
+    const lblY  = lblAbove ? y - NODE_R - 12 : y + NODE_R + 12;
+    const trans = lblAbove ? 'translate(-50%,-100%)' : 'translate(-50%,0)';
+
+    labelsHTML += `<div style="position:absolute;left:${x}px;top:${lblY}px;transform:${trans};text-align:center;width:${CELL_W - 10}px;pointer-events:none;z-index:6">
+      <div style="font-size:11px;font-weight:700;color:var(--gray-800);line-height:1.4;word-break:break-word">${ch.name}</div>
+      ${dateStr?`<div style="font-size:9.5px;color:var(--gray-400);margin-top:2px">ถึง ${dateStr}</div>`:''}
+      ${chip}
+    </div>`;
+  });
+
+  const legend = `<div class="rm-legend">
+    ${doneCnt   ? `<span class="rm-leg rm-leg-done">✓ เสร็จแล้ว ${doneCnt} ด่าน</span>` : ''}
+    ${activeCnt ? `<span class="rm-leg rm-leg-active">▶ กำลังดำเนินการ ${activeCnt} ด่าน</span>` : ''}
+    ${todoCnt   ? `<span class="rm-leg rm-leg-todo">○ รอดำเนินการ ${todoCnt} ด่าน</span>` : ''}
+  </div>`;
+
+  panel.innerHTML = `
+    <div class="rm-outer">
+      <div class="rm-container" style="width:${svgW}px;height:${svgH + 60}px">
+        <svg width="${svgW}" height="${svgH}" style="position:absolute;top:0;left:0;overflow:visible">
+          <!-- Road surface -->
+          <path d="${roadD}" fill="none" stroke="#1e293b" stroke-width="${ROAD_W}" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Dashed centre line -->
+          <path d="${roadD}" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="20 15" stroke-linejoin="round"/>
+          <!-- Subtle top sheen -->
+          <path d="${roadD}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="${ROAD_W - 6}" stroke-linecap="round" stroke-linejoin="round"/>
+          ${trophySVG}
+        </svg>
+        ${nodesHTML}
+        ${labelsHTML}
+      </div>
+      ${legend}
+    </div>`;
+}
 
 function showChList() {
   _chState.currentId = null;
@@ -2946,6 +3156,8 @@ function openChDetail(id) {
 function renderChDetail() {
   document.getElementById('ch-list-panel').style.display='none';
   document.getElementById('ch-detail-panel').style.display='';
+  document.getElementById('ch-board-panel').style.display='none';
+  document.getElementById('ch-calendar-panel').style.display='none';
   const ch = db.challenges.find(c=>c.id===_chState.currentId);
   if (!ch) { showChList(); return; }
   document.getElementById('ch-detail-name').textContent = ch.name;
