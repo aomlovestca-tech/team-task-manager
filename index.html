@@ -401,7 +401,7 @@
   .ch-back-btn { background:none; border:1px solid var(--gray-300); color:var(--gray-600); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
   .ch-tabs { display:flex; gap:4px; background:var(--gray-100); border-radius:10px; padding:4px; margin-bottom:20px; width:fit-content; }
   .ch-tab { padding:7px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; color:var(--gray-500); transition:all .15s; }
-  .ch-tab.active { background:#fff; color:var(--primary-dark); box-shadow:0 1px 4px rgba(0,0,0,.1); }
+  .ch-tab.active { background:#cefb59; color:#0d2200; box-shadow:0 1px 4px rgba(0,0,0,.1); }
   .ch-overview-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
   .ch-stat-box { background:#fff; border-radius:10px; border:1px solid var(--gray-200); padding:16px; text-align:center; }
   .ch-stat-num { font-size:28px; font-weight:800; color:var(--primary); }
@@ -420,8 +420,8 @@
   .ch-mytasks-select { padding:7px 12px; border:1px solid var(--gray-300); border-radius:8px; font-size:13px; min-width:180px; }
   .ch-empty { text-align:center; padding:60px 20px; color:var(--gray-400); font-size:15px; }
   .ch-filter-chip { display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-200);background:var(--bg);color:var(--gray-500);transition:all .15s; }
-  .ch-filter-chip:hover { border-color:var(--primary);color:var(--primary); }
-  .ch-filter-chip.active { background:var(--primary);border-color:var(--primary);color:#fff; }
+  .ch-filter-chip:hover { border-color:#4d7c0f;color:#4d7c0f; }
+  .ch-filter-chip.active { background:#cefb59;border-color:#a8d932;color:#0d2200;font-weight:700; }
 
   /* ── ROAD MAP BOARD ── */
   .rm-outer { background:#fff; border-radius:var(--radius); border:1px solid var(--gray-200); padding:24px; overflow-x:auto; }
@@ -1121,7 +1121,7 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 ปฏิทินงาน
               </button>
-              <button class="btn btn-primary" onclick="openChCreate()">+ สร้างชาเลนจ์</button>
+              <button class="btn btn-lime" onclick="openChCreate()">+ สร้างชาเลนจ์</button>
             </div>
           </div>
           <div id="ch-filter-bar" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 14px 0"></div>
