@@ -522,29 +522,29 @@
   .cal-today-btn:hover { background:var(--gray-50); }
 
   /* ── WEEKLY MEETING ── */
-  .wm-header { background: linear-gradient(135deg,#5b21b6 0%,#7c3aed 60%,#8b5cf6 100%); color:#fff; padding: 0 20px; border-radius: var(--radius) var(--radius) 0 0; margin: -20px -20px 0 -20px; }
+  .wm-header { background: #cefb59; color:#1a2e00; padding: 0 20px; border-radius: var(--radius) var(--radius) 0 0; margin: -20px -20px 0 -20px; }
   .wm-top { display:flex; align-items:center; justify-content:space-between; padding:14px 0 10px; gap:12px; flex-wrap:wrap; }
   .wm-title-group { display:flex; align-items:center; gap:10px; }
-  .wm-title-group h2 { font-size:20px; font-weight:800; letter-spacing:-.3px; }
-  .wm-week-badge { background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:3px 12px; font-size:12px; font-weight:600; }
+  .wm-title-group h2 { font-size:20px; font-weight:800; letter-spacing:-.3px; color:#1a2e00; }
+  .wm-week-badge { background:#1a2e00; border:1px solid #1a2e00; border-radius:20px; padding:3px 12px; font-size:12px; font-weight:700; color:#cefb59; }
   .wm-clock { text-align:center; }
-  .wm-clock-time { font-family:'Inter',monospace; font-size:30px; font-weight:800; letter-spacing:1px; line-height:1; }
-  .wm-clock-date { font-size:12px; opacity:.85; margin-top:3px; }
+  .wm-clock-time { font-family:'Inter',monospace; font-size:30px; font-weight:800; letter-spacing:1px; line-height:1; color:#1a2e00; }
+  .wm-clock-date { font-size:12px; color:#2d4800; margin-top:3px; }
   .wm-countdown { text-align:right; }
-  .wm-countdown-num { font-size:26px; font-weight:800; line-height:1; }
-  .wm-countdown-label { font-size:11px; opacity:.8; }
-  .wm-countdown-bar { width:110px; height:4px; background:rgba(255,255,255,.25); border-radius:2px; margin:5px 0 0 auto; overflow:hidden; }
-  .wm-countdown-fill { height:100%; border-radius:2px; background:#fbbf24; }
+  .wm-countdown-num { font-size:26px; font-weight:800; line-height:1; color:#1a2e00; }
+  .wm-countdown-label { font-size:11px; color:#2d4800; }
+  .wm-countdown-bar { width:110px; height:4px; background:rgba(0,0,0,.15); border-radius:2px; margin:5px 0 0 auto; overflow:hidden; }
+  .wm-countdown-fill { height:100%; border-radius:2px; background:#4d7c0f; }
   .wm-week-strip { display:flex; gap:0; padding:0 0 12px; justify-content:center; }
-  .wm-day-cell { flex:1; max-width:100px; text-align:center; padding:7px 4px; border-radius:8px; }
-  .wm-day-cell.wm-today { background:rgba(255,255,255,.2); border:1.5px solid rgba(255,255,255,.5); }
+  .wm-day-cell { flex:1; max-width:100px; text-align:center; padding:7px 4px; border-radius:8px; color:#1a2e00; }
+  .wm-day-cell.wm-today { background:#1a2e00; border:2px solid #1a2e00; color:#cefb59 !important; }
   .wm-day-cell.wm-past { opacity:.5; }
   .wm-day-cell.wm-future { opacity:.72; }
   .wm-day-cell.wm-weekend { opacity:.38; }
-  .wm-day-name { font-size:10px; font-weight:600; opacity:.8; letter-spacing:.4px; }
+  .wm-day-name { font-size:10px; font-weight:600; opacity:.75; letter-spacing:.4px; }
   .wm-day-num { font-size:18px; font-weight:800; line-height:1.1; margin:2px 0; }
-  .wm-day-tasks { font-size:10px; opacity:.7; }
-  .wm-today-dot { width:5px; height:5px; background:#fbbf24; border-radius:50%; margin:3px auto 0; }
+  .wm-day-tasks { font-size:10px; opacity:.65; }
+  .wm-today-dot { width:5px; height:5px; background:#4d7c0f; border-radius:50%; margin:3px auto 0; }
 
   .wm-stats-bar { display:flex; gap:8px; padding:12px 20px; flex-wrap:wrap; background:#fff; border-bottom:1px solid var(--gray-100); margin: 0 -20px; }
   .wm-stat-chip { display:flex; align-items:center; gap:6px; background:var(--gray-50); border:1px solid var(--gray-200); border-radius:20px; padding:5px 12px; font-size:12px; }
@@ -552,19 +552,19 @@
   .wm-stat-num { font-weight:800; font-size:14px; }
   .wm-stat-chip.wm-overdue-chip { border-color:#fca5a5; background:#fef2f2; }
   .wm-week-range { margin-left:auto; font-size:12px; color:var(--gray-400); align-self:center; display:flex; align-items:center; gap:4px; }
-  .wm-title-icon { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background:rgba(255,255,255,.2); flex-shrink:0; }
-  .wm-title-icon svg { width:20px; height:20px; stroke:rgba(255,255,255,.9); }
+  .wm-title-icon { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background:rgba(0,0,0,.1); flex-shrink:0; }
+  .wm-title-icon svg { width:20px; height:20px; stroke:rgba(26,46,0,.85); }
 
   .wm-member-section { padding:12px 20px; background:#fff; border-bottom:2px solid var(--gray-100); margin: 0 -20px 20px; }
   .wm-member-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--gray-400); margin-bottom:9px; }
   .wm-member-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .wm-chip { display:flex; align-items:center; gap:7px; border-radius:30px; padding:6px 12px 6px 7px; cursor:pointer; border:2px solid transparent; background:var(--gray-100); transition:all .15s; font-weight:600; font-size:13px; color:var(--gray-700); }
-  .wm-chip:hover { background:var(--primary-light); border-color:var(--primary); color:var(--primary-dark); }
-  .wm-chip.wm-active { background:var(--primary); color:#fff; border-color:var(--primary); box-shadow:0 2px 10px rgba(124,58,237,.3); }
+  .wm-chip:hover { background:var(--gray-200); border-color:var(--gray-400); color:var(--gray-800); }
+  .wm-chip.wm-active { background:#cefb59; color:#1a2e00; border-color:#a8d932; box-shadow:0 2px 10px rgba(160,220,30,.4); }
   .wm-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; color:#fff; }
-  .wm-chip.wm-active .wm-avatar { background:rgba(255,255,255,.25) !important; }
-  .wm-nav-btn { margin-left:auto; display:flex; align-items:center; gap:7px; background:var(--primary); color:#fff; border:none; border-radius:24px; padding:8px 18px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; box-shadow:0 2px 8px rgba(124,58,237,.25); }
-  .wm-nav-btn:hover { background:var(--primary-dark); transform:translateY(-1px); }
+  .wm-chip.wm-active .wm-avatar { background:rgba(0,0,0,.15) !important; color:#1a2e00 !important; }
+  .wm-nav-btn { margin-left:auto; display:flex; align-items:center; gap:7px; background:#1a2e00; color:#cefb59; border:none; border-radius:24px; padding:8px 18px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:all .15s; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+  .wm-nav-btn:hover { background:#0d1800; transform:translateY(-1px); }
   .wm-nav-prog { font-size:11px; color:var(--gray-400); font-weight:600; margin-left:2px; white-space:nowrap; }
 
   .wm-member-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; background:#fff; border-radius:var(--radius); padding:14px 18px; box-shadow:var(--shadow); }
