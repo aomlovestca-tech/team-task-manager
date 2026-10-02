@@ -460,6 +460,20 @@
   .ch-task-edit-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:210; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
   .ch-task-edit-overlay.open { opacity:1; pointer-events:auto; }
   .ch-task-edit-modal { background:#fff; border-radius:16px; width:100%; max-width:480px; padding:24px; max-height:90vh; overflow-y:auto; }
+  /* Unsaved-changes confirm dialog */
+  .unsaved-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1100; display:flex; align-items:center; justify-content:center; }
+  .unsaved-dialog { background:#fff; border-radius:18px; padding:28px 24px 20px; width:calc(100% - 48px); max-width:360px; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,.18); }
+  .unsaved-dialog h3 { font-size:17px; font-weight:700; color:var(--gray-800); margin:0 0 8px; }
+  .unsaved-dialog p { font-size:14px; color:var(--gray-500); margin:0 0 20px; line-height:1.5; }
+  .unsaved-dialog .ud-btns { display:flex; flex-direction:column; gap:10px; }
+  .unsaved-dialog .ud-save { background:var(--primary); color:#fff; border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; }
+  .unsaved-dialog .ud-discard { background:transparent; color:#ef4444; border:none; font-size:14px; font-weight:600; cursor:pointer; padding:8px; }
+  .unsaved-dialog .ud-cancel { background:var(--gray-100); color:var(--gray-700); border:none; border-radius:12px; padding:12px; font-size:14px; font-weight:600; cursor:pointer; }
+  @media (prefers-color-scheme: dark) {
+    .unsaved-dialog { background:var(--gray-800,#1f2937); }
+    .unsaved-dialog h3 { color:var(--gray-100,#f3f4f6); }
+    .unsaved-dialog .ud-cancel { background:var(--gray-700,#374151); color:var(--gray-200,#e5e7eb); }
+  }
   @media(max-width:768px){
     .ch-overview-grid { grid-template-columns:1fr 1fr; }
     .ch-detail-header { gap:8px; }
@@ -1285,7 +1299,7 @@
     <div class="modal-handle"></div>
     <div class="modal-header">
       <div class="modal-title" id="task-modal-title">เพิ่มงานใหม่</div>
-      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+      <button class="modal-close" onclick="requestCloseTaskModal()">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
@@ -1347,9 +1361,22 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-danger" id="task-delete-btn" onclick="deleteCurrentTask()" style="display:none;margin-right:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> ลบงาน</button>
-        <button class="btn btn-outline" onclick="closeTaskModal()">ยกเลิก</button>
+        <button class="btn btn-outline" onclick="requestCloseTaskModal()">ยกเลิก</button>
         <button class="btn btn-primary" onclick="saveTask()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- UNSAVED CHANGES DIALOG -->
+<div class="unsaved-overlay" id="unsaved-overlay" style="display:none">
+  <div class="unsaved-dialog">
+    <h3>บันทึกการแก้ไขก่อนไหม?</h3>
+    <p>มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก<br>ต้องการบันทึกก่อนปิดการ์ดไหม?</p>
+    <div class="ud-btns">
+      <button class="ud-save" onclick="unsavedSave()">💾 บันทึกการแก้ไข</button>
+      <button class="ud-cancel" onclick="unsavedCancel()">← กลับไปแก้ไขต่อ</button>
+      <button class="ud-discard" onclick="unsavedDiscard()">ปิดโดยไม่บันทึก</button>
     </div>
   </div>
 </div>
@@ -2422,6 +2449,28 @@ function populateChallengeDropdown(selectedChId='') {
     db.challenges.map(ch=>`<option value="${ch.id}"${ch.id===selectedChId?' selected':''}>${ch.name}</option>`).join('');
 }
 
+// Snapshot of form values when modal opens — used to detect unsaved changes
+let _taskModalSnapshot = null;
+
+function _getTaskFormState() {
+  return {
+    title:     (document.getElementById('f-title')||{}).value||'',
+    desc:      (document.getElementById('f-desc')||{}).value||'',
+    status:    (document.getElementById('f-status')||{}).value||'',
+    priority:  (document.getElementById('f-priority')||{}).value||'',
+    startDate: (document.getElementById('f-start-date')||{}).value||'',
+    due:       (document.getElementById('f-due')||{}).value||'',
+    note:      (document.getElementById('f-note')||{}).value||'',
+    challenge: (document.getElementById('f-challenge')||{}).value||'',
+    members:   [...selectedMemberIds].sort().join(','),
+  };
+}
+function _isTaskFormDirty() {
+  if (!_taskModalSnapshot) return false;
+  const cur = _getTaskFormState();
+  return JSON.stringify(cur) !== JSON.stringify(_taskModalSnapshot);
+}
+
 function openTaskModal(id=null, defaultStatus='Todo', defaultDate=null) {
   editingTaskId = id;
   const overlay = document.getElementById('task-modal-overlay');
@@ -2450,7 +2499,7 @@ function openTaskModal(id=null, defaultStatus='Todo', defaultDate=null) {
     document.getElementById('task-modal-title').textContent = 'เพิ่มงานใหม่';
     document.getElementById('f-title').value      = '';
     document.getElementById('f-desc').value       = '';
-    document.getElementById('f-status').value     = '';
+    document.getElementById('f-status').value     = defaultStatus||'';
     document.getElementById('f-priority').value   = 'Medium';
     document.getElementById('f-start-date').value = defaultDate||'';
     document.getElementById('f-due').value        = '';
@@ -2463,14 +2512,38 @@ function openTaskModal(id=null, defaultStatus='Todo', defaultDate=null) {
   renderMemberChips();
   renderSubtasks();
   overlay.classList.add('open');
-  // Focus title field
-  setTimeout(()=>{ const el=document.getElementById('f-title'); if(el) el.focus(); }, 200);
+  // Snapshot form state AFTER all fields are set (for dirty detection)
+  setTimeout(()=>{
+    _taskModalSnapshot = _getTaskFormState();
+    const el=document.getElementById('f-title'); if(el) el.focus();
+  }, 220);
 }
 
 function closeTaskModal(e) {
-  if (e && e.target!==document.getElementById('task-modal-overlay')) return;
+  // If called from backdrop click, check for unsaved changes
+  if (e && e.target !== document.getElementById('task-modal-overlay')) return;
+  if (_isTaskFormDirty()) {
+    document.getElementById('unsaved-overlay').style.display = 'flex';
+    return;
+  }
+  _taskModalSnapshot = null;
   document.getElementById('task-modal-overlay').classList.remove('open');
 }
+function _forceCloseTaskModal() {
+  _taskModalSnapshot = null;
+  document.getElementById('unsaved-overlay').style.display = 'none';
+  document.getElementById('task-modal-overlay').classList.remove('open');
+}
+function requestCloseTaskModal() {
+  if (_isTaskFormDirty()) {
+    document.getElementById('unsaved-overlay').style.display = 'flex';
+  } else {
+    _forceCloseTaskModal();
+  }
+}
+function unsavedSave()    { document.getElementById('unsaved-overlay').style.display='none'; saveTask(); }
+function unsavedCancel()  { document.getElementById('unsaved-overlay').style.display='none'; }
+function unsavedDiscard() { _forceCloseTaskModal(); }
 
 async function saveTask() {
   const title      = document.getElementById('f-title').value.trim();
@@ -2554,7 +2627,7 @@ async function saveTask() {
       }
     }
 
-    document.getElementById('task-modal-overlay').classList.remove('open');
+    _forceCloseTaskModal();
     toast(editingTaskId?'อัปเดตงานเรียบร้อย':'เพิ่มงานใหม่เรียบร้อย','success');
     // Force immediate re-render of challenge page if open
     if (_chState.currentId) {
@@ -2581,7 +2654,7 @@ async function deleteCurrentTask() {
         try { await saveChallengeFS(updatedCh); } catch(e) {}
       }
     }
-    document.getElementById('task-modal-overlay').classList.remove('open');
+    _forceCloseTaskModal();
     toast('ลบงานเรียบร้อย','success');
   } catch(e) { toast('ลบไม่สำเร็จ','error'); }
 }
@@ -3739,7 +3812,10 @@ function exportExcel() {
 
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    document.getElementById('task-modal-overlay').classList.remove('open');
+    const unsaved = document.getElementById('unsaved-overlay');
+    if (unsaved && unsaved.style.display !== 'none') { unsavedCancel(); return; }
+    const taskOverlay = document.getElementById('task-modal-overlay');
+    if (taskOverlay && taskOverlay.classList.contains('open')) { requestCloseTaskModal(); return; }
     document.getElementById('member-modal-overlay').classList.remove('open');
   }
 });
