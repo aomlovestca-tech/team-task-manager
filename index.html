@@ -424,29 +424,61 @@
   .ch-filter-chip.active { background:#cefb59;border-color:#a8d932;color:#0d2200;font-weight:700; }
 
   /* ── ROAD MAP BOARD ── */
-  .rm-outer { background:#fff; border-radius:var(--radius); border:1px solid var(--gray-200); padding:24px; overflow-x:auto; }
-  .rm-container { position:relative; margin:0 auto; }
-  /* Node circles */
-  .rm-node { position:absolute; transform:translate(-50%,-50%); width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; cursor:pointer; z-index:10; transition:transform .18s, box-shadow .18s; box-shadow:0 4px 12px rgba(0,0,0,.22); border:4px solid #fff; }
-  .rm-node:hover { transform:translate(-50%,-50%) scale(1.14); box-shadow:0 6px 18px rgba(0,0,0,.28); }
-  .rm-node-done { background:#22c55e; color:#fff; }
-  .rm-node-active { background:#f59e0b; color:#fff; }
-  .rm-node-todo { background:#f1f5f9; color:#64748b; border-color:#cbd5e1; }
-  .rm-node-pulse { animation:rm-pulse 2s ease-in-out infinite; }
-  @keyframes rm-pulse { 0%,100%{box-shadow:0 4px 12px rgba(0,0,0,.22),0 0 0 0 rgba(245,158,11,.45)} 50%{box-shadow:0 4px 12px rgba(0,0,0,.22),0 0 0 14px rgba(245,158,11,0)} }
-  /* Labels */
-  .rm-lbl { position:absolute; transform:translateX(-50%); text-align:center; width:154px; pointer-events:none; z-index:6; }
-  .rm-lbl-top { /* set translateY via inline style */ }
-  .rm-lbl-name { font-size:11px; font-weight:700; color:var(--gray-800); line-height:1.35; }
-  .rm-lbl-date { font-size:9px; color:var(--gray-400); margin-top:2px; }
-  .rm-done-chip { display:inline-block; background:#dcfce7; color:#15803d; font-size:9px; font-weight:700; padding:2px 8px; border-radius:99px; margin-top:3px; }
-  .rm-pct-chip { display:inline-block; background:#fef3c7; color:#92400e; font-size:9px; font-weight:700; padding:2px 8px; border-radius:99px; margin-top:3px; }
-  /* Legend */
-  .rm-legend { display:flex; gap:12px; justify-content:center; margin-top:24px; flex-wrap:wrap; }
-  .rm-leg { font-size:12px; font-weight:600; padding:5px 14px; border-radius:99px; }
-  .rm-leg-done { background:#dcfce7; color:#15803d; }
-  .rm-leg-active { background:#fef3c7; color:#92400e; }
-  .rm-leg-todo { background:var(--gray-100); color:var(--gray-500); }
+  /* ── VERTICAL ROADMAP (board view) ── */
+  .vrm-outer { background:linear-gradient(160deg,#040d0a 0%,#071210 60%,#040d0a 100%); border-radius:var(--radius); padding:36px 28px 32px; }
+  /* timeline with continuous center line */
+  .vrm-timeline { position:relative; display:flex; flex-direction:column; max-width:900px; margin:0 auto; }
+  .vrm-timeline::before { content:''; position:absolute; left:43px; top:36px; bottom:36px; width:2px; background:linear-gradient(to bottom,transparent 0%,rgba(206,251,89,.55) 8%,rgba(206,251,89,.35) 50%,rgba(206,251,89,.55) 92%,transparent 100%); box-shadow:0 0 10px rgba(206,251,89,.25),0 0 24px rgba(206,251,89,.1); z-index:0; }
+  /* group row */
+  .vrm-group { display:flex; align-items:flex-start; gap:22px; position:relative; z-index:1; }
+  /* left node column */
+  .vrm-node-col { width:86px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:7px; position:relative; z-index:2; padding-top:2px; }
+  /* node circle */
+  .vrm-node { position:relative; width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .vrm-node-ring  { position:absolute; inset:-11px; border-radius:50%; border:1.5px solid rgba(206,251,89,.18); }
+  .vrm-node-ring2 { position:absolute; inset:-4px; border-radius:50%; border:1px solid rgba(206,251,89,.3); }
+  .vrm-node-inner { position:relative; width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:1; }
+  .vrm-num { font-size:17px; font-weight:800; letter-spacing:.5px; line-height:1; }
+  /* node states — green only */
+  .vrm-node-done  .vrm-node-ring  { border-color:rgba(206,251,89,.3); }
+  .vrm-node-done  .vrm-node-ring2 { border-color:rgba(206,251,89,.6); }
+  .vrm-node-done  .vrm-node-inner { background:rgba(206,251,89,.16); border:2px solid #cefb59; box-shadow:0 0 20px rgba(206,251,89,.4),0 0 50px rgba(206,251,89,.15); }
+  .vrm-node-done  .vrm-num { color:#cefb59; }
+  .vrm-node-active .vrm-node-ring  { border-color:rgba(206,251,89,.25); animation:vrm-ring 2.5s ease-in-out infinite; }
+  .vrm-node-active .vrm-node-ring2 { border-color:rgba(206,251,89,.5); }
+  .vrm-node-active .vrm-node-inner { background:rgba(206,251,89,.1); border:2px solid #cefb59; box-shadow:0 0 24px rgba(206,251,89,.45),0 0 50px rgba(206,251,89,.18); }
+  .vrm-node-active .vrm-num { color:#cefb59; }
+  @keyframes vrm-ring { 0%,100%{opacity:.25;transform:scale(1)} 50%{opacity:.55;transform:scale(1.07)} }
+  .vrm-node-todo  .vrm-node-ring  { border-color:rgba(45,90,0,.5); }
+  .vrm-node-todo  .vrm-node-ring2 { border-color:rgba(45,90,0,.7); }
+  .vrm-node-todo  .vrm-node-inner { background:rgba(26,46,0,.6); border:2px solid #2d5a00; box-shadow:0 0 10px rgba(45,90,0,.3); }
+  .vrm-node-todo  .vrm-num { color:#5a9400; }
+  /* date badge under node */
+  .vrm-date-badge { font-size:11px; font-weight:700; color:rgba(206,251,89,.85); text-align:center; line-height:1.6; letter-spacing:.3px; white-space:nowrap; }
+  .vrm-date-badge small { display:block; font-size:9px; font-weight:500; color:rgba(206,251,89,.45); }
+  /* separator between groups */
+  .vrm-sep { display:flex; align-items:center; height:52px; position:relative; z-index:1; padding-left:0; }
+  .vrm-sep-inner { width:86px; flex-shrink:0; display:flex; justify-content:center; align-items:center; height:100%; }
+  /* cards area */
+  .vrm-cards-wrap { flex:1; display:flex; flex-wrap:wrap; gap:11px; padding:4px 0 22px; align-items:flex-start; min-height:60px; }
+  /* card — two green tones only */
+  .vrm-card { flex:1 1 200px; max-width:280px; border-radius:10px; padding:13px 13px 11px; cursor:pointer; transition:filter .15s,transform .15s; border:1px solid rgba(255,255,255,.06); border-left:3px solid; }
+  .vrm-card:hover { filter:brightness(1.12); transform:translateY(-2px); }
+  .vrm-card-lime { background:rgba(206,251,89,.07); border-left-color:#cefb59; }
+  .vrm-card-dark { background:rgba(26,46,0,.45); border-left-color:#2d5a00; }
+  .vrm-card-title { font-size:12.5px; font-weight:700; color:#fff; line-height:1.45; margin-bottom:5px; word-break:break-word; }
+  .vrm-card-date  { font-size:10px; color:rgba(255,255,255,.38); margin-bottom:8px; }
+  .vrm-card-footer { display:flex; align-items:center; gap:8px; }
+  .vrm-chip-lime { font-size:10px; font-weight:700; padding:2px 9px; border-radius:99px; background:rgba(206,251,89,.18); color:#cefb59; }
+  .vrm-chip-dark { font-size:10px; font-weight:700; padding:2px 9px; border-radius:99px; background:rgba(26,46,0,.6); color:#5a9400; }
+  .vrm-progbar { flex:1; height:3px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; }
+  .vrm-progfill { height:100%; background:#cefb59; border-radius:2px; }
+  /* legend */
+  .vrm-legend { display:flex; gap:10px; justify-content:center; margin-top:22px; flex-wrap:wrap; }
+  .vrm-leg { font-size:11px; font-weight:600; padding:4px 14px; border-radius:99px; }
+  .vrm-leg-done   { background:rgba(206,251,89,.12); color:#cefb59; border:1px solid rgba(206,251,89,.3); }
+  .vrm-leg-active { background:rgba(206,251,89,.08); color:#9dcc30; border:1px solid rgba(206,251,89,.2); }
+  .vrm-leg-todo   { background:rgba(26,46,0,.5); color:#5a9400; border:1px solid rgba(45,90,0,.5); }
   .ch-create-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
   .ch-create-overlay.open { opacity:1; pointer-events:auto; }
   .ch-modal { background:#fff; border-radius:20px 20px 0 0; width:100%; max-width:640px; max-height:90vh; overflow-y:auto; padding:24px; }
@@ -1168,7 +1200,7 @@
         <div id="ch-board-panel" style="display:none">
           <div class="ch-header" style="margin-bottom:16px">
             <div>
-              <h2 style="font-size:18px;font-weight:700;color:var(--gray-800)">🗺️ บอร์ดงาน</h2>
+              <h2 style="font-size:18px;font-weight:700;color:var(--gray-800)">บอร์ดงาน</h2>
               <div style="font-size:13px;color:var(--gray-400)">ด่านงานของแต่ละชาเลนจ์ · เดินไปให้ถึงเส้นชัย!</div>
             </div>
             <button class="btn btn-outline btn-sm" onclick="closeBoardView()">← กลับ</button>
@@ -3115,7 +3147,7 @@ function renderChBoard() {
   const panel = document.getElementById('ch-board-content');
   if (!panel) return;
 
-  // Filter chips
+  // ── Filter chips ────────────────────────────────────────────────
   const allPfx = [...new Set(db.challenges.map(ch=>{
     const m = ch.name.match(/^([A-Z][A-Z0-9\s]*?)\s*[:\-]/);
     return m ? m[1].trim() : '';
@@ -3128,10 +3160,11 @@ function renderChBoard() {
     ).join('');
   }
 
+  // ── Sort by start date ──────────────────────────────────────────
   const sorted = [...db.challenges].sort((a,b)=>{
-    const ea = a.endDate||a.startDate||'9999-12-31';
-    const eb = b.endDate||b.startDate||'9999-12-31';
-    return ea.localeCompare(eb);
+    const sa = a.startDate||'9999-12-31', sb = b.startDate||'9999-12-31';
+    if (sa !== sb) return sa.localeCompare(sb);
+    return (a.endDate||'9999-12-31').localeCompare(b.endDate||'9999-12-31');
   });
   const filtered = chListFilter ? sorted.filter(ch=>{
     const m = ch.name.match(/^([A-Z][A-Z0-9\s]*?)\s*[:\-]/);
@@ -3139,143 +3172,114 @@ function renderChBoard() {
   }) : sorted;
 
   if (!filtered.length) {
-    panel.innerHTML = '<div class="ch-empty">ยังไม่มีชาเลนจ์</div>';
+    panel.innerHTML = '<div class="ch-empty" style="color:rgba(255,255,255,.4);padding:40px;text-align:center">ยังไม่มีชาเลนจ์</div>';
     return;
   }
 
-  // ── INFOGRAPHIC ROAD MAP CONSTANTS ──────────────────────────────────
-  const PER_ROW  = 4;
-  const CELL_W   = 180;   // horizontal distance between node centres
-  const ROW_H    = 270;   // vertical distance between rows (extra room for arch + cards)
-  const PAD_X    = 90;    // side padding
-  const PAD_Y    = 160;   // top/bottom padding (accommodates pin + card above row 0)
-  const ROAD_W   = 56;    // road stroke width
-  const PIN_H    = 44;    // pin circle centre offset from road centre
-  const PIN_R    = 16;    // pin circle radius
-  const CARD_W   = 162;   // info card width
-  // straight-line road — no arch
-  // Infographic pin colours — cycle by challenge index
-  const PIN_COLORS = ['#ef4444','#f59e0b','#22c55e','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#06b6d4'];
+  // ── Group by start date (same start date = same node) ───────────
+  // Challenges with the same startDate are concurrent → same node
+  // Different startDate → separate node (preserves order of timeline)
+  const groupMap = new Map();
+  filtered.forEach(ch => {
+    const key = ch.startDate || '0000-01-01';
+    if (!groupMap.has(key)) groupMap.set(key, []);
+    groupMap.get(key).push(ch);
+  });
+  // Sort keys by date so nodes appear chronologically
+  const groups = [...groupMap.entries()]
+    .sort((a,b) => a[0].localeCompare(b[0]))
+    .map(([,chs]) => chs);
 
-  const n = filtered.length;
-  const numRows  = Math.ceil(n / PER_ROW);
-  const maxRowLen= Math.min(n, PER_ROW);
-  const svgW = PAD_X * 2 + (maxRowLen - 1) * CELL_W;
-  const svgH = PAD_Y + (numRows - 1) * ROW_H + PAD_Y;
+  // ── Build HTML ──────────────────────────────────────────────────
+  const chevSVG = `<svg width="22" height="28" viewBox="0 0 22 28" fill="none">
+    <path d="M4 4 L11 14 L18 4" stroke="#cefb59" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4 14 L11 24 L18 14" stroke="#cefb59" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
+  </svg>`;
 
-  // Node centre positions — snake pattern, flat y (straight road)
-  const pos = filtered.map((ch, i) => {
-    const row    = Math.floor(i / PER_ROW);
-    const col    = i % PER_ROW;
-    const rowLen = Math.min(n - row * PER_ROW, PER_ROW);
-    const x = row % 2 === 0
-      ? PAD_X + col * CELL_W
-      : PAD_X + (rowLen - 1 - col) * CELL_W;
-    const y = PAD_Y + row * ROW_H;
-    return { x, y };
+  let totalDone=0, totalActive=0, totalTodo=0;
+
+  // Helper: format date as DD/MM (short)
+  function fmtShort(d) {
+    if (!d) return '';
+    const [y,m,day] = d.split('-');
+    return `${day}/${m}`;
+  }
+
+  const pieces = [];
+  groups.forEach((group, gi) => {
+    const isLast   = gi === groups.length - 1;
+    const allDone  = group.every(c => chPct(c) >= 100);
+    const anyActive= group.some(c => { const p=chPct(c); return p>0 && p<100; });
+    const nodeState= allDone ? 'vrm-node-done' : anyActive ? 'vrm-node-active' : 'vrm-node-todo';
+    const nodeNum  = String(gi + 1).padStart(2, '0');
+
+    // Date range badge: min startDate – max endDate across the group
+    const starts = group.map(c=>c.startDate).filter(Boolean).sort();
+    const ends   = group.map(c=>c.endDate).filter(Boolean).sort();
+    const grpStart = starts[0] || '';
+    const grpEnd   = ends[ends.length-1] || '';
+    let dateBadge = '';
+    if (grpStart || grpEnd) {
+      const s = grpStart ? fmtShort(grpStart) : '';
+      const e = grpEnd   ? fmtShort(grpEnd)   : '';
+      // Show start date prominently, end date smaller below
+      if (s && e && s !== e) {
+        dateBadge = `${s}<small>ถึง ${e}</small>`;
+      } else {
+        dateBadge = s || e;
+      }
+    }
+
+    const cardsHTML = group.map(ch => {
+      const pct    = chPct(ch);
+      const isDone = pct >= 100;
+      const isAct  = !isDone && pct > 0;
+      if (isDone) totalDone++; else if (isAct) totalActive++; else totalTodo++;
+
+      const cardClass = (isDone || isAct) ? 'vrm-card vrm-card-lime' : 'vrm-card vrm-card-dark';
+      const chipClass = (isDone || isAct) ? 'vrm-chip-lime' : 'vrm-chip-dark';
+      const chipLabel = isDone ? '✓ Done' : isAct ? `${pct}%` : 'รอดำเนินการ';
+      const dateStr   = (ch.startDate||ch.endDate) ?
+        `${ch.startDate ? formatDate(ch.startDate) : ''}${ch.endDate ? ' – '+formatDate(ch.endDate) : ''}` : '';
+
+      return `<div class="${cardClass}" onclick="openChDetail('${ch.id}')">
+        <div class="vrm-card-title">${ch.name}</div>
+        ${dateStr ? `<div class="vrm-card-date">${dateStr}</div>` : ''}
+        <div class="vrm-card-footer">
+          <span class="${chipClass}">${chipLabel}</span>
+          ${isAct ? `<div class="vrm-progbar"><div class="vrm-progfill" style="width:${pct}%"></div></div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    pieces.push(`<div class="vrm-group">
+      <div class="vrm-node-col">
+        <div class="vrm-node ${nodeState}">
+          <div class="vrm-node-ring"></div>
+          <div class="vrm-node-ring2"></div>
+          <div class="vrm-node-inner"><span class="vrm-num">${nodeNum}</span></div>
+        </div>
+        ${dateBadge ? `<div class="vrm-date-badge">${dateBadge}</div>` : ''}
+      </div>
+      <div class="vrm-cards-wrap">${cardsHTML}</div>
+    </div>`);
+
+    if (!isLast) {
+      pieces.push(`<div class="vrm-sep">
+        <div class="vrm-sep-inner">${chevSVG}</div>
+      </div>`);
+    }
   });
 
-  // Simple polyline path (straight segments)
-  const roadD = pos.length < 2 ? '' :
-    pos.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+  const rowsHTML = pieces.join('');
 
-  // ── Build SVG pins + HTML cards ───────────────────────────────────
-  let pinsSVG  = '';
-  let cardsHTML= '';
-  let doneCnt  = 0, activeCnt = 0, todoCnt = 0;
-
-  filtered.forEach((ch, i) => {
-    const pct     = chPct(ch);
-    const { x, y }= pos[i];
-    const row     = Math.floor(i / PER_ROW);
-    const isDone  = pct >= 100;
-    const isActive= !isDone && pct > 0;
-    if (isDone) doneCnt++; else if (isActive) activeCnt++; else todoCnt++;
-
-    // Pin colour: green=done, amber=active, else cycle colour
-    const baseColor= PIN_COLORS[i % PIN_COLORS.length];
-    const pinFill  = isDone ? '#22c55e' : isActive ? '#f59e0b' : baseColor;
-    const pinIcon  = isDone ? '✓' : (i + 1);
-
-    // Pin direction: up (-1) for even rows, down (+1) for odd rows
-    const pinDir = (row % 2 === 0) ? -1 : 1;
-    const pcy    = y + pinDir * PIN_H;             // pin circle centre
-    const stemEnd= pcy + (-pinDir) * PIN_R;        // stem end (toward road)
-    const stemY  = y + pinDir * 3;                 // stem touches road surface
-
-    // SVG: stem line + circle + number/tick
-    pinsSVG += `
-      <line x1="${x}" y1="${stemY}" x2="${x}" y2="${stemEnd}" stroke="${pinFill}" stroke-width="3.5" stroke-linecap="round"/>
-      <circle cx="${x}" cy="${pcy}" r="${PIN_R + 2}" fill="${pinFill}" opacity=".18"/>
-      <circle cx="${x}" cy="${pcy}" r="${PIN_R}" fill="${pinFill}"/>
-      <circle cx="${x}" cy="${pcy}" r="${PIN_R}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-      <text x="${x}" y="${pcy + 5}" text-anchor="middle" font-size="${isDone?15:13}" font-weight="900" fill="#fff" font-family="'Segoe UI',sans-serif">${pinIcon}</text>
-    `;
-    // Pulse ring for active pins
-    if (isActive) pinsSVG += `<circle cx="${x}" cy="${pcy}" r="${PIN_R + 8}" fill="none" stroke="${pinFill}" stroke-width="2" opacity=".35"><animate attributeName="r" values="${PIN_R+4};${PIN_R+14};${PIN_R+4}" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".4;0;.4" dur="2s" repeatCount="indefinite"/></circle>`;
-
-    // Date string for card
-    const dateStr = ch.endDate
-      ? formatDate(ch.endDate)
-      : ch.startDate ? formatDate(ch.startDate) : '';
-
-    // Status chip colours
-    const chipBg   = isDone ? '#dcfce7' : isActive ? '#fef3c7' : '#f1f5f9';
-    const chipColor= isDone ? '#059669' : isActive ? '#b45309' : '#64748b';
-    const chipLabel= isDone ? '✓ Done'  : isActive ? `${pct}%` : 'รอดำเนินการ';
-
-    // Card positioning: always on the far side of pin from road
-    const cardAnchorY = pcy + pinDir * (PIN_R + 6);
-    const cardTrans   = (pinDir === -1) ? 'translate(-50%,-100%)' : 'translate(-50%,0)';
-
-    cardsHTML += `<div onclick="openChDetail('${ch.id}')" style="
-        position:absolute;
-        left:${x}px;
-        top:${cardAnchorY}px;
-        transform:${cardTrans};
-        width:${CARD_W}px;
-        background:#fff;
-        border-radius:10px;
-        box-shadow:0 3px 14px rgba(0,0,0,.14);
-        border-left:4px solid ${pinFill};
-        padding:9px 10px 9px 11px;
-        cursor:pointer;
-        z-index:10;
-        text-align:left;
-      ">
-      <div style="display:flex;align-items:flex-start;gap:7px">
-        <span style="width:19px;height:19px;min-width:19px;border-radius:50%;background:${pinFill};color:#fff;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;margin-top:1px">${pinIcon}</span>
-        <div style="font-size:11px;font-weight:700;color:#1f2937;line-height:1.4;word-break:break-word;flex:1">${ch.name}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:5px;padding-left:26px">
-        ${dateStr?`<span style="font-size:9px;color:#9ca3af">ถึง ${dateStr}</span>`:''}
-        <span style="display:inline-block;background:${chipBg};color:${chipColor};font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px">${chipLabel}</span>
-      </div>
-    </div>`;
-  });
-
-  const legend = `<div class="rm-legend">
-    ${doneCnt   ? `<span class="rm-leg rm-leg-done">✓ เสร็จแล้ว ${doneCnt} ด่าน</span>` : ''}
-    ${activeCnt ? `<span class="rm-leg rm-leg-active">▶ กำลังดำเนินการ ${activeCnt} ด่าน</span>` : ''}
-    ${todoCnt   ? `<span class="rm-leg rm-leg-todo">○ รอดำเนินการ ${todoCnt} ด่าน</span>` : ''}
+  const legend = `<div class="vrm-legend">
+    ${totalDone   ? `<span class="vrm-leg vrm-leg-done">✓ เสร็จแล้ว ${totalDone} ชาเลนจ์</span>` : ''}
+    ${totalActive ? `<span class="vrm-leg vrm-leg-active">▶ กำลังดำเนิน ${totalActive} ชาเลนจ์</span>` : ''}
+    ${totalTodo   ? `<span class="vrm-leg vrm-leg-todo">○ รอดำเนินการ ${totalTodo} ชาเลนจ์</span>` : ''}
   </div>`;
 
-  panel.innerHTML = `
-    <div class="rm-outer" style="background:#eef2f7">
-      <div class="rm-container" style="width:${svgW}px;height:${svgH}px">
-        <svg width="${svgW}" height="${svgH}" style="position:absolute;top:0;left:0;overflow:visible">
-          <!-- Road surface -->
-          <path d="${roadD}" fill="none" stroke="#1e293b" stroke-width="${ROAD_W}" stroke-linecap="round" stroke-linejoin="round"/>
-          <!-- Dashed centre line -->
-          <path d="${roadD}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="3" stroke-linecap="round" stroke-dasharray="18 12" stroke-linejoin="round"/>
-          <!-- Subtle sheen -->
-          <path d="${roadD}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="${ROAD_W - 8}" stroke-linecap="round" stroke-linejoin="round"/>
-          ${pinsSVG}
-        </svg>
-        ${cardsHTML}
-      </div>
-      ${legend}
-    </div>`;
+  panel.innerHTML = `<div class="vrm-outer"><div class="vrm-timeline">${rowsHTML}</div>${legend}</div>`;
 }
 
 function showChList() {
