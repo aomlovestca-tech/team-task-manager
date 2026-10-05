@@ -231,6 +231,8 @@
   .mt-sbtn { padding:8px 16px; border-radius:100px; border:1.5px solid var(--gray-200); background:#fff; font-size:13px; font-weight:600; color:var(--gray-500); cursor:pointer; transition:all .15s; white-space:nowrap; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
   .mt-sbtn:hover { border-color:var(--primary); color:var(--primary); }
   .mt-sbtn.mt-s-active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .mt-sbtn-overdue { border-color:#ef4444 !important; color:#ef4444; }
+  .mt-sbtn.mt-s-overdue-active { background:#ef4444 !important; color:#fff !important; border-color:#ef4444 !important; }
 
   /* date range bar – compact */
   .mt-date-bar { display:flex; align-items:center; gap:8px; background:#fff; border-radius:12px; padding:10px 14px; box-shadow:var(--shadow); flex-wrap:wrap; }
@@ -1124,6 +1126,7 @@
             <div class="mt-sbtn" onclick="mtSelectStatus('Todo')">รอดำเนินการ</div>
             <div class="mt-sbtn" onclick="mtSelectStatus('Done')">เสร็จสิ้น</div>
             <div class="mt-sbtn" onclick="mtSelectStatus('On Hold')">รอพัก</div>
+            <div class="mt-sbtn mt-sbtn-overdue" onclick="mtSelectStatus('overdue')">⚠ เกินกำหนด</div>
           </div>
           <div class="mt-date-bar" id="mt-date-bar">
             <span class="mt-date-label">📅 ช่วงวันที่:</span>
@@ -2280,8 +2283,15 @@ function mtSelectMember(id) {
 
 function mtSelectStatus(s) {
   mtCurrentStatus = s;
-  document.querySelectorAll('.mt-sbtn').forEach(btn => btn.classList.remove('mt-s-active'));
-  event.currentTarget.classList.add('mt-s-active');
+  document.querySelectorAll('.mt-sbtn').forEach(btn => {
+    btn.classList.remove('mt-s-active');
+    btn.classList.remove('mt-s-overdue-active');
+  });
+  if (s === 'overdue') {
+    event.currentTarget.classList.add('mt-s-overdue-active');
+  } else {
+    event.currentTarget.classList.add('mt-s-active');
+  }
   renderMyTasks();
 }
 
@@ -2290,7 +2300,11 @@ function renderMyTasks() {
 
   let tasks = db.tasks;
   if (mtCurrentMemberId) tasks = tasks.filter(t => getTaskMemberIds(t).includes(mtCurrentMemberId));
-  if (mtCurrentStatus)   tasks = tasks.filter(t => t.status === mtCurrentStatus);
+  if (mtCurrentStatus === 'overdue') {
+    tasks = tasks.filter(t => isOverdue(t.due, t.status));
+  } else if (mtCurrentStatus) {
+    tasks = tasks.filter(t => t.status === mtCurrentStatus);
+  }
 
   // Date range filter: show tasks whose date range overlaps [mtDateFrom, mtDateTo]
   if (mtDateFrom || mtDateTo) {
