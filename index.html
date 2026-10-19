@@ -3503,7 +3503,7 @@ function renderRoles() {
           <option value="manager"${role==='manager'?'selected':''}>Manager</option>
           <option value="member" ${role==='member' ?'selected':''}>Member</option>
         </select>
-        <button class="btn btn-outline btn-sm" onclick="openPinSet('${m.id}','${m.name}')"><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>PIN</button>
+        <button class="btn btn-outline btn-sm" onclick="${isSelf?'openChangePinModal()':`openPinSet('${m.id}','${m.name}')`}"><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>PIN</button>
       </div>
     </div>`;
   }).join('') || '<div style="color:var(--gray-400);text-align:center;padding:40px">ยังไม่มีสมาชิก</div>';
