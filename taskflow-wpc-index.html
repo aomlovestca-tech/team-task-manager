@@ -72,9 +72,24 @@
   .role-select { padding: 5px 10px; border-radius: 7px; border: 1.5px solid var(--gray-200); font-size: 12px; font-weight: 600; background: #fff; cursor: pointer; }
 
   /* TOPBAR USER CHIP */
-  .topbar-user { display: flex; align-items: center; gap: 8px; background: var(--gray-100); border-radius: 99px; padding: 4px 12px 4px 4px; cursor: pointer; }
+  .topbar-user { display: flex; align-items: center; gap: 8px; background: var(--gray-100); border-radius: 99px; padding: 4px 12px 4px 4px; cursor: pointer; user-select:none; }
+  .topbar-user:hover { background: var(--gray-200); }
   .topbar-user-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
   .topbar-user-name { font-size: 13px; font-weight: 600; color: var(--gray-700); }
+  .topbar-user-caret { font-size: 10px; color: var(--gray-400); }
+  /* USER DROPDOWN */
+  .user-dropdown { position:absolute; top:56px; right:20px; background:#fff; border:1px solid var(--gray-200); border-radius:12px; box-shadow:var(--shadow-lg); padding:6px; min-width:190px; z-index:200; display:none; }
+  .user-dropdown.open { display:block; }
+  .user-dd-header { padding:10px 12px 8px; border-bottom:1px solid var(--gray-100); margin-bottom:4px; }
+  .user-dd-name { font-size:14px; font-weight:700; color:var(--gray-800); }
+  .user-dd-role { font-size:11px; color:var(--gray-400); margin-top:2px; }
+  .user-dd-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; color:var(--gray-700); }
+  .user-dd-item:hover { background:var(--gray-100); }
+  .user-dd-sep { height:1px; background:var(--gray-200); margin:4px 0; }
+  /* MEMBER TABS */
+  .member-tabs { display:flex; gap:0; border-bottom:2px solid var(--gray-200); margin-bottom:20px; }
+  .member-tab { padding:9px 18px; font-size:14px; font-weight:600; color:var(--gray-400); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; }
+  .member-tab.active { color:var(--primary); border-color:var(--primary); }
 
   /* APPROVAL PAGE */
   .apv-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
@@ -1045,7 +1060,6 @@
       <div class="nav-section-title" id="nav-manager-title" style="margin-top:12px;display:none">MANAGER</div>
       <div class="nav-item" id="nav-approvals" style="display:none" onclick="showView('approvals')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span> อนุมัติงาน <span class="nav-badge-red" id="badge-approvals" style="display:none">0</span></div>
       <div class="nav-item" id="nav-history" style="display:none" onclick="showView('history')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> ประวัติการแก้ไข</div>
-      <div class="nav-item" id="nav-roles" style="display:none" onclick="showView('roles')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> จัดการสิทธิ์</div>
       <div class="nav-section-title" style="margin-top:12px">SETTINGS</div>
       <div class="nav-item" onclick="showView('members')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Team Members</div>
       <div class="nav-item" onclick="showView('monthly')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Monthly Report</div>
@@ -1069,9 +1083,19 @@
         <button class="btn btn-outline btn-sm btn-print" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
         <button class="btn btn-success btn-sm btn-excel" onclick="exportExcel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg> Excel</button>
         <button class="btn btn-primary btn-lime" onclick="openTaskModal()">+ เพิ่มงาน</button>
-        <div class="topbar-user" id="topbar-user-chip" onclick="doLogout()" title="คลิกเพื่อออกจากระบบ" style="display:none">
+        <div class="topbar-user" id="topbar-user-chip" onclick="toggleUserDropdown(event)" style="display:none">
           <div class="topbar-user-av" id="topbar-user-av" style="background:#7C3AED">A</div>
           <div class="topbar-user-name" id="topbar-user-name">AOM</div>
+          <span class="topbar-user-caret">▾</span>
+        </div>
+        <div class="user-dropdown" id="user-dropdown">
+          <div class="user-dd-header">
+            <div class="user-dd-name" id="dd-name">AOM</div>
+            <div class="user-dd-role" id="dd-role">Owner</div>
+          </div>
+          <div class="user-dd-item" onclick="openChangePinModal()">🔑 เปลี่ยน PIN ของฉัน</div>
+          <div class="user-dd-sep"></div>
+          <div class="user-dd-item" style="color:#ef4444" onclick="doLogout()">🚪 ออกจากระบบ</div>
         </div>
       </div>
     </div>
@@ -1322,10 +1346,24 @@
 
       <!-- TEAM MEMBERS -->
       <div class="view" id="view-members">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
-          <button class="btn btn-primary" onclick="openMemberModal()">+ เพิ่มสมาชิก</button>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:0">
+          <div class="member-tabs">
+            <div class="member-tab active" id="mtab-members" onclick="switchMemberTab('members')">👥 สมาชิก</div>
+            <div class="member-tab" id="mtab-roles" onclick="switchMemberTab('roles')" style="display:none">🛡️ สิทธิ์ & PIN</div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-member" onclick="openMemberModal()" style="margin-bottom:2px">+ เพิ่มสมาชิก</button>
         </div>
-        <div class="members-grid" id="members-grid"></div>
+        <!-- Members panel -->
+        <div id="members-panel">
+          <div class="members-grid" id="members-grid"></div>
+        </div>
+        <!-- Roles panel -->
+        <div id="roles-panel" style="display:none">
+          <div style="background:#fef9c3;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#a16207;line-height:1.5">
+            <strong>บทบาทในระบบ:</strong> <strong>Owner</strong> = จัดการสิทธิ์ + อนุมัติทุกอย่าง · <strong>Manager</strong> = อนุมัติงาน + แก้ไขวันได้โดยตรง · <strong>Member</strong> = ต้องส่งคำขอผ่านหัวหน้า
+          </div>
+          <div id="roles-list"></div>
+        </div>
       </div>
 
       <!-- APPROVALS -->
@@ -1358,17 +1396,6 @@
     </div>
   </div>
 
-      <!-- ROLE MANAGEMENT (owner only) -->
-      <div class="view" id="view-roles">
-        <div style="margin-bottom:20px">
-          <h2 style="font-size:20px;font-weight:800">จัดการสิทธิ์</h2>
-          <div style="font-size:13px;color:var(--gray-400);margin-top:2px">กำหนด Role และ PIN ของสมาชิกแต่ละคน</div>
-        </div>
-        <div style="background:#fef9c3;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#a16207">
-          <strong>บทบาทในระบบ:</strong> Owner = จัดการสิทธิ์ + อนุมัติงานทุกอย่าง · Manager = อนุมัติงาน + แก้ไขวันได้โดยตรง · Member = ต้องส่งคำขอผ่านหัวหน้า
-        </div>
-        <div id="roles-list"></div>
-      </div>
 
 </div>
 
@@ -1436,6 +1463,9 @@
     </div>
     <div class="pin-err" id="pin-err"></div>
     <div class="pin-hint" id="pin-hint">ยังไม่มี PIN? ติดต่อ AOM เพื่อตั้ง PIN</div>
+    <div style="text-align:center;margin-top:16px">
+      <a href="#" style="font-size:12px;color:rgba(255,255,255,.35);text-decoration:none" onclick="showForgotPin(event)">ลืม PIN?</a>
+    </div>
   </div>
 </div>
 
@@ -1454,6 +1484,38 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closePinSet()">ยกเลิก</button>
       <button class="btn btn-primary" onclick="savePinSet()">บันทึก PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PIN MODAL (self-service) -->
+<div class="modal-overlay" id="change-pin-overlay" style="display:none" onclick="if(event.target===this)closeChangePinModal()">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-header"><div class="modal-title">🔑 เปลี่ยน PIN ของฉัน</div><button class="modal-close" onclick="closeChangePinModal()">✕</button></div>
+    <div class="modal-body">
+      <label class="form-label">PIN ปัจจุบัน</label>
+      <input class="form-control" id="chpin-current" type="password" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••" style="font-size:22px;letter-spacing:8px;text-align:center;margin-bottom:14px">
+      <label class="form-label">PIN ใหม่ (4 หลัก)</label>
+      <input class="form-control" id="chpin-new" type="password" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••" style="font-size:22px;letter-spacing:8px;text-align:center;margin-bottom:14px">
+      <label class="form-label">ยืนยัน PIN ใหม่</label>
+      <input class="form-control" id="chpin-confirm" type="password" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••" style="font-size:22px;letter-spacing:8px;text-align:center">
+      <div id="chpin-err" style="margin-top:10px;font-size:13px;color:#ef4444;text-align:center"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeChangePinModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveChangePin()">บันทึก PIN ใหม่</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PIN MODAL -->
+<div class="modal-overlay" id="forgot-pin-overlay" style="display:none" onclick="if(event.target===this)closeForgotPin()">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header"><div class="modal-title">ลืม PIN?</div><button class="modal-close" onclick="closeForgotPin()">✕</button></div>
+    <div class="modal-body" id="forgot-pin-content" style="min-height:120px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeForgotPin()">ปิด</button>
+      <button class="btn btn-primary" id="forgot-pin-submit-btn" onclick="submitForgotPin()" style="display:none">ยืนยันอีเมล</button>
     </div>
   </div>
 </div>
@@ -1833,11 +1895,10 @@ const VIEW_META = {
   weekly:    { title:'Weekly Meeting',  sub:'รายงานสถานการณ์งานประจำสัปดาห์' },
   monthly:   { title:'Monthly Report',  sub:'สรุปงานรายเดือน' },
   mytasks:   { title:'งานของฉัน',        sub:'My Tasks' },
-  members:   { title:'Team Members',    sub:'จัดการสมาชิกในทีม' },
+  members:   { title:'Team Members',    sub:'จัดการสมาชิกและสิทธิ์ในทีม' },
   challenge: { title:'Challenge',        sub:'ติดตามชาเลนจ์ของทีม' },
   approvals: { title:'อนุมัติงาน',       sub:'รายการขอสร้างงาน / ขอเปลี่ยนวันส่งงาน' },
   history:   { title:'ประวัติการแก้ไข',  sub:'บันทึกทุกการเปลี่ยนแปลงการ์ดงาน' },
-  roles:     { title:'จัดการสิทธิ์',      sub:'กำหนด Role และ PIN ของสมาชิก' }
 };
 
 function showView(id) {
@@ -1864,7 +1925,6 @@ function showView(id) {
   if (id === 'members')   renderMembers();
   if (id === 'approvals') renderApprovals();
   if (id === 'history')   renderHistory();
-  if (id === 'roles')     renderRoles();
 }
 
 // ══════════════════════════════════════════════════════
@@ -2599,7 +2659,23 @@ function renderMyTasks() {
 // ══════════════════════════════════════════════════════
 //  RENDER MEMBERS
 // ══════════════════════════════════════════════════════
+function switchMemberTab(tab) {
+  document.getElementById('members-panel').style.display = tab==='members' ? '' : 'none';
+  document.getElementById('roles-panel').style.display   = tab==='roles'   ? '' : 'none';
+  document.getElementById('mtab-members').classList.toggle('active', tab==='members');
+  document.getElementById('mtab-roles').classList.toggle('active', tab==='roles');
+  if (tab==='roles') renderRoles();
+}
+
 function renderMembers() {
+  // Show/hide the roles tab based on role
+  const rolesTab = document.getElementById('mtab-roles');
+  const isOwner = currentUser && currentUser.role==='owner';
+  if (rolesTab) rolesTab.style.display = isOwner ? '' : 'none';
+  // If roles panel is showing but user is no longer owner, switch to members
+  const rolesPanel = document.getElementById('roles-panel');
+  if (!isOwner && rolesPanel && rolesPanel.style.display !== 'none') switchMemberTab('members');
+
   const grid=document.getElementById('members-grid');
   if (!db.members.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><p>ยังไม่มีสมาชิก คลิก "เพิ่มสมาชิก"</p></div>';return;}
   grid.innerHTML=db.members.map(m=>{
@@ -3229,10 +3305,15 @@ function applyUserRole() {
   document.getElementById('nav-manager-title').style.display = isManager ? '' : 'none';
   document.getElementById('nav-approvals').style.display     = isManager ? '' : 'none';
   document.getElementById('nav-history').style.display       = isManager ? '' : 'none';
-  document.getElementById('nav-roles').style.display         = isOwner   ? '' : 'none';
   // Bottom nav approvals button
   const bnApv = document.getElementById('bn-approvals');
   if (bnApv) bnApv.style.display = isManager ? '' : 'none';
+  // Populate user dropdown header
+  const ddName = document.getElementById('dd-name');
+  const ddRole = document.getElementById('dd-role');
+  const roleLabel = {owner:'เจ้าของ', manager:'หัวหน้างาน', member:'สมาชิก'};
+  if (ddName) ddName.textContent = currentUser.name;
+  if (ddRole) ddRole.textContent = roleLabel[currentUser.role] || currentUser.role;
   // Topbar user chip
   const chip = document.getElementById('topbar-user-chip');
   const av   = document.getElementById('topbar-user-av');
@@ -3249,17 +3330,137 @@ function doLogout() {
   document.getElementById('nav-manager-title').style.display = 'none';
   document.getElementById('nav-approvals').style.display     = 'none';
   document.getElementById('nav-history').style.display       = 'none';
-  document.getElementById('nav-roles').style.display         = 'none';
   const bnApv = document.getElementById('bn-approvals');
   if (bnApv) bnApv.style.display = 'none';
   document.getElementById('topbar-user-chip').style.display = 'none';
+  closeUserDropdown();
   showView('dashboard');
   initPinLogin();
 }
 
-// Role management (owner only)
+// ── USER DROPDOWN ────────────────────────────────────────
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('user-dropdown');
+  if (!dd) return;
+  dd.classList.toggle('open');
+}
+function closeUserDropdown() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('user-dropdown');
+  if (dd && dd.classList.contains('open')) {
+    if (!dd.contains(e.target) && !document.getElementById('topbar-user-chip').contains(e.target)) {
+      dd.classList.remove('open');
+    }
+  }
+});
+
+// ── CHANGE PIN MODAL ─────────────────────────────────────
+function openChangePinModal() {
+  closeUserDropdown();
+  document.getElementById('chpin-current').value = '';
+  document.getElementById('chpin-new').value = '';
+  document.getElementById('chpin-confirm').value = '';
+  document.getElementById('chpin-err').textContent = '';
+  document.getElementById('change-pin-overlay').style.display = 'flex';
+}
+function closeChangePinModal() {
+  document.getElementById('change-pin-overlay').style.display = 'none';
+}
+async function saveChangePin() {
+  if (!currentUser) return;
+  const cur = document.getElementById('chpin-current').value.trim();
+  const n1  = document.getElementById('chpin-new').value.trim();
+  const n2  = document.getElementById('chpin-confirm').value.trim();
+  const errEl = document.getElementById('chpin-err');
+  errEl.textContent = '';
+  // Validate
+  const member = db.members.find(m => m.id === currentUser.id);
+  if (!member) { errEl.textContent = 'ไม่พบข้อมูลสมาชิก'; return; }
+  if (cur !== String(member.pin)) { errEl.textContent = 'PIN ปัจจุบันไม่ถูกต้อง'; return; }
+  if (!/^\d{4}$/.test(n1)) { errEl.textContent = 'PIN ใหม่ต้องเป็นตัวเลข 4 หลัก'; return; }
+  if (n1 !== n2) { errEl.textContent = 'ยืนยัน PIN ใหม่ไม่ตรงกัน'; return; }
+  try {
+    await firestore.collection('members').doc(member.id).update({ pin: n1 });
+    closeChangePinModal();
+    toast('เปลี่ยน PIN สำเร็จ ✓', 'success');
+  } catch(e) {
+    errEl.textContent = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+  }
+}
+
+// ── FORGOT PIN ───────────────────────────────────────────
+function showForgotPin(e) {
+  e.preventDefault();
+  const sel = document.getElementById('pin-member-select');
+  const memberId = sel ? sel.value : '';
+  const member = db.members.find(m => m.id === memberId);
+  const content = document.getElementById('forgot-pin-content');
+  const submitBtn = document.getElementById('forgot-pin-submit-btn');
+  if (!member) {
+    content.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:20px 0">กรุณาเลือกชื่อก่อนกด ลืม PIN</p>';
+    submitBtn.style.display = 'none';
+  } else if (member.role === 'owner') {
+    // Owner flow — ask for email verification
+    const emailHint = member.email ? member.email.replace(/(.{2}).+(@.+)/, '$1***$2') : '';
+    content.innerHTML = `
+      <p style="font-size:14px;color:var(--gray-600);margin-bottom:16px;line-height:1.6">
+        ยืนยันอีเมลที่ลงทะเบียนไว้เพื่อดู PIN ของคุณ
+        ${emailHint ? `<br><span style="color:var(--gray-400);font-size:12px">(${emailHint})</span>` : ''}
+      </p>
+      <input class="form-control" id="forgot-email-input" type="email" placeholder="กรอกอีเมลของคุณ" style="margin-bottom:4px">
+      <div id="forgot-email-err" style="font-size:12px;color:#ef4444;min-height:16px;margin-top:4px"></div>
+    `;
+    submitBtn.style.display = '';
+    submitBtn.setAttribute('data-member-id', member.id);
+  } else {
+    // Regular member — contact owner
+    content.innerHTML = `
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:40px;margin-bottom:12px">🔒</div>
+        <p style="font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:8px">ติดต่อเจ้าของระบบ</p>
+        <p style="font-size:13px;color:var(--gray-500);line-height:1.6">
+          กรุณาติดต่อ <strong>${db.members.filter(m=>m.role==='owner').map(m=>m.name).join(', ') || 'เจ้าของระบบ'}</strong><br>
+          เพื่อขอรับ PIN ใหม่
+        </p>
+      </div>
+    `;
+    submitBtn.style.display = 'none';
+  }
+  document.getElementById('forgot-pin-overlay').style.display = 'flex';
+}
+function closeForgotPin() {
+  document.getElementById('forgot-pin-overlay').style.display = 'none';
+}
+async function submitForgotPin() {
+  const memberId = document.getElementById('forgot-pin-submit-btn').getAttribute('data-member-id');
+  const member = db.members.find(m => m.id === memberId);
+  const emailInput = document.getElementById('forgot-email-input');
+  const errEl = document.getElementById('forgot-email-err');
+  if (!member || !emailInput) return;
+  const typed = emailInput.value.trim().toLowerCase();
+  const stored = (member.email || '').trim().toLowerCase();
+  errEl.textContent = '';
+  if (!typed) { errEl.textContent = 'กรุณากรอกอีเมล'; return; }
+  if (!stored) { errEl.textContent = 'ไม่พบอีเมลที่ลงทะเบียน กรุณาติดต่อ Admin'; return; }
+  if (typed !== stored) { errEl.textContent = 'อีเมลไม่ตรงกับที่ลงทะเบียนไว้'; return; }
+  // Show PIN
+  document.getElementById('forgot-pin-content').innerHTML = `
+    <div style="text-align:center;padding:16px 0">
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:10px">PIN ของคุณคือ</p>
+      <div style="font-size:40px;font-weight:800;letter-spacing:12px;color:var(--primary);margin-bottom:12px">${member.pin}</div>
+      <p style="font-size:12px;color:var(--gray-400)">กรุณาเปลี่ยน PIN หลังจากเข้าสู่ระบบ</p>
+    </div>
+  `;
+  document.getElementById('forgot-pin-submit-btn').style.display = 'none';
+}
+
+// Role management (owner only) — renders into roles-panel inside view-members
 function renderRoles() {
-  if (!currentUser || currentUser.role !== 'owner') { showView('dashboard'); return; }
+  if (!currentUser || currentUser.role !== 'owner') return;
   const list = document.getElementById('roles-list');
   if (!list) return;
   list.innerHTML = (db.members||[]).map(m => {
@@ -3268,11 +3469,19 @@ function renderRoles() {
     const roleLabel = role==='owner'?'Owner':role==='manager'?'Manager':'Member';
     const bg = m.avatar&&m.avatar.startsWith('#')?m.avatar:'#7C3AED';
     const isSelf = m.id === currentUser.id;
-    return `<div class="role-card">
+    const emailRow = (role==='owner') ? `
+      <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">
+        <input type="email" id="email-${m.id}" value="${m.email||''}" placeholder="อีเมล (สำหรับลืม PIN)"
+          style="flex:1;min-width:160px;padding:5px 10px;border-radius:7px;border:1.5px solid var(--gray-200);font-size:12px;outline:none"
+          onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--gray-200)'">
+        <button class="btn btn-outline btn-sm" onclick="saveOwnerEmail('${m.id}')">บันทึกอีเมล</button>
+      </div>` : '';
+    return `<div class="role-card" style="flex-wrap:wrap">
       <div class="role-avatar" style="background:${bg}">${m.name[0].toUpperCase()}</div>
-      <div class="role-info">
+      <div class="role-info" style="flex:1;min-width:0">
         <div class="role-name">${m.name} <span class="role-badge ${badgeCls}">${roleLabel}</span></div>
         <div style="font-size:11px;color:var(--gray-400);margin-top:2px">PIN: ${m.pin?'••••':'ยังไม่ตั้ง'}</div>
+        ${emailRow}
       </div>
       <div class="role-actions">
         <select class="role-select" onchange="changeRole('${m.id}',this.value)" ${isSelf?'disabled':''}>
@@ -3290,7 +3499,20 @@ async function changeRole(memberId, newRole) {
   const m = db.members.find(m=>m.id===memberId);
   if (!m) return;
   m.role = newRole;
-  try { await saveMemberFS(m); toast(`เปลี่ยน Role ของ ${m.name} เป็น ${newRole} แล้ว`,'success'); renderRoles(); } catch(e){ toast('บันทึกไม่สำเร็จ','error'); }
+  try { await saveMemberFS(m); toast(`เปลี่ยน Role ของ ${m.name} เป็น ${newRole} แล้ว`,'success'); renderRoles(); renderMembers(); } catch(e){ toast('บันทึกไม่สำเร็จ','error'); }
+}
+
+async function saveOwnerEmail(memberId) {
+  const m = db.members.find(m=>m.id===memberId);
+  if (!m) return;
+  const input = document.getElementById('email-'+memberId);
+  if (!input) return;
+  const email = input.value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    toast('รูปแบบอีเมลไม่ถูกต้อง','error'); return;
+  }
+  m.email = email;
+  try { await saveMemberFS(m); toast('บันทึกอีเมลแล้ว ✓','success'); } catch(e){ toast('บันทึกไม่สำเร็จ','error'); }
 }
 
 function openPinSet(memberId, memberName) {
