@@ -118,6 +118,7 @@
   .hist-filter-input { flex: 1; min-width: 200px; padding: 8px 14px; border-radius: 9px; border: 1.5px solid var(--gray-200); font-size: 13px; background: #fff; }
   .hist-item { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 10px; padding: 14px 18px; display: flex; align-items: flex-start; gap: 14px; }
   .hist-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .hist-icon svg { width: 16px; height: 16px; }
   .hist-icon-create { background: #d1fae5; }
   .hist-icon-update { background: #dbeafe; }
   .hist-icon-delete { background: #fee2e2; }
@@ -1094,9 +1095,9 @@
             <div class="user-dd-name" id="dd-name">AOM</div>
             <div class="user-dd-role" id="dd-role">Owner</div>
           </div>
-          <div class="user-dd-item" onclick="openChangePinModal()">🔑 เปลี่ยน PIN ของฉัน</div>
+          <div class="user-dd-item" onclick="openChangePinModal()"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:6px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>เปลี่ยน PIN ของฉัน</div>
           <div class="user-dd-sep"></div>
-          <div class="user-dd-item" style="color:#ef4444" onclick="doLogout()">🚪 ออกจากระบบ</div>
+          <div class="user-dd-item" style="color:#ef4444" onclick="doLogout()"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:6px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>ออกจากระบบ</div>
         </div>
         </div><!-- end position:relative wrapper -->
       </div>
@@ -1245,7 +1246,7 @@
             <div class="mt-sbtn mt-sbtn-overdue" onclick="mtSelectStatus('overdue')">⚠ เกินกำหนด</div>
           </div>
           <div class="mt-date-bar" id="mt-date-bar">
-            <span class="mt-date-label">📅 ช่วงวันที่:</span>
+            <span class="mt-date-label"><svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>ช่วงวันที่:</span>
             <input type="date" id="mt-date-from" class="mt-date-input" onchange="mtApplyDateRange()" title="วันเริ่มต้น" />
             <span class="mt-date-sep">–</span>
             <input type="date" id="mt-date-to" class="mt-date-input" onchange="mtApplyDateRange()" title="วันสิ้นสุด" />
@@ -1350,8 +1351,8 @@
       <div class="view" id="view-members">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:0">
           <div class="member-tabs">
-            <div class="member-tab active" id="mtab-members" onclick="switchMemberTab('members')">👥 สมาชิก</div>
-            <div class="member-tab" id="mtab-roles" onclick="switchMemberTab('roles')" style="display:none">🛡️ สิทธิ์ & PIN</div>
+            <div class="member-tab active" id="mtab-members" onclick="switchMemberTab('members')"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>สมาชิก</div>
+            <div class="member-tab" id="mtab-roles" onclick="switchMemberTab('roles')" style="display:none"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>สิทธิ์ & PIN</div>
           </div>
           <button class="btn btn-primary btn-sm" id="btn-add-member" onclick="openMemberModal()" style="margin-bottom:2px">+ เพิ่มสมาชิก</button>
         </div>
@@ -1377,8 +1378,8 @@
           </div>
         </div>
         <div class="apv-tabs" style="margin-bottom:20px">
-          <div class="apv-tab active" id="apv-tab-new" onclick="switchApvTab('new')">📋 ขอสร้างงานใหม่ <span id="apv-count-new" style="font-size:11px;opacity:.7"></span></div>
-          <div class="apv-tab" id="apv-tab-date" onclick="switchApvTab('date')">📅 ขอเปลี่ยนวัน <span id="apv-count-date" style="font-size:11px;opacity:.7"></span></div>
+          <div class="apv-tab active" id="apv-tab-new" onclick="switchApvTab('new')"><svg style="width:13px;height:13px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>ขอสร้างงานใหม่ <span id="apv-count-new" style="font-size:11px;opacity:.7"></span></div>
+          <div class="apv-tab" id="apv-tab-date" onclick="switchApvTab('date')"><svg style="width:13px;height:13px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>ขอเปลี่ยนวัน <span id="apv-count-date" style="font-size:11px;opacity:.7"></span></div>
         </div>
         <div id="apv-list"></div>
       </div>
@@ -1390,7 +1391,7 @@
           <div style="font-size:13px;color:var(--gray-400);margin-top:2px">บันทึกการเปลี่ยนแปลงการ์ดงานทั้งหมด</div>
         </div>
         <div class="hist-filter-bar">
-          <input class="hist-filter-input" id="hist-search" placeholder="🔍 ค้นหาชื่องาน..." oninput="renderHistory()">
+          <input class="hist-filter-input" id="hist-search" placeholder="ค้นหาชื่องาน..." oninput="renderHistory()">
         </div>
         <div id="hist-list"></div>
       </div>
@@ -1493,7 +1494,7 @@
 <!-- CHANGE PIN MODAL (self-service) -->
 <div class="modal-overlay" id="change-pin-overlay" style="display:none" onclick="if(event.target===this)closeChangePinModal()">
   <div class="modal" style="max-width:340px">
-    <div class="modal-header"><div class="modal-title">🔑 เปลี่ยน PIN ของฉัน</div><button class="modal-close" onclick="closeChangePinModal()">✕</button></div>
+    <div class="modal-header"><div class="modal-title"><svg style="width:16px;height:16px;vertical-align:-2px;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>เปลี่ยน PIN ของฉัน</div><button class="modal-close" onclick="closeChangePinModal()">✕</button></div>
     <div class="modal-body">
       <label class="form-label">PIN ปัจจุบัน</label>
       <input class="form-control" id="chpin-current" type="password" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••" style="font-size:22px;letter-spacing:8px;text-align:center;margin-bottom:14px">
@@ -1550,11 +1551,11 @@
     </div>
     <div class="form-group" style="margin-bottom:16px">
       <label class="form-label">เลือกงาน (Tasks) ที่ต้องการติดตาม</label>
-      <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px">💡 เลือกเดือนทางขวาเพื่อกรองงานตามช่วงเวลา หรือค้นหาชื่องานได้เลย</div>
+      <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px"><svg style="width:12px;height:12px;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>เลือกเดือนทางขวาเพื่อกรองงานตามช่วงเวลา หรือค้นหาชื่องานได้เลย</div>
       <div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-end">
         <input class="form-control" id="ch-task-search" placeholder="ค้นหางาน..." oninput="renderChTaskPickerKeep()" style="flex:1">
         <div style="display:flex;flex-direction:column;gap:2px">
-          <span style="font-size:10px;color:var(--gray-400);white-space:nowrap">📅 กรองตามเดือน</span>
+          <span style="font-size:10px;color:var(--gray-400);white-space:nowrap"><svg style="width:11px;height:11px;vertical-align:-1px;margin-right:3px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>กรองตามเดือน</span>
           <input type="month" class="form-control" id="ch-task-month" oninput="renderChTaskPickerKeep()" style="width:160px">
         </div>
       </div>
@@ -1663,7 +1664,7 @@
     <h3>บันทึกการแก้ไขก่อนไหม?</h3>
     <p>มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก<br>ต้องการบันทึกก่อนปิดการ์ดไหม?</p>
     <div class="ud-btns">
-      <button class="ud-save" onclick="unsavedSave()">💾 บันทึกการแก้ไข</button>
+      <button class="ud-save" onclick="unsavedSave()"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>บันทึกการแก้ไข</button>
       <button class="ud-cancel" onclick="unsavedCancel()">← กลับไปแก้ไขต่อ</button>
       <button class="ud-discard" onclick="unsavedDiscard()">ปิดโดยไม่บันทึก</button>
     </div>
@@ -1788,7 +1789,7 @@ function startRealtimeSync() {
     refreshCurrentView(); updateBadge();
   });
   firestore.collection('members').onSnapshot(snap => {
-    db.members = snap.docs.map(d => d.data());
+    db.members = snap.docs.map(d => { const data = d.data(); return {...data, id: data.id || d.id}; });
     populateMemberDropdowns(); refreshCurrentView();
     // Refresh PIN login dropdown if overlay is still showing AND no user is logged in
     const pinOverlay = document.getElementById('pin-overlay');
@@ -2987,7 +2988,7 @@ async function saveTask() {
         // Log history
         await _logHistory('dateChangeRequest', task, prevTask, { startDate: [prevTask.startDate, fStartDate], due: [prevTask.due, fDueDate] });
         _forceCloseTaskModal();
-        toast('ส่งคำขอเปลี่ยนวันแล้ว รอหัวหน้าอนุมัติ 🔔','success');
+        toast('ส่งคำขอเปลี่ยนวันแล้ว รอหัวหน้าอนุมัติ','success');
       } catch(e) { toast('ส่งคำขอไม่สำเร็จ','error'); }
       return;
     }
@@ -3011,7 +3012,7 @@ async function saveTask() {
       // Log history
       await _logHistory('pendingCreate', task, null, {});
       _forceCloseTaskModal();
-      toast('ส่งคำขอสร้างงานแล้ว รอหัวหน้าอนุมัติ 🔔','success');
+      toast('ส่งคำขอสร้างงานแล้ว รอหัวหน้าอนุมัติ','success');
     } catch(e) { toast('ส่งคำขอไม่สำเร็จ','error'); }
     return;
   }
@@ -3236,7 +3237,7 @@ function initPinLogin() {
   const hasOwner = (db.members||[]).some(m=>m.role==='owner');
   const hint = document.getElementById('pin-hint');
   if (!hasOwner) {
-    hint.innerHTML = '⚠️ ยังไม่มี Owner — <a href="#" style="color:#cefb59" onclick="firstSetupOwner(event)">ตั้งค่า Owner คนแรก</a>';
+    hint.innerHTML = '<svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;color:#f59e0b" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>ยังไม่มี Owner — <a href="#" style="color:#cefb59" onclick="firstSetupOwner(event)">ตั้งค่า Owner คนแรก</a>';
   } else {
     hint.textContent = 'ยังไม่มี PIN? ติดต่อ Owner เพื่อตั้ง PIN';
   }
@@ -3257,7 +3258,7 @@ async function firstSetupOwner(e) {
   if (!m) return;
   m.role = 'owner';
   m.pin  = pin;
-  try { await saveMemberFS(m); alert(`✅ ตั้ง ${m.name} เป็น Owner แล้ว กรุณา Login ด้วย PIN ที่ตั้งไว้`); initPinLogin(); } catch(err){ alert('บันทึกไม่สำเร็จ'); }
+  try { await saveMemberFS(m); alert(`ตั้ง ${m.name} เป็น Owner แล้ว กรุณา Login ด้วย PIN ที่ตั้งไว้`); initPinLogin(); } catch(err){ alert('บันทึกไม่สำเร็จ'); }
 }
 
 function pinResetInput() {
@@ -3392,6 +3393,7 @@ async function saveChangePin() {
   // Validate
   const member = db.members.find(m => m.id === currentUser.id);
   if (!member) { errEl.textContent = 'ไม่พบข้อมูลสมาชิก'; return; }
+  if (!member.pin) { errEl.textContent = 'ยังไม่มี PIN — ให้ Owner กดปุ่ม PIN ตั้งให้ก่อน'; return; }
   if (cur !== String(member.pin)) { errEl.textContent = 'PIN ปัจจุบันไม่ถูกต้อง'; return; }
   if (!/^\d{4}$/.test(n1)) { errEl.textContent = 'PIN ใหม่ต้องเป็นตัวเลข 4 หลัก'; return; }
   if (n1 !== n2) { errEl.textContent = 'ยืนยัน PIN ใหม่ไม่ตรงกัน'; return; }
@@ -3432,7 +3434,7 @@ function showForgotPin(e) {
     // Regular member — contact owner
     content.innerHTML = `
       <div style="text-align:center;padding:20px 0">
-        <div style="font-size:40px;margin-bottom:12px">🔒</div>
+        <div style="margin-bottom:12px;color:var(--gray-300)"><svg style="width:48px;height:48px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <p style="font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:8px">ติดต่อเจ้าของระบบ</p>
         <p style="font-size:13px;color:var(--gray-500);line-height:1.6">
           กรุณาติดต่อ <strong>${db.members.filter(m=>m.role==='owner').map(m=>m.name).join(', ') || 'เจ้าของระบบ'}</strong><br>
@@ -3489,7 +3491,7 @@ function renderRoles() {
         <button class="btn btn-outline btn-sm" onclick="saveOwnerEmail('${m.id}')">บันทึกอีเมล</button>
       </div>` : '';
     return `<div class="role-card" style="flex-wrap:wrap">
-      <div class="role-avatar" style="background:${bg}">${m.name[0].toUpperCase()}</div>
+      <div class="role-avatar" style="background:${bg};${m.photo?'overflow:hidden;padding:0;':''}">${m.photo?`<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">`:m.name[0].toUpperCase()}</div>
       <div class="role-info" style="flex:1;min-width:0">
         <div class="role-name">${m.name} <span class="role-badge ${badgeCls}">${roleLabel}</span></div>
         <div style="font-size:11px;color:var(--gray-400);margin-top:2px">PIN: ${m.pin?'••••':'ยังไม่ตั้ง'}</div>
@@ -3501,7 +3503,7 @@ function renderRoles() {
           <option value="manager"${role==='manager'?'selected':''}>Manager</option>
           <option value="member" ${role==='member' ?'selected':''}>Member</option>
         </select>
-        <button class="btn btn-outline btn-sm" onclick="openPinSet('${m.id}','${m.name}')">🔑 PIN</button>
+        <button class="btn btn-outline btn-sm" onclick="openPinSet('${m.id}','${m.name}')"><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>PIN</button>
       </div>
     </div>`;
   }).join('') || '<div style="color:var(--gray-400);text-align:center;padding:40px">ยังไม่มีสมาชิก</div>';
@@ -3546,7 +3548,7 @@ async function savePinSet() {
   const m = db.members.find(m=>m.id===memberId);
   if (!m) return;
   m.pin = p1;
-  try { await saveMemberFS(m); closePinSet(); toast(`ตั้ง PIN ของ ${m.name} แล้ว ✅`,'success'); renderRoles(); } catch(e){ err.textContent='บันทึกไม่สำเร็จ'; }
+  try { await saveMemberFS(m); closePinSet(); toast(`ตั้ง PIN ของ ${m.name} แล้ว`,'success'); renderRoles(); } catch(e){ err.textContent='บันทึกไม่สำเร็จ'; }
 }
 
 function updateApprovalBadge() {
@@ -3768,7 +3770,7 @@ function renderCalendar() {
       const fade   = isDone ? 'opacity:.5;' : '';
       const strike = isDone ? 'text-decoration:line-through;' : '';
       const label  = (startsHere ? '' : '↳ ') + ev.title;
-      const prioIcon = ev.priority==='High' ? '🔴 ' : ev.priority==='Medium' ? '🟡 ' : '';
+      const prioIcon = ev.priority==='High' ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:4px;vertical-align:middle"></span>' : ev.priority==='Medium' ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:4px;vertical-align:middle"></span>' : '';
 
       evBarsHTML += `<div class="cal-evt-bar"
         style="left:${left}%;width:calc(${widthPct}% - 3px);top:${top}px;background:${ev.color};opacity:.72;border-radius:${br};${fade}"
@@ -4585,7 +4587,7 @@ function renderApprovals() {
 
   const items = _apvTab === 'new' ? newTasks : dateCh;
   if (!items.length) {
-    list.innerHTML = `<div class="apv-empty"><div class="apv-empty-icon">✅</div><div class="apv-empty-title">ไม่มีรายการรอการอนุมัติ</div><div>ทุกรายการได้รับการจัดการแล้ว</div></div>`;
+    list.innerHTML = `<div class="apv-empty"><div class="apv-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px;color:#10b981"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="apv-empty-title">ไม่มีรายการรอการอนุมัติ</div><div>ทุกรายการได้รับการจัดการแล้ว</div></div>`;
     return;
   }
 
@@ -4593,21 +4595,21 @@ function renderApprovals() {
     if (req.type === 'newTask') {
       const t = req.taskData || {};
       const mNames = (t.memberIds||[]).map(id=>{ const m=db.members.find(x=>x.id===id); return m?m.name:id; }).join(', ')||'—';
-      const pBadge = t.priority==='High'?'🔴':t.priority==='Medium'?'🟡':'🟢';
+      const pBadge = t.priority==='High'?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:3px;vertical-align:middle"></span>':t.priority==='Medium'?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:3px;vertical-align:middle"></span>':'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:3px;vertical-align:middle"></span>';
       return `
       <div class="apv-card">
         <div class="apv-card-head">
-          <span class="apv-badge-new">✨ งานใหม่</span>
+          <span class="apv-badge-new">+ งานใหม่</span>
           <div class="apv-card-title">${t.title||'—'}</div>
           <div style="font-size:11px;color:var(--gray-400)">${fmtTs(req.ts)}</div>
         </div>
         <div class="apv-card-body">
           <div class="apv-meta">
-            <span>👤 ผู้รับผิดชอบ: <strong>${mNames}</strong></span>
+            <span><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;opacity:.6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>ผู้รับผิดชอบ: <strong>${mNames}</strong></span>
             <span>${pBadge} Priority: <strong>${t.priority||'—'}</strong></span>
-            <span>📅 เริ่ม: <strong>${formatDate(t.startDate)}</strong></span>
-            <span>🏁 สิ้นสุด: <strong>${formatDate(t.due)}</strong></span>
-            <span>📊 สถานะ: <strong>${t.status||'—'}</strong></span>
+            <span><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;opacity:.6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>เริ่ม: <strong>${formatDate(t.startDate)}</strong></span>
+            <span><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;opacity:.6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>สิ้นสุด: <strong>${formatDate(t.due)}</strong></span>
+            <span><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;opacity:.6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>สถานะ: <strong>${t.status||'—'}</strong></span>
           </div>
           ${t.desc?`<div style="font-size:13px;color:var(--gray-600);padding:8px 0;border-top:1px solid var(--gray-100)">${t.desc}</div>`:''}
         </div>
@@ -4623,13 +4625,13 @@ function renderApprovals() {
       return `
       <div class="apv-card">
         <div class="apv-card-head">
-          <span class="apv-badge-date">📅 ขอเปลี่ยนวัน</span>
+          <span class="apv-badge-date"><svg style="width:11px;height:11px;vertical-align:-1px;margin-right:3px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>ขอเปลี่ยนวัน</span>
           <div class="apv-card-title">${req.taskTitle||'—'}</div>
           <div style="font-size:11px;color:var(--gray-400)">${fmtTs(req.ts)}</div>
         </div>
         <div class="apv-card-body">
           <div class="apv-meta">
-            <span>👤 ผู้รับผิดชอบ: <strong>${mNames}</strong></span>
+            <span><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;opacity:.6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>ผู้รับผิดชอบ: <strong>${mNames}</strong></span>
           </div>
           <div class="apv-date-change">
             <div>
@@ -4689,7 +4691,7 @@ async function approveNewTask(reqId) {
     // Log history
     await _logHistory('approvedCreate', task, null, {});
     updateApprovalBadge();
-    toast('อนุมัติสร้างงานเรียบร้อย ✅','success');
+    toast('อนุมัติสร้างงานเรียบร้อย','success');
     renderApprovals();
   } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
 }
@@ -4722,7 +4724,7 @@ async function approveDateChange(reqId) {
     req.status = 'approved'; req.approvedAt = Date.now();
     await saveTaskRequestFS(req);
     updateApprovalBadge();
-    toast('อนุมัติเปลี่ยนวันเรียบร้อย ✅','success');
+    toast('อนุมัติเปลี่ยนวันเรียบร้อย','success');
     renderApprovals();
   } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
 }
@@ -4749,22 +4751,28 @@ function renderHistory() {
   const list = document.getElementById('hist-list');
   if (!list) return;
   const q = (document.getElementById('hist-search')||{}).value?.toLowerCase()||'';
+  const IC_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const IC_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const IC_EDIT  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+  const IC_CAL   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+  const IC_CROSS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  const IC_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
   const ACTION_LABEL = {
-    pendingCreate:     { icon:'⏳', label:'ส่งขอสร้างงาน',     cls:'hist-icon-approve' },
-    approvedCreate:    { icon:'✅', label:'อนุมัติสร้างงาน',    cls:'hist-icon-create' },
-    update:            { icon:'✏️', label:'แก้ไขงาน',            cls:'hist-icon-update' },
-    dateChangeRequest: { icon:'📅', label:'ขอเปลี่ยนวัน',        cls:'hist-icon-approve' },
-    approvedDateChange:{ icon:'📅', label:'อนุมัติเปลี่ยนวัน',   cls:'hist-icon-create' },
-    rejected:          { icon:'✕', label:'ปฏิเสธคำขอ',           cls:'hist-icon-delete' },
-    delete:            { icon:'🗑', label:'ลบงาน',                cls:'hist-icon-delete' }
+    pendingCreate:     { icon:IC_CLOCK, label:'ส่งขอสร้างงาน',     cls:'hist-icon-approve' },
+    approvedCreate:    { icon:IC_CHECK, label:'อนุมัติสร้างงาน',    cls:'hist-icon-create' },
+    update:            { icon:IC_EDIT,  label:'แก้ไขงาน',            cls:'hist-icon-update' },
+    dateChangeRequest: { icon:IC_CAL,   label:'ขอเปลี่ยนวัน',        cls:'hist-icon-approve' },
+    approvedDateChange:{ icon:IC_CAL,   label:'อนุมัติเปลี่ยนวัน',   cls:'hist-icon-create' },
+    rejected:          { icon:IC_CROSS, label:'ปฏิเสธคำขอ',           cls:'hist-icon-delete' },
+    delete:            { icon:IC_TRASH, label:'ลบงาน',                cls:'hist-icon-delete' }
   };
   let items = (db.taskHistory||[]).filter(h => !q || (h.taskTitle||'').toLowerCase().includes(q));
   if (!items.length) {
-    list.innerHTML = `<div style="text-align:center;padding:60px;color:var(--gray-400)"><div style="font-size:40px;margin-bottom:12px">📋</div><div style="font-size:16px;font-weight:700">ยังไม่มีประวัติการแก้ไข</div></div>`;
+    list.innerHTML = `<div style="text-align:center;padding:60px;color:var(--gray-400)"><div style="margin-bottom:12px"><svg style="width:44px;height:44px;opacity:.4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div><div style="font-size:16px;font-weight:700">ยังไม่มีประวัติการแก้ไข</div></div>`;
     return;
   }
   list.innerHTML = items.map(h => {
-    const meta = ACTION_LABEL[h.action] || { icon:'📝', label:h.action, cls:'hist-icon-update' };
+    const meta = ACTION_LABEL[h.action] || { icon:IC_EDIT, label:h.action, cls:'hist-icon-update' };
     const changesHtml = (h.changedFields||[]).length ? `
       <div class="hist-changes">
         ${h.changedFields.map(c=>`
