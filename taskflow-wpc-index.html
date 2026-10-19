@@ -36,6 +36,49 @@
   .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .nav-icon svg { width: 18px; height: 18px; }
   .nav-badge { margin-left: auto; background: #cefb59; color: #000; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; }
+  .nav-badge-red { margin-left: auto; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; min-width: 18px; text-align: center; }
+
+  /* APPROVAL PAGE */
+  .apv-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .apv-tabs { display: flex; gap: 8px; }
+  .apv-tab { padding: 8px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--gray-200); background: #fff; color: var(--gray-600); transition: all .15s; }
+  .apv-tab.active { background: #0d0d10; color: #cefb59; border-color: #0d0d10; }
+  .apv-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
+  .apv-card-head { padding: 16px 20px 12px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 12px; }
+  .apv-card-title { font-size: 15px; font-weight: 700; flex: 1; }
+  .apv-badge-new { background: #6d28d9; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+  .apv-badge-date { background: #f59e0b; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+  .apv-card-body { padding: 14px 20px; }
+  .apv-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--gray-500); margin-bottom: 10px; }
+  .apv-meta strong { color: var(--gray-700); }
+  .apv-date-change { display: flex; align-items: center; gap: 8px; background: var(--gray-50); border-radius: 8px; padding: 10px 14px; font-size: 13px; }
+  .apv-date-old { color: #ef4444; text-decoration: line-through; font-weight: 600; }
+  .apv-date-new { color: #10b981; font-weight: 700; }
+  .apv-actions { padding: 12px 20px; background: var(--gray-50); display: flex; align-items: center; gap: 8px; }
+  .apv-note { font-size: 12px; color: var(--gray-500); flex: 1; font-style: italic; }
+  .apv-empty { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+  .apv-empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .apv-empty-title { font-size: 16px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; }
+
+  /* HISTORY PAGE */
+  .hist-filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .hist-filter-input { flex: 1; min-width: 200px; padding: 8px 14px; border-radius: 9px; border: 1.5px solid var(--gray-200); font-size: 13px; background: #fff; }
+  .hist-item { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 10px; padding: 14px 18px; display: flex; align-items: flex-start; gap: 14px; }
+  .hist-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .hist-icon-create { background: #d1fae5; }
+  .hist-icon-update { background: #dbeafe; }
+  .hist-icon-delete { background: #fee2e2; }
+  .hist-icon-approve { background: #fef9c3; }
+  .hist-body { flex: 1; min-width: 0; }
+  .hist-title { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .hist-desc { font-size: 12px; color: var(--gray-500); }
+  .hist-time { font-size: 11px; color: var(--gray-400); white-space: nowrap; }
+  .hist-changes { margin-top: 8px; background: var(--gray-50); border-radius: 7px; padding: 8px 12px; font-size: 11px; }
+  .hist-change-row { display: flex; gap: 8px; align-items: baseline; padding: 2px 0; }
+  .hist-field { font-weight: 700; color: var(--gray-600); min-width: 80px; }
+  .hist-old { color: #ef4444; text-decoration: line-through; }
+  .hist-arrow { color: var(--gray-400); }
+  .hist-new { color: #10b981; font-weight: 600; }
   .sidebar-footer { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,.08); font-size: 12px; color: rgba(255,255,255,.3); }
 
   /* MAIN */
@@ -960,6 +1003,9 @@
       <div class="nav-item" onclick="showView('weekly')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Weekly Meeting <span class="nav-badge" id="badge-inprogress">0</span></div>
       <div class="nav-item" onclick="showView('challenge')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6-6 6 6"/><path d="M6 12l6-6 6 6"/><path d="M6 15l6-6 6 6"/></svg></span> Challenge</div>
       <div class="nav-item" onclick="showView('mytasks')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> งานของฉัน</div>
+      <div class="nav-section-title" style="margin-top:12px">MANAGER</div>
+      <div class="nav-item" onclick="showView('approvals')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span> อนุมัติงาน <span class="nav-badge-red" id="badge-approvals" style="display:none">0</span></div>
+      <div class="nav-item" onclick="showView('history')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> ประวัติการแก้ไข</div>
       <div class="nav-section-title" style="margin-top:12px">SETTINGS</div>
       <div class="nav-item" onclick="showView('members')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Team Members</div>
       <div class="nav-item" onclick="showView('monthly')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Monthly Report</div>
@@ -1238,6 +1284,33 @@
         <div class="members-grid" id="members-grid"></div>
       </div>
 
+      <!-- APPROVALS -->
+      <div class="view" id="view-approvals">
+        <div class="apv-header">
+          <div>
+            <h2 style="font-size:20px;font-weight:800">อนุมัติงาน</h2>
+            <div style="font-size:13px;color:var(--gray-400);margin-top:2px">รายการขอสร้างงานใหม่ และขอเปลี่ยนระยะเวลางาน</div>
+          </div>
+        </div>
+        <div class="apv-tabs" style="margin-bottom:20px">
+          <div class="apv-tab active" id="apv-tab-new" onclick="switchApvTab('new')">📋 ขอสร้างงานใหม่ <span id="apv-count-new" style="font-size:11px;opacity:.7"></span></div>
+          <div class="apv-tab" id="apv-tab-date" onclick="switchApvTab('date')">📅 ขอเปลี่ยนวัน <span id="apv-count-date" style="font-size:11px;opacity:.7"></span></div>
+        </div>
+        <div id="apv-list"></div>
+      </div>
+
+      <!-- EDIT HISTORY -->
+      <div class="view" id="view-history">
+        <div style="margin-bottom:20px">
+          <h2 style="font-size:20px;font-weight:800">ประวัติการแก้ไข</h2>
+          <div style="font-size:13px;color:var(--gray-400);margin-top:2px">บันทึกการเปลี่ยนแปลงการ์ดงานทั้งหมด</div>
+        </div>
+        <div class="hist-filter-bar">
+          <input class="hist-filter-input" id="hist-search" placeholder="🔍 ค้นหาชื่องาน..." oninput="renderHistory()">
+        </div>
+        <div id="hist-list"></div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1471,7 +1544,7 @@ const firestore = firebase.firestore();
 //  DATA STORE
 // ══════════════════════════════════════════════════════
 const AVATAR_GRAY = '#9ca3af';
-let db = { tasks: [], members: [], challenges: [], currentWeekOffset: 0 };
+let db = { tasks: [], members: [], challenges: [], taskRequests: [], taskHistory: [], currentWeekOffset: 0 };
 let _chState = { currentId: null, tab: 'overview', editTaskIdx: null };
 let chListFilter = ''; // active filter prefix for challenge list
 let calFilter = '';    // active filter prefix for calendar view
@@ -1495,14 +1568,18 @@ function getTaskMonth(t) {
 async function loadDB() {
   try {
     showLoadingOverlay(true);
-    const [ts, ms, cs] = await Promise.all([
+    const [ts, ms, cs, rqs, hs] = await Promise.all([
       firestore.collection('tasks').get(),
       firestore.collection('members').get(),
-      firestore.collection('challenges').get()
+      firestore.collection('challenges').get(),
+      firestore.collection('taskRequests').get(),
+      firestore.collection('taskEditHistory').orderBy('ts','desc').limit(500).get()
     ]);
-    db.tasks      = ts.docs.map(d => d.data());
-    db.members    = ms.docs.map(d => d.data());
-    db.challenges = cs.docs.map(d => d.data());
+    db.tasks        = ts.docs.map(d => d.data());
+    db.members      = ms.docs.map(d => d.data());
+    db.challenges   = cs.docs.map(d => d.data());
+    db.taskRequests = rqs.docs.map(d => d.data());
+    db.taskHistory  = hs.docs.map(d => d.data());
     db.currentWeekOffset = parseInt(localStorage.getItem('weekOffset') || '0');
     showLoadingOverlay(false);
   } catch(e) {
@@ -1517,6 +1594,13 @@ async function removeTask(id)     { await firestore.collection('tasks').doc(id).
 async function saveMemberFS(m)    { await firestore.collection('members').doc(m.id).set(m); }
 async function removeMember(id)   { await firestore.collection('members').doc(id).delete(); }
 
+// Approval requests
+async function saveTaskRequestFS(req) { await firestore.collection('taskRequests').doc(req.id).set(req); }
+async function removeTaskRequestFS(id){ await firestore.collection('taskRequests').doc(id).delete(); }
+
+// Edit history
+async function appendHistoryFS(entry) { await firestore.collection('taskEditHistory').doc(entry.id).set(entry); }
+
 function startRealtimeSync() {
   firestore.collection('tasks').onSnapshot(snap => {
     db.tasks = snap.docs.map(d => d.data());
@@ -1528,6 +1612,15 @@ function startRealtimeSync() {
   });
   firestore.collection('challenges').onSnapshot(snap => {
     db.challenges = snap.docs.map(d => d.data());
+    refreshCurrentView();
+  });
+  firestore.collection('taskRequests').onSnapshot(snap => {
+    db.taskRequests = snap.docs.map(d => d.data());
+    updateApprovalBadge();
+    refreshCurrentView();
+  });
+  firestore.collection('taskEditHistory').orderBy('ts','desc').limit(500).onSnapshot(snap => {
+    db.taskHistory = snap.docs.map(d => d.data());
     refreshCurrentView();
   });
 }
@@ -1621,7 +1714,9 @@ const VIEW_META = {
   monthly:   { title:'Monthly Report',  sub:'สรุปงานรายเดือน' },
   mytasks:   { title:'งานของฉัน',        sub:'My Tasks' },
   members:   { title:'Team Members',    sub:'จัดการสมาชิกในทีม' },
-  challenge: { title:'Challenge',        sub:'ติดตามชาเลนจ์ของทีม' }
+  challenge: { title:'Challenge',        sub:'ติดตามชาเลนจ์ของทีม' },
+  approvals: { title:'อนุมัติงาน',       sub:'รายการขอสร้างงาน / ขอเปลี่ยนวันส่งงาน' },
+  history:   { title:'ประวัติการแก้ไข',  sub:'บันทึกทุกการเปลี่ยนแปลงการ์ดงาน' }
 };
 
 function showView(id) {
@@ -1644,6 +1739,8 @@ function showView(id) {
   if (id === 'challenge')  renderChallenge();
   if (id === 'mytasks')   renderMyTasks();
   if (id === 'members')   renderMembers();
+  if (id === 'approvals') renderApprovals();
+  if (id === 'history')   renderHistory();
 }
 
 // ══════════════════════════════════════════════════════
@@ -2612,6 +2709,8 @@ async function saveTask() {
   const wy = getISOWeekYear(dateRef);
 
   const taskId = editingTaskId || uid();
+  const prevTask = editingTaskId ? db.tasks.find(t => t.id === editingTaskId) : null;
+
   // Snapshot subtask data (collect any in-flight title edits from DOM)
   const inputs = document.querySelectorAll('.subtask-title-input');
   inputs.forEach((el, i) => { if (subtaskList[i]) subtaskList[i].title = el.value; });
@@ -2639,53 +2738,149 @@ async function saveTask() {
     completedAt: (() => {
       const prev = editingTaskId ? db.tasks.find(t=>t.id===editingTaskId) : null;
       if (fStatus === 'Done') {
-        // already Done → keep old completedAt; newly Done → stamp now
         return (prev && prev.status === 'Done' && prev.completedAt) ? prev.completedAt : Date.now();
       }
-      return null; // task is NOT Done → clear completedAt
+      return null;
     })()
   };
 
+  // ── Date change request (for existing tasks where start or due changed) ──
+  if (editingTaskId && prevTask) {
+    const dateChanged = (prevTask.startDate !== fStartDate) || (prevTask.due !== fDueDate);
+    if (dateChanged) {
+      // Create date change request instead of direct save
+      try {
+        const req = {
+          id: uid(),
+          type: 'dateChange',
+          status: 'pending',
+          taskId,
+          taskTitle: title,
+          memberIds: task.memberIds,
+          oldStartDate: prevTask.startDate || '',
+          oldDueDate:   prevTask.due || '',
+          newStartDate: fStartDate,
+          newDueDate:   fDueDate,
+          requesterNote: '',
+          ts: Date.now(),
+          createdAt: Date.now()
+        };
+        await saveTaskRequestFS(req);
+        db.taskRequests.push(req);
+        updateApprovalBadge();
+        // Still save non-date fields directly (title, status, priority, etc.)
+        const taskWithOldDates = {
+          ...task,
+          startDate: prevTask.startDate,
+          due: prevTask.due,
+          week: prevTask.week,
+          year: prevTask.year
+        };
+        await saveTaskFS(taskWithOldDates);
+        const localIdx = db.tasks.findIndex(t => t.id === task.id);
+        if (localIdx >= 0) { db.tasks[localIdx] = taskWithOldDates; } else { db.tasks.push(taskWithOldDates); }
+        // Log history
+        await _logHistory('dateChangeRequest', task, prevTask, { startDate: [prevTask.startDate, fStartDate], due: [prevTask.due, fDueDate] });
+        _forceCloseTaskModal();
+        toast('ส่งคำขอเปลี่ยนวันแล้ว รอหัวหน้าอนุมัติ 🔔','success');
+      } catch(e) { toast('ส่งคำขอไม่สำเร็จ','error'); }
+      return;
+    }
+  }
+
+  // ── New task → send for approval ──
+  if (!editingTaskId) {
+    try {
+      const req = {
+        id: uid(),
+        type: 'newTask',
+        status: 'pending',
+        taskData: task,
+        challengeId: fChallengeId,
+        ts: Date.now(),
+        createdAt: Date.now()
+      };
+      await saveTaskRequestFS(req);
+      db.taskRequests.push(req);
+      updateApprovalBadge();
+      // Log history
+      await _logHistory('pendingCreate', task, null, {});
+      _forceCloseTaskModal();
+      toast('ส่งคำขอสร้างงานแล้ว รอหัวหน้าอนุมัติ 🔔','success');
+    } catch(e) { toast('ส่งคำขอไม่สำเร็จ','error'); }
+    return;
+  }
+
+  // ── Normal update (existing task, no date change) ──
   try {
+    // Detect what changed for history
+    const changedFields = {};
+    if (prevTask) {
+      const fields = ['title','desc','status','priority','note','memberIds'];
+      fields.forEach(f => {
+        const a = JSON.stringify(prevTask[f]??'');
+        const b = JSON.stringify(task[f]??'');
+        if (a !== b) changedFields[f] = [prevTask[f], task[f]];
+      });
+    }
+
     await saveTaskFS(task);
     // Update local cache immediately (don't wait for Firestore snapshot)
     const localIdx = db.tasks.findIndex(t => t.id === task.id);
     if (localIdx >= 0) { db.tasks[localIdx] = task; } else { db.tasks.push(task); }
 
+    // Log history
+    await _logHistory('update', task, prevTask, changedFields);
+
     const mids = task.memberIds || [];
 
     // ── Challenge assignment ──
-    // Find which challenge CURRENTLY owns this task (before change)
-    const prevOwnerCh = db.challenges.find(ch => ch.tasks && ch.tasks.some(ct => ct.taskId === taskId));
     const newChId = fChallengeId;
-
     for (const ch of db.challenges) {
       if (!ch.tasks) ch.tasks = [];
       const cidx = ch.tasks.findIndex(ct => ct.taskId === taskId);
       if (ch.id === newChId) {
-        // Add or update in this challenge
         const entry = { taskId, title, assigneeIds: mids, assigneeId: mids[0]||'', blockers: cidx>=0 ? ch.tasks[cidx].blockers||'' : '' };
         if (cidx >= 0) { ch.tasks[cidx] = entry; } else { ch.tasks.push(entry); }
         try { await saveChallengeFS(ch); } catch(e) {}
       } else if (cidx >= 0) {
-        // Remove from this challenge (task moved out)
         ch.tasks.splice(cidx, 1);
         try { await saveChallengeFS(ch); } catch(e) {}
       }
     }
 
     _forceCloseTaskModal();
-    toast(editingTaskId?'อัปเดตงานเรียบร้อย':'เพิ่มงานใหม่เรียบร้อย','success');
-    // Force immediate re-render of challenge page if open
+    toast('อัปเดตงานเรียบร้อย','success');
     if (_chState.currentId) {
       const activeCh = db.challenges.find(c => c.id === _chState.currentId);
       if (activeCh) renderChOverview(activeCh);
     }
-    // Re-render calendar if open
     if (document.getElementById('ch-calendar-panel') && document.getElementById('ch-calendar-panel').style.display !== 'none') {
       renderCalendar();
     }
   } catch(e) { toast('บันทึกไม่สำเร็จ กรุณาลองใหม่','error'); }
+}
+
+// ── History logger ─────────────────────────────────────
+async function _logHistory(action, task, prevTask, changedFields) {
+  try {
+    const FIELD_LABELS = { title:'ชื่องาน', desc:'รายละเอียด', status:'สถานะ', priority:'ความสำคัญ', note:'หมายเหตุ', memberIds:'ผู้รับผิดชอบ', startDate:'วันเริ่ม', due:'วันสิ้นสุด' };
+    const entry = {
+      id: uid(),
+      action,
+      taskId:    task.id,
+      taskTitle: task.title,
+      ts:        Date.now(),
+      changedFields: Object.entries(changedFields).map(([f,[o,n]]) => ({
+        field: f,
+        fieldLabel: FIELD_LABELS[f] || f,
+        oldVal: Array.isArray(o) ? o.map(id => { const m=db.members.find(x=>x.id===id); return m?m.name:id; }).join(', ') : (o||''),
+        newVal: Array.isArray(n) ? n.map(id => { const m=db.members.find(x=>x.id===id); return m?m.name:id; }).join(', ') : (n||'')
+      }))
+    };
+    await appendHistoryFS(entry);
+    db.taskHistory.unshift(entry);
+  } catch(e) { /* history logging is non-critical */ }
 }
 
 async function deleteCurrentTask() {
@@ -2693,7 +2888,10 @@ async function deleteCurrentTask() {
   if (!confirm('ต้องการลบงานนี้ใช่ไหม?')) return;
   try {
     const deletedId = editingTaskId;
+    const deletedTask = db.tasks.find(t => t.id === deletedId) || { id: deletedId, title: '—' };
     await removeTask(deletedId);
+    // Log deletion
+    await _logHistory('delete', deletedTask, null, {});
     // Remove deleted task from all challenges that reference it
     for (const ch of db.challenges) {
       if (ch.tasks && ch.tasks.some(t => t.taskId === deletedId)) {
@@ -2817,6 +3015,14 @@ function populateMemberDropdowns() {
 
 function updateBadge() {
   document.getElementById('badge-inprogress').textContent=db.tasks.filter(t=>t.status==='In Progress').length;
+  updateApprovalBadge();
+}
+function updateApprovalBadge() {
+  const count = (db.taskRequests||[]).filter(r=>r.status==='pending').length;
+  const el = document.getElementById('badge-approvals');
+  if (!el) return;
+  if (count > 0) { el.textContent = count; el.style.display = ''; }
+  else { el.style.display = 'none'; }
 }
 
 function changeWeek(dir) { db.currentWeekOffset+=dir; localStorage.setItem('weekOffset',db.currentWeekOffset); renderWeekly(); }
@@ -2831,6 +3037,8 @@ function refreshCurrentView() {
   if(id==='mytasks')   renderMyTasks();
   if(id==='members')   renderMembers();
   if(id==='challenge')  renderChallenge();
+  if(id==='approvals') renderApprovals();
+  if(id==='history')   renderHistory();
 }
 
 
@@ -3816,6 +4024,234 @@ function exportExcel() {
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(monthlyRows.length?monthlyRows:[{}]),'Monthly Report (รายเดือน)');
   XLSX.writeFile(wb,`TaskFlow-LUCK-${new Date().toISOString().slice(0,10)}.xlsx`);
   toast('Export Excel สำเร็จ','success');
+}
+
+// ══════════════════════════════════════════════════════
+//  APPROVALS
+// ══════════════════════════════════════════════════════
+let _apvTab = 'new';
+function switchApvTab(tab) {
+  _apvTab = tab;
+  document.querySelectorAll('.apv-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('apv-tab-' + (tab === 'new' ? 'new' : 'date')).classList.add('active');
+  renderApprovals();
+}
+
+function renderApprovals() {
+  const list = document.getElementById('apv-list');
+  if (!list) return;
+  const pending = (db.taskRequests||[]).filter(r => r.status === 'pending');
+  const newTasks = pending.filter(r => r.type === 'newTask');
+  const dateCh   = pending.filter(r => r.type === 'dateChange');
+
+  const cnt = document.getElementById('apv-count-new');
+  const cnd = document.getElementById('apv-count-date');
+  if (cnt) cnt.textContent = newTasks.length ? `(${newTasks.length})` : '';
+  if (cnd) cnd.textContent = dateCh.length   ? `(${dateCh.length})`   : '';
+
+  const items = _apvTab === 'new' ? newTasks : dateCh;
+  if (!items.length) {
+    list.innerHTML = `<div class="apv-empty"><div class="apv-empty-icon">✅</div><div class="apv-empty-title">ไม่มีรายการรอการอนุมัติ</div><div>ทุกรายการได้รับการจัดการแล้ว</div></div>`;
+    return;
+  }
+
+  list.innerHTML = items.sort((a,b)=>b.ts-a.ts).map(req => {
+    if (req.type === 'newTask') {
+      const t = req.taskData || {};
+      const mNames = (t.memberIds||[]).map(id=>{ const m=db.members.find(x=>x.id===id); return m?m.name:id; }).join(', ')||'—';
+      const pBadge = t.priority==='High'?'🔴':t.priority==='Medium'?'🟡':'🟢';
+      return `
+      <div class="apv-card">
+        <div class="apv-card-head">
+          <span class="apv-badge-new">✨ งานใหม่</span>
+          <div class="apv-card-title">${t.title||'—'}</div>
+          <div style="font-size:11px;color:var(--gray-400)">${fmtTs(req.ts)}</div>
+        </div>
+        <div class="apv-card-body">
+          <div class="apv-meta">
+            <span>👤 ผู้รับผิดชอบ: <strong>${mNames}</strong></span>
+            <span>${pBadge} Priority: <strong>${t.priority||'—'}</strong></span>
+            <span>📅 เริ่ม: <strong>${formatDate(t.startDate)}</strong></span>
+            <span>🏁 สิ้นสุด: <strong>${formatDate(t.due)}</strong></span>
+            <span>📊 สถานะ: <strong>${t.status||'—'}</strong></span>
+          </div>
+          ${t.desc?`<div style="font-size:13px;color:var(--gray-600);padding:8px 0;border-top:1px solid var(--gray-100)">${t.desc}</div>`:''}
+        </div>
+        <div class="apv-actions">
+          <span class="apv-note">กรุณาตรวจสอบข้อมูลงานก่อนอนุมัติ</span>
+          <button class="btn btn-danger btn-sm" onclick="rejectRequest('${req.id}')">✕ ปฏิเสธ</button>
+          <button class="btn btn-success btn-sm" onclick="approveNewTask('${req.id}')">✓ อนุมัติสร้างงาน</button>
+        </div>
+      </div>`;
+    } else {
+      // dateChange
+      const mNames = (req.memberIds||[]).map(id=>{ const m=db.members.find(x=>x.id===id); return m?m.name:id; }).join(', ')||'—';
+      return `
+      <div class="apv-card">
+        <div class="apv-card-head">
+          <span class="apv-badge-date">📅 ขอเปลี่ยนวัน</span>
+          <div class="apv-card-title">${req.taskTitle||'—'}</div>
+          <div style="font-size:11px;color:var(--gray-400)">${fmtTs(req.ts)}</div>
+        </div>
+        <div class="apv-card-body">
+          <div class="apv-meta">
+            <span>👤 ผู้รับผิดชอบ: <strong>${mNames}</strong></span>
+          </div>
+          <div class="apv-date-change">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--gray-400);margin-bottom:4px">วันเดิม</div>
+              <span class="apv-date-old">${formatDate(req.oldStartDate)} – ${formatDate(req.oldDueDate)}</span>
+            </div>
+            <div style="font-size:20px;color:var(--gray-400)">→</div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--gray-400);margin-bottom:4px">วันที่ขอใหม่</div>
+              <span class="apv-date-new">${formatDate(req.newStartDate)} – ${formatDate(req.newDueDate)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="apv-actions">
+          <span class="apv-note">หากอนุมัติ ระบบจะอัปเดตวันงานทันที</span>
+          <button class="btn btn-danger btn-sm" onclick="rejectRequest('${req.id}')">✕ ปฏิเสธ</button>
+          <button class="btn btn-success btn-sm" onclick="approveDateChange('${req.id}')">✓ อนุมัติเปลี่ยนวัน</button>
+        </div>
+      </div>`;
+    }
+  }).join('');
+}
+
+function fmtTs(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+}
+
+async function approveNewTask(reqId) {
+  const req = db.taskRequests.find(r => r.id === reqId);
+  if (!req) return;
+  try {
+    const task = req.taskData;
+    await saveTaskFS(task);
+    // Update local cache
+    const li = db.tasks.findIndex(t => t.id === task.id);
+    if (li >= 0) db.tasks[li] = task; else db.tasks.push(task);
+
+    // Challenge assignment
+    if (req.challengeId) {
+      const ch = db.challenges.find(c => c.id === req.challengeId);
+      if (ch) {
+        if (!ch.tasks) ch.tasks = [];
+        const mids = task.memberIds||[];
+        const ei = ch.tasks.findIndex(ct => ct.taskId === task.id);
+        const entry = { taskId: task.id, title: task.title, assigneeIds: mids, assigneeId: mids[0]||'', blockers: '' };
+        if (ei >= 0) ch.tasks[ei] = entry; else ch.tasks.push(entry);
+        try { await saveChallengeFS(ch); } catch(e) {}
+      }
+    }
+
+    // Mark request as approved
+    req.status = 'approved'; req.approvedAt = Date.now();
+    await saveTaskRequestFS(req);
+
+    // Log history
+    await _logHistory('approvedCreate', task, null, {});
+    updateApprovalBadge();
+    toast('อนุมัติสร้างงานเรียบร้อย ✅','success');
+    renderApprovals();
+  } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
+}
+
+async function approveDateChange(reqId) {
+  const req = db.taskRequests.find(r => r.id === reqId);
+  if (!req) return;
+  const task = db.tasks.find(t => t.id === req.taskId);
+  if (!task) { toast('ไม่พบงาน','error'); return; }
+  try {
+    const dateRef = new Date(req.newStartDate + 'T00:00:00');
+    const updatedTask = {
+      ...task,
+      startDate: req.newStartDate,
+      due:       req.newDueDate,
+      week:      getISOWeek(dateRef),
+      year:      getISOWeekYear(dateRef),
+      updatedAt: Date.now()
+    };
+    await saveTaskFS(updatedTask);
+    const li = db.tasks.findIndex(t => t.id === task.id);
+    if (li >= 0) db.tasks[li] = updatedTask;
+
+    // Log history
+    await _logHistory('approvedDateChange', updatedTask, task, {
+      startDate: [req.oldStartDate, req.newStartDate],
+      due:       [req.oldDueDate,   req.newDueDate]
+    });
+
+    req.status = 'approved'; req.approvedAt = Date.now();
+    await saveTaskRequestFS(req);
+    updateApprovalBadge();
+    toast('อนุมัติเปลี่ยนวันเรียบร้อย ✅','success');
+    renderApprovals();
+  } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
+}
+
+async function rejectRequest(reqId) {
+  const req = db.taskRequests.find(r => r.id === reqId);
+  if (!req) return;
+  try {
+    req.status = 'rejected'; req.rejectedAt = Date.now();
+    await saveTaskRequestFS(req);
+    // Log history
+    const task = req.type === 'newTask' ? (req.taskData||{}) : (db.tasks.find(t=>t.id===req.taskId)||{id:req.taskId,title:req.taskTitle});
+    await _logHistory('rejected', task, null, {});
+    updateApprovalBadge();
+    toast('ปฏิเสธคำขอแล้ว','success');
+    renderApprovals();
+  } catch(e) { toast('เกิดข้อผิดพลาด','error'); }
+}
+
+// ══════════════════════════════════════════════════════
+//  EDIT HISTORY
+// ══════════════════════════════════════════════════════
+function renderHistory() {
+  const list = document.getElementById('hist-list');
+  if (!list) return;
+  const q = (document.getElementById('hist-search')||{}).value?.toLowerCase()||'';
+  const ACTION_LABEL = {
+    pendingCreate:     { icon:'⏳', label:'ส่งขอสร้างงาน',     cls:'hist-icon-approve' },
+    approvedCreate:    { icon:'✅', label:'อนุมัติสร้างงาน',    cls:'hist-icon-create' },
+    update:            { icon:'✏️', label:'แก้ไขงาน',            cls:'hist-icon-update' },
+    dateChangeRequest: { icon:'📅', label:'ขอเปลี่ยนวัน',        cls:'hist-icon-approve' },
+    approvedDateChange:{ icon:'📅', label:'อนุมัติเปลี่ยนวัน',   cls:'hist-icon-create' },
+    rejected:          { icon:'✕', label:'ปฏิเสธคำขอ',           cls:'hist-icon-delete' },
+    delete:            { icon:'🗑', label:'ลบงาน',                cls:'hist-icon-delete' }
+  };
+  let items = (db.taskHistory||[]).filter(h => !q || (h.taskTitle||'').toLowerCase().includes(q));
+  if (!items.length) {
+    list.innerHTML = `<div style="text-align:center;padding:60px;color:var(--gray-400)"><div style="font-size:40px;margin-bottom:12px">📋</div><div style="font-size:16px;font-weight:700">ยังไม่มีประวัติการแก้ไข</div></div>`;
+    return;
+  }
+  list.innerHTML = items.map(h => {
+    const meta = ACTION_LABEL[h.action] || { icon:'📝', label:h.action, cls:'hist-icon-update' };
+    const changesHtml = (h.changedFields||[]).length ? `
+      <div class="hist-changes">
+        ${h.changedFields.map(c=>`
+          <div class="hist-change-row">
+            <span class="hist-field">${c.fieldLabel}:</span>
+            <span class="hist-old">${c.oldVal||'—'}</span>
+            <span class="hist-arrow">→</span>
+            <span class="hist-new">${c.newVal||'—'}</span>
+          </div>`).join('')}
+      </div>` : '';
+    return `
+    <div class="hist-item">
+      <div class="hist-icon ${meta.cls}">${meta.icon}</div>
+      <div class="hist-body">
+        <div class="hist-title">${meta.label}</div>
+        <div class="hist-desc">${h.taskTitle||'—'}</div>
+        ${changesHtml}
+      </div>
+      <div class="hist-time">${fmtTs(h.ts)}</div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════════════════
