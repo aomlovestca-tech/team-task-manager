@@ -1473,7 +1473,7 @@
 </div>
 
 <!-- PIN SET MODAL (owner sets PIN for a member) -->
-<div class="modal-overlay" id="pin-set-overlay" style="display:none" onclick="if(event.target===this)closePinSet()">
+<div class="modal-overlay" id="pin-set-overlay" onclick="if(event.target===this)closePinSet()">
   <div class="modal" style="max-width:340px">
     <div class="modal-header"><div class="modal-title" id="pin-set-title">ตั้ง PIN</div><button class="modal-close" onclick="closePinSet()">✕</button></div>
     <div class="modal-body">
@@ -1492,7 +1492,7 @@
 </div>
 
 <!-- CHANGE PIN MODAL (self-service) -->
-<div class="modal-overlay" id="change-pin-overlay" style="display:none" onclick="if(event.target===this)closeChangePinModal()">
+<div class="modal-overlay" id="change-pin-overlay" onclick="if(event.target===this)closeChangePinModal()">
   <div class="modal" style="max-width:340px">
     <div class="modal-header"><div class="modal-title"><svg style="width:16px;height:16px;vertical-align:-2px;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>เปลี่ยน PIN ของฉัน</div><button class="modal-close" onclick="closeChangePinModal()">✕</button></div>
     <div class="modal-body">
@@ -1512,7 +1512,7 @@
 </div>
 
 <!-- FORGOT PIN MODAL -->
-<div class="modal-overlay" id="forgot-pin-overlay" style="display:none" onclick="if(event.target===this)closeForgotPin()">
+<div class="modal-overlay" id="forgot-pin-overlay" onclick="if(event.target===this)closeForgotPin()">
   <div class="modal" style="max-width:360px">
     <div class="modal-header"><div class="modal-title">ลืม PIN?</div><button class="modal-close" onclick="closeForgotPin()">✕</button></div>
     <div class="modal-body" id="forgot-pin-content" style="min-height:120px"></div>
@@ -3378,10 +3378,10 @@ function openChangePinModal() {
   document.getElementById('chpin-new').value = '';
   document.getElementById('chpin-confirm').value = '';
   document.getElementById('chpin-err').textContent = '';
-  document.getElementById('change-pin-overlay').style.display = 'flex';
+  document.getElementById('change-pin-overlay').classList.add('open');
 }
 function closeChangePinModal() {
-  document.getElementById('change-pin-overlay').style.display = 'none';
+  document.getElementById('change-pin-overlay').classList.remove('open');
 }
 async function saveChangePin() {
   if (!currentUser) return;
@@ -3444,10 +3444,10 @@ function showForgotPin(e) {
     `;
     submitBtn.style.display = 'none';
   }
-  document.getElementById('forgot-pin-overlay').style.display = 'flex';
+  document.getElementById('forgot-pin-overlay').classList.add('open');
 }
 function closeForgotPin() {
-  document.getElementById('forgot-pin-overlay').style.display = 'none';
+  document.getElementById('forgot-pin-overlay').classList.remove('open');
 }
 async function submitForgotPin() {
   const memberId = document.getElementById('forgot-pin-submit-btn').getAttribute('data-member-id');
@@ -3535,9 +3535,9 @@ function openPinSet(memberId, memberName) {
   document.getElementById('pin-set-val').value = '';
   document.getElementById('pin-set-confirm').value = '';
   document.getElementById('pin-set-err').textContent = '';
-  document.getElementById('pin-set-overlay').style.display = 'flex';
+  document.getElementById('pin-set-overlay').classList.add('open');
 }
-function closePinSet() { document.getElementById('pin-set-overlay').style.display = 'none'; }
+function closePinSet() { document.getElementById('pin-set-overlay').classList.remove('open'); }
 async function savePinSet() {
   const memberId = document.getElementById('pin-set-member-id').value;
   const p1 = document.getElementById('pin-set-val').value.trim();
