@@ -1726,6 +1726,9 @@ function startRealtimeSync() {
   firestore.collection('members').onSnapshot(snap => {
     db.members = snap.docs.map(d => d.data());
     populateMemberDropdowns(); refreshCurrentView();
+    // Refresh PIN login dropdown if overlay is still showing
+    const pinOverlay = document.getElementById('pin-overlay');
+    if (pinOverlay && pinOverlay.style.display !== 'none') { initPinLogin(); }
   });
   firestore.collection('challenges').onSnapshot(snap => {
     db.challenges = snap.docs.map(d => d.data());
@@ -4560,21 +4563,28 @@ function renderHistory() {
   initMonthSelects();
   renderDashboard();
   startRealtimeSync();
-  // Restore session or show PIN login
-  try {
-    const saved = sessionStorage.getItem('taskflow_user');
-    if (saved) {
-      const u = JSON.parse(saved);
-      // Re-validate: member must still exist and PIN must match
-      const m = db.members.find(m=>m.id===u.id);
-      if (m && m.pin) {
-        currentUser = { id:m.id, name:m.name, role:m.role||'member', avatar:m.avatar||m.name[0] };
-        applyUserRole();
-        return;
+  // Session restore is handled inside the members onSnapshot (first fire)
+  // so we just show PIN login now; if session is valid it will be restored
+  // once Firestore delivers members data
+  let _sessionRestored = false;
+  const _origMembersSnap = firestore.collection('members').onSnapshot(snap => {
+    if (_sessionRestored) return;
+    _sessionRestored = true;
+    const members = snap.docs.map(d => d.data());
+    try {
+      const saved = sessionStorage.getItem('taskflow_user');
+      if (saved) {
+        const u = JSON.parse(saved);
+        const m = members.find(m => m.id === u.id);
+        if (m && m.pin) {
+          currentUser = { id:m.id, name:m.name, role:m.role||'member', avatar:m.avatar||m.name[0] };
+          applyUserRole();
+          return;
+        }
       }
-    }
-  } catch(e){}
-  initPinLogin();
+    } catch(e) {}
+    initPinLogin();
+  });
 })();
 
 document.addEventListener('keydown',e=>{
