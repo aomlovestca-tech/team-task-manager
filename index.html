@@ -393,6 +393,22 @@
   .mcs-num { font-size: 18px; font-weight: 800; color: var(--primary); }
   .mcs-label { font-size: 10px; color: var(--gray-400); }
   .member-card-actions { display: flex; gap: 8px; margin-top: 8px; }
+  /* CEO BANNER */
+  .ceo-banner { grid-column: 1 / -1; background: linear-gradient(135deg,#1a2a00 0%,#2d4400 60%,#1a2a00 100%); border-radius: var(--radius); box-shadow: 0 4px 24px rgba(206,251,89,.18); padding: 24px 32px; display: flex; align-items: center; gap: 24px; position: relative; overflow: hidden; }
+  .ceo-banner::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 80% 50%,rgba(206,251,89,.12) 0%,transparent 70%); pointer-events:none; }
+  .ceo-banner-info { flex: 1; min-width: 0; }
+  .ceo-banner-name { font-size: 20px; font-weight: 800; color: #cefb59; letter-spacing: .3px; }
+  .ceo-banner-title { font-size: 13px; color: rgba(206,251,89,.7); margin-top: 4px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; }
+  .ceo-banner-desc { font-size: 13px; color: rgba(255,255,255,.6); margin-top: 8px; line-height: 1.5; }
+  /* CHALLENGE TASK CARD */
+  .task-card.challenge-card { background: #1a2a00; border-left-color: #cefb59 !important; }
+  .task-card.challenge-card .task-card-title { color: #cefb59; }
+  .task-card.challenge-card .task-card-desc { color: rgba(206,251,89,.7); }
+  .task-card.challenge-card .task-card-date { color: rgba(206,251,89,.6) !important; }
+  .task-card.challenge-card .task-card-footer { border-top-color: rgba(206,251,89,.15); }
+  .task-card.challenge-card .task-card-note { color: rgba(255,255,255,.6); }
+  /* HOLD badge */
+  .ch-hold-badge { background:#334155;color:#94a3b8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;white-space:nowrap; }
 
   /* MODAL */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 999; display: flex; align-items: flex-end; justify-content: center; padding: 0; opacity: 0; pointer-events: none; transition: opacity .2s; visibility: hidden; }
@@ -2392,8 +2408,11 @@ function taskCard(t) {
   const ids = getTaskMemberIds(t);
   const members = ids.map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
   const ov = isOverdue(t.due, t.status);
-  const borderColor = {High:'var(--danger)',Medium:'var(--warning)',Low:'var(--success)'}[t.priority]||'var(--gray-200)';
-  const avs = members.slice(0,3).map(m=>mkAvatar(m,{size:'20px',fs:'9px',extra:'margin-right:-4px;border:2px solid #fff;'})).join('');
+  // Check if task belongs to a challenge
+  const inChallenge = db.challenges && db.challenges.some(ch => (ch.tasks||[]).some(ct => ct.taskId === t.id));
+  const borderColor = inChallenge ? '#cefb59' : ({High:'var(--danger)',Medium:'var(--warning)',Low:'var(--success)'}[t.priority]||'var(--gray-200)');
+  const avBorderColor = inChallenge ? '#1a2a00' : '#fff';
+  const avs = members.slice(0,3).map(m=>mkAvatar(m,{size:'20px',fs:'9px',extra:`margin-right:-4px;border:2px solid ${avBorderColor};`})).join('');
   const names = members.map(m=>m.name.split(' ')[0]).join(', ');
   const dateRange = t.startDate ? `${formatDate(t.startDate)} – ${formatDate(t.due)}` : formatDate(t.due);
   // Subtask progress
@@ -2406,7 +2425,9 @@ function taskCard(t) {
     <span>${subDone}/${subTotal} งานย่อย</span>
     <span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px">${subPct}%</span>
   </div>` : '';
-  return `<div class="task-card" style="border-left-color:${borderColor}" onclick="openTaskModal('${t.id}')">
+  const challengeBadge = inChallenge ? `<span style="background:#cefb59;color:#1a2a00;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:.5px">⚡ CHALLENGE</span>` : '';
+  return `<div class="task-card${inChallenge?' challenge-card':''}" style="border-left-color:${borderColor}" onclick="openTaskModal('${t.id}')">
+    ${challengeBadge ? `<div style="margin-bottom:4px">${challengeBadge}</div>` : ''}
     <div class="task-card-title">${t.title}</div>
     ${t.desc?`<div class="task-card-desc">${t.desc}</div>`:''}
     <div class="task-card-footer">
@@ -2670,7 +2691,7 @@ function switchMemberTab(tab) {
 function renderMembers() {
   // Show/hide the roles tab based on role
   const rolesTab = document.getElementById('mtab-roles');
-  const isOwner = currentUser && currentUser.role==='owner';
+  const isOwner = currentUser && (currentUser.role==='owner' || currentUser.role==='ceo');
   if (rolesTab) rolesTab.style.display = isOwner ? '' : 'none';
   // If roles panel is showing but user is no longer owner, switch to members
   const rolesPanel = document.getElementById('roles-panel');
@@ -2678,7 +2699,23 @@ function renderMembers() {
 
   const grid=document.getElementById('members-grid');
   if (!db.members.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="es-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><p>ยังไม่มีสมาชิก คลิก "เพิ่มสมาชิก"</p></div>';return;}
-  grid.innerHTML=db.members.map(m=>{
+
+  const ceoMembers = db.members.filter(m => m.role === 'ceo');
+  const regularMembers = db.members.filter(m => m.role !== 'ceo');
+
+  const ceoBanners = ceoMembers.map(m => {
+    return `<div class="ceo-banner">
+      ${mkAvatar(m,{size:'64px',fs:'24px',extra:'border:3px solid #cefb59;flex-shrink:0'})}
+      <div class="ceo-banner-info">
+        <div class="ceo-banner-name">${m.name}</div>
+        <div class="ceo-banner-title">CEO · ผู้อนุมัติสูงสุด</div>
+        <div class="ceo-banner-desc">ดูแลและอนุมัติการทำงานของทีม — ไม่ได้รับมอบหมายงานโดยตรง</div>
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#cefb59" stroke-width="1.5" style="width:48px;height:48px;opacity:.25;flex-shrink:0"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>
+    </div>`;
+  }).join('');
+
+  const regularCards = regularMembers.map(m=>{
     const mt=db.tasks.filter(t=>getTaskMemberIds(t).includes(m.id));
     const md=mt.filter(t=>t.status==='Done').length;
     const mp=mt.filter(t=>t.status==='In Progress').length;
@@ -2697,6 +2734,8 @@ function renderMembers() {
       </div>
     </div>`;
   }).join('');
+
+  grid.innerHTML = ceoBanners + regularCards;
 }
 
 function filterToMember(id) { showView('mytasks'); mtCurrentMemberId=id; mtCurrentStatus=''; renderMyTasks(); }
@@ -3299,8 +3338,9 @@ async function pinSubmit() {
 
 function applyUserRole() {
   if (!currentUser) return;
-  const isManager = currentUser.role === 'manager' || currentUser.role === 'owner';
-  const isOwner   = currentUser.role === 'owner';
+  const isCeo     = currentUser.role === 'ceo';
+  const isManager = currentUser.role === 'manager' || currentUser.role === 'owner' || isCeo;
+  const isOwner   = currentUser.role === 'owner' || isCeo;
   // Show/hide sidebar manager section
   document.getElementById('nav-manager-title').style.display = isManager ? '' : 'none';
   document.getElementById('nav-approvals').style.display     = isManager ? '' : 'none';
@@ -3311,7 +3351,7 @@ function applyUserRole() {
   // Populate user dropdown header
   const ddName = document.getElementById('dd-name');
   const ddRole = document.getElementById('dd-role');
-  const roleLabel = {owner:'เจ้าของ', manager:'หัวหน้างาน', member:'สมาชิก'};
+  const roleLabel = {owner:'เจ้าของ', ceo:'CEO / ผู้อนุมัติ', manager:'หัวหน้างาน', member:'สมาชิก'};
   if (ddName) ddName.textContent = currentUser.name;
   if (ddRole) ddRole.textContent = roleLabel[currentUser.role] || currentUser.role;
   // Topbar user chip
@@ -4151,9 +4191,14 @@ function renderChOverview(ch) {
       </div>`;
     }
 
-    return `<div class="ch-task-row"${isDone?' style="opacity:0.85"':''}>
+    const isHeld = !isDone && !!t.hold;
+    const rowStyle = isDone ? ' style="opacity:0.85"' : isHeld ? ' style="opacity:0.6;background:var(--gray-50,#f9fafb)"' : '';
+    return `<div class="ch-task-row"${rowStyle}>
       <div class="ch-task-info" style="flex:1">
-        <div class="ch-task-title" onclick="openTaskModal('${t.taskId}')" style="cursor:pointer;display:inline-block;background:var(--gray-100,#f3f4f6);border-radius:6px;padding:4px 10px;margin-bottom:2px">${displayTitle}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px">
+          <div class="ch-task-title" onclick="openTaskModal('${t.taskId}')" style="cursor:pointer;display:inline-block;background:var(--gray-100,#f3f4f6);border-radius:6px;padding:4px 10px">${displayTitle}</div>
+          ${isHeld?`<span class="ch-hold-badge">⏸ HOLD</span>`:''}
+        </div>
         ${names?`<div class="ch-task-assign">${names}</div>`:''}
         ${dateBadge}
         ${statusLabel&&!isDone?`<div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">สถานะ: <strong>${statusLabel}</strong></div>`:''}
@@ -4166,12 +4211,15 @@ function renderChOverview(ch) {
         <div style="font-size:11px;color:var(--gray-400)">${pct}%</div>`:''}
         ${t.blockers&&t.blockers.trim()?`<div class="ch-task-blocker">⚠ ${t.blockers}</div>`:''}
       </div>
-      <div style="display:flex;flex-direction:row;gap:6px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
         ${isDone
           ? `<span style="background:#cefb59;color:#1a2a00;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;letter-spacing:0.3px">คุณทำสำเร็จ</span>`
-          : `<button onclick="markChTaskDone(${i})" style="background:#cefb59;color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">✓ Done</button>`
+          : `<div style="display:flex;gap:6px;align-items:center">
+              <button onclick="toggleChTaskHold(${i})" style="background:${isHeld?'#22c55e':'#475569'};color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">${isHeld?'▶ Resume':'⏸ Hold'}</button>
+              <button onclick="markChTaskDone(${i})" style="background:#cefb59;color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap${isHeld?';opacity:0.4;pointer-events:none':''}">✓ Done</button>
+            </div>`
         }
-        <button onclick="openChTaskEdit(${i})" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">แจ้งปัญหา</button>
+        ${!isDone?`<button onclick="openChTaskEdit(${i})" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">แจ้งปัญหา</button>`:''}
       </div>
     </div>`;
   };
@@ -4185,12 +4233,21 @@ function renderChOverview(ch) {
     const db_ = (lb&&lb.due) ? lb.due : (lb&&lb.startDate ? lb.startDate : '9999');
     return da.localeCompare(db_);
   };
-  const pendingRows = allEntries.filter(({t})=>getTaskProgress(t.taskId)<100).sort(sortByDue);
-  const doneRows    = allEntries.filter(({t})=>getTaskProgress(t.taskId)>=100).sort(sortByDue);
+  const allPendingEntries = allEntries.filter(({t})=>getTaskProgress(t.taskId)<100).sort(sortByDue);
+  const activeRows = allPendingEntries.filter(({t})=>!t.hold);
+  const heldRows   = allPendingEntries.filter(({t})=>!!t.hold);
+  const doneRows   = allEntries.filter(({t})=>getTaskProgress(t.taskId)>=100).sort(sortByDue);
 
-  const pendingHtml = pendingRows.length
-    ? pendingRows.map(({t,i})=>buildTaskRow(t,i,false)).join('')
-    : '<div style="padding:20px;text-align:center;color:var(--gray-400)">ไม่มีงานที่รอดำเนินการ</div>';
+  let pendingHtml = '';
+  if (!allPendingEntries.length) {
+    pendingHtml = '<div style="padding:20px;text-align:center;color:var(--gray-400)">ไม่มีงานที่รอดำเนินการ</div>';
+  } else {
+    pendingHtml = activeRows.map(({t,i})=>buildTaskRow(t,i,false)).join('');
+    if (heldRows.length) {
+      pendingHtml += `<div style="padding:10px 0 4px;font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:1px;text-transform:uppercase;border-top:1px dashed var(--gray-200);margin-top:4px">⏸ HOLD (${heldRows.length})</div>`;
+      pendingHtml += heldRows.map(({t,i})=>buildTaskRow(t,i,false)).join('');
+    }
+  }
 
   const doneHtml = doneRows.length
     ? doneRows.map(({t,i})=>buildTaskRow(t,i,true)).join('')
@@ -4423,6 +4480,17 @@ async function saveChTaskEdit() {
     await saveChallengeFS(ch);
     closeChTaskEdit();
     toast('บันทึกแล้ว','success');
+  } catch(e){ toast('เกิดข้อผิดพลาด','error'); }
+}
+
+async function toggleChTaskHold(i) {
+  const ch = db.challenges.find(c=>c.id===_chState.currentId);
+  if (!ch||!ch.tasks[i]) return;
+  ch.tasks[i].hold = !ch.tasks[i].hold;
+  try {
+    await saveChallengeFS(ch);
+    renderChOverview(ch);
+    toast(ch.tasks[i].hold ? 'HOLD งานแล้ว ⏸' : 'Resume งานแล้ว ▶', 'success');
   } catch(e){ toast('เกิดข้อผิดพลาด','error'); }
 }
 
