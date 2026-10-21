@@ -429,6 +429,16 @@
   .task-card.challenge-card .task-card-date { color: rgba(206,251,89,.6) !important; }
   .task-card.challenge-card .task-card-footer { border-top-color: rgba(206,251,89,.15); }
   .task-card.challenge-card .task-card-note { color: rgba(255,255,255,.6); }
+  /* ── Challenge glow border in Weekly Meeting ── */
+  @keyframes challengeBorderBlink {
+    0%,100% { box-shadow: 0 0 0 2px #cefb59, 0 0 14px 3px rgba(206,251,89,.55); border-color: #cefb59; }
+    50%      { box-shadow: 0 0 0 2px rgba(206,251,89,.25), 0 0 4px 1px rgba(206,251,89,.1); border-color: rgba(206,251,89,.4); }
+  }
+  #view-weekly .task-card.challenge-card {
+    border: 2px solid #cefb59;
+    border-left: 4px solid #cefb59;
+    animation: challengeBorderBlink 1.6s ease-in-out infinite;
+  }
   /* HOLD badge */
   .ch-hold-badge { background:#334155;color:#94a3b8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;white-space:nowrap; }
 
