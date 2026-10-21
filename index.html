@@ -1404,6 +1404,11 @@
             <h2 style="font-size:20px;font-weight:800">อนุมัติงาน</h2>
             <div style="font-size:13px;color:var(--gray-400);margin-top:2px">รายการขอสร้างงานใหม่ และขอเปลี่ยนระยะเวลางาน</div>
           </div>
+          <button onclick="showView('myrequests')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;border:1.5px solid var(--gray-200);background:#fff;font-size:12px;font-weight:700;color:var(--gray-600);cursor:pointer;white-space:nowrap">
+            <svg style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 0 2-2h11"/></svg>
+            คำขอของฉัน
+            <span id="apv-myreq-badge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;padding:1px 6px;font-size:10px">0</span>
+          </button>
         </div>
         <div class="apv-tabs" style="margin-bottom:20px">
           <div class="apv-tab active" id="apv-tab-new" onclick="switchApvTab('new')"><svg style="width:13px;height:13px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>ขอสร้างงานใหม่ <span id="apv-count-new" style="font-size:11px;opacity:.7"></span></div>
@@ -3647,7 +3652,7 @@ function updateApprovalBadge() {
       if (myPending > 0) { bn.textContent = myPending; bn.style.display = 'flex'; } else { bn.style.display = 'none'; }
     }
   } else if (bn) { bn.style.display = 'none'; }
-  // sidebar badge for myrequests (members)
+  // sidebar + approvals-header badge for myrequests (all roles)
   if (currentUser) {
     const myPending = (db.taskRequests||[]).filter(r => {
       const mine = r.requesterId ? r.requesterId === currentUser.id
@@ -3656,6 +3661,8 @@ function updateApprovalBadge() {
     }).length;
     const br = document.getElementById('badge-myrequests');
     if (br) { br.textContent = myPending; br.style.display = myPending ? '' : 'none'; }
+    const bh = document.getElementById('apv-myreq-badge');
+    if (bh) { bh.textContent = myPending; bh.style.display = myPending ? '' : 'none'; }
   }
 }
 
