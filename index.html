@@ -87,9 +87,9 @@
   .user-dd-item:hover { background:var(--gray-100); }
   .user-dd-sep { height:1px; background:var(--gray-200); margin:4px 0; }
   /* MEMBER TABS */
-  .member-tabs { display:flex; gap:0; border-bottom:2px solid var(--gray-200); margin-bottom:20px; }
-  .member-tab { padding:9px 18px; font-size:14px; font-weight:600; color:var(--gray-400); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; }
-  .member-tab.active { color:var(--primary); border-color:var(--primary); }
+  .member-tabs { display:flex; gap:8px; border-bottom:none; margin-bottom:20px; }
+  .member-tab { padding:9px 20px; font-size:13px; font-weight:700; color:var(--gray-500); cursor:pointer; border-radius:99px; border:1.5px solid var(--gray-200); background:#fff; transition:all .15s; }
+  .member-tab.active { background:#000; color:#cefb59; border-color:#000; }
 
   /* APPROVAL PAGE */
   .apv-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
@@ -2749,11 +2749,6 @@ function renderMembers() {
         <div class="ceo-banner-name">${m.name}</div>
         <div class="ceo-banner-title">CEO · ผู้อนุมัติสูงสุด</div>
         <div class="ceo-banner-desc">ดูแลและอนุมัติการทำงานของทีม — ไม่ได้รับมอบหมายงานโดยตรง</div>
-      </div>
-      <div class="ceo-stars">
-        <span class="ceo-star">⭐</span>
-        <span class="ceo-star">⭐</span>
-        <span class="ceo-star">⭐</span>
       </div>
     </div>`;
   }).join('');
