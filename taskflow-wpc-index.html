@@ -410,6 +410,14 @@
   /* CEO BANNER */
   .ceo-banner { grid-column: 1 / -1; background: #000; border: 2px solid #cefb59; border-radius: var(--radius); box-shadow: 0 4px 24px rgba(206,251,89,.18); padding: 24px 32px; display: flex; align-items: center; gap: 24px; position: relative; overflow: hidden; }
   .ceo-banner::before { display: none; }
+  .ceo-stars { display:flex; gap:6px; flex-shrink:0; }
+  .ceo-star { font-size:28px; animation: starBlink 1.6s ease-in-out infinite; }
+  .ceo-star:nth-child(2) { animation-delay:.4s; font-size:22px; }
+  .ceo-star:nth-child(3) { animation-delay:.8s; font-size:18px; }
+  @keyframes starBlink {
+    0%,100% { opacity:.2; text-shadow: none; }
+    50% { opacity:1; text-shadow: 0 0 12px #cefb59, 0 0 24px #cefb59; }
+  }
   .ceo-banner-info { flex: 1; min-width: 0; }
   .ceo-banner-name { font-size: 20px; font-weight: 800; color: #cefb59; letter-spacing: .3px; }
   .ceo-banner-title { font-size: 13px; color: rgba(206,251,89,.7); margin-top: 4px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; }
@@ -1385,7 +1393,7 @@
             <div class="member-tab active" id="mtab-members" onclick="switchMemberTab('members')"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>สมาชิก</div>
             <div class="member-tab" id="mtab-roles" onclick="switchMemberTab('roles')" style="display:none"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>สิทธิ์ & PIN</div>
           </div>
-          <button class="btn btn-primary btn-sm" id="btn-add-member" onclick="openMemberModal()" style="margin-bottom:2px">+ เพิ่มสมาชิก</button>
+          <button id="btn-add-member" onclick="openMemberModal()" style="margin-bottom:2px;padding:8px 18px;background:#000;color:#cefb59;border:1.5px solid #cefb59;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.3px">+ เพิ่มสมาชิก</button>
         </div>
         <!-- Members panel -->
         <div id="members-panel">
@@ -2742,7 +2750,11 @@ function renderMembers() {
         <div class="ceo-banner-title">CEO · ผู้อนุมัติสูงสุด</div>
         <div class="ceo-banner-desc">ดูแลและอนุมัติการทำงานของทีม — ไม่ได้รับมอบหมายงานโดยตรง</div>
       </div>
-      <svg viewBox="0 0 24 24" fill="none" stroke="#cefb59" stroke-width="1.5" style="width:48px;height:48px;opacity:.25;flex-shrink:0"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>
+      <div class="ceo-stars">
+        <span class="ceo-star">⭐</span>
+        <span class="ceo-star">⭐</span>
+        <span class="ceo-star">⭐</span>
+      </div>
     </div>`;
   }).join('');
 
@@ -3652,7 +3664,7 @@ function updateApprovalBadge() {
       if (myPending > 0) { bn.textContent = myPending; bn.style.display = 'flex'; } else { bn.style.display = 'none'; }
     }
   } else if (bn) { bn.style.display = 'none'; }
-  // sidebar badge for myrequests (members)
+  // sidebar + approvals-header badge for myrequests (all roles)
   if (currentUser) {
     const myPending = (db.taskRequests||[]).filter(r => {
       const mine = r.requesterId ? r.requesterId === currentUser.id
@@ -3661,6 +3673,8 @@ function updateApprovalBadge() {
     }).length;
     const br = document.getElementById('badge-myrequests');
     if (br) { br.textContent = myPending; br.style.display = myPending ? '' : 'none'; }
+    const bh = document.getElementById('apv-myreq-badge');
+    if (bh) { bh.textContent = myPending; bh.style.display = myPending ? '' : 'none'; }
   }
 }
 
