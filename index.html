@@ -1709,7 +1709,16 @@
         <div class="form-group full">
           <div class="subtask-section-header">
             <label class="form-label" style="margin-bottom:0">งานย่อย</label>
-            <button type="button" class="subtask-add-btn" onclick="addSubtask()">＋ เพิ่มงานย่อย</button>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <div id="subtask-filter-bar" style="display:flex;gap:3px"></div>
+              <select id="subtask-sort-sel" onchange="setSubtaskSort(this.value)" style="font-size:11px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;color:var(--gray-600);cursor:pointer">
+                <option value="default">เรียง: ค่าเริ่มต้น</option>
+                <option value="name">เรียง: ชื่อ A→Z</option>
+                <option value="date">เรียง: วันที่</option>
+                <option value="status">เรียง: สถานะ</option>
+              </select>
+              <button type="button" class="subtask-add-btn" onclick="addSubtask()">＋ เพิ่มงานย่อย</button>
+            </div>
           </div>
           <div id="subtask-list"></div>
         </div>
@@ -2800,15 +2809,51 @@ function filterToMember(id) { showView('mytasks'); mtCurrentMemberId=id; mtCurre
 let editingTaskId = null;
 let selectedMemberIds = [];
 let subtaskList = []; // [{ id, title, assigneeIds, startDate, due, status }]
+let subtaskFilter = 'all';   // 'all' | 'todo' | 'done'
+let subtaskSort   = 'default'; // 'default' | 'name' | 'date'
+
+function renderSubtaskFilterBar() {
+  const bar = document.getElementById('subtask-filter-bar');
+  if (!bar) return;
+  const total = subtaskList.length;
+  const doneCount = subtaskList.filter(s=>s.status==='Done').length;
+  const todoCount = total - doneCount;
+  const filters = [
+    { key:'all',  label:`ทั้งหมด (${total})` },
+    { key:'todo', label:`รอทำ (${todoCount})` },
+    { key:'done', label:`เสร็จ (${doneCount})` },
+  ];
+  bar.innerHTML = filters.map(f =>
+    `<button type="button" onclick="setSubtaskFilter('${f.key}')"
+      style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;cursor:pointer;border:1px solid ${subtaskFilter===f.key?'var(--primary)':'var(--gray-200)'};background:${subtaskFilter===f.key?'var(--primary-light)':'#fff'};color:${subtaskFilter===f.key?'var(--primary)':'var(--gray-500)'}">
+      ${f.label}</button>`
+  ).join('');
+}
+function setSubtaskFilter(f) { subtaskFilter = f; renderSubtasks(); }
+function setSubtaskSort(s) { subtaskSort = s; renderSubtasks(); }
 
 function renderSubtasks() {
   const container = document.getElementById('subtask-list');
   if (!container) return;
+  renderSubtaskFilterBar();
   if (!subtaskList.length) {
     container.innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:10px 0;border:1px dashed var(--gray-200);border-radius:7px">ยังไม่มีงานย่อย — คลิก "＋ เพิ่มงานย่อย" เพื่อเริ่ม</div>';
     return;
   }
-  container.innerHTML = subtaskList.map((st, i) => {
+  // Build display list with original indices
+  let displayList = subtaskList.map((st, i) => ({ st, i }));
+  // Filter
+  if (subtaskFilter === 'done') displayList = displayList.filter(({st}) => st.status === 'Done');
+  else if (subtaskFilter === 'todo') displayList = displayList.filter(({st}) => st.status !== 'Done');
+  // Sort
+  if (subtaskSort === 'name') displayList.sort((a,b) => (a.st.title||'').localeCompare(b.st.title||'','th'));
+  else if (subtaskSort === 'date') displayList.sort((a,b) => (a.st.due||a.st.startDate||'').localeCompare(b.st.due||b.st.startDate||''));
+  else if (subtaskSort === 'status') displayList.sort((a,b) => (a.st.status==='Done'?1:0)-(b.st.status==='Done'?1:0));
+  if (!displayList.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:10px 0;border:1px dashed var(--gray-200);border-radius:7px">— ไม่มีงานย่อยที่ตรงกับตัวกรอง —</div>';
+    return;
+  }
+  container.innerHTML = displayList.map(({st, i}) => {
     const memberChips = db.members.map(m => {
       const sel = st.assigneeIds.includes(m.id);
       return `<div class="subtask-member-chip ${sel?'selected':''}" onclick="toggleSubtaskMember(${i},'${m.id}')">
@@ -2928,11 +2973,13 @@ function openTaskModal(id=null, defaultStatus='Todo', defaultDate=null) {
     document.getElementById('f-due').value        = t.due||'';
     document.getElementById('f-note').value       = t.note||'';
     subtaskList = (t.subtasks||[]).map(s=>({...s, assigneeIds:[...(s.assigneeIds||[])]}));
+    subtaskFilter = 'all'; subtaskSort = 'default';
     populateChallengeDropdown(ownerCh ? ownerCh.id : '');
     deleteBtn.style.display='inline-flex';
   } else {
     selectedMemberIds = [];
     subtaskList = [];
+    subtaskFilter = 'all'; subtaskSort = 'default';
     document.getElementById('task-modal-title').textContent = 'เพิ่มงานใหม่';
     document.getElementById('f-title').value      = '';
     document.getElementById('f-desc').value       = '';
