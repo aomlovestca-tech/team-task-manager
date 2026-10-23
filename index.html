@@ -3057,25 +3057,34 @@ async function saveTask() {
     const dateChanged = (prevTask.startDate !== fStartDate) || (prevTask.due !== fDueDate);
     if (dateChanged) {
       // Create date change request instead of direct save
+      // If there's already a pending dateChange request for this task, update it instead of duplicating
       try {
-        const req = {
-          id: uid(),
-          type: 'dateChange',
-          status: 'pending',
-          requesterId: currentUser ? currentUser.id : '',
-          taskId,
-          taskTitle: title,
-          memberIds: task.memberIds,
-          oldStartDate: prevTask.startDate || '',
-          oldDueDate:   prevTask.due || '',
-          newStartDate: fStartDate,
-          newDueDate:   fDueDate,
-          requesterNote: '',
-          ts: Date.now(),
-          createdAt: Date.now()
-        };
+        const existingReq = db.taskRequests.find(r => r.type === 'dateChange' && r.taskId === taskId && r.status === 'pending');
+        const req = existingReq
+          ? { ...existingReq, newStartDate: fStartDate, newDueDate: fDueDate, ts: Date.now(), taskTitle: title, memberIds: task.memberIds }
+          : {
+              id: uid(),
+              type: 'dateChange',
+              status: 'pending',
+              requesterId: currentUser ? currentUser.id : '',
+              taskId,
+              taskTitle: title,
+              memberIds: task.memberIds,
+              oldStartDate: prevTask.startDate || '',
+              oldDueDate:   prevTask.due || '',
+              newStartDate: fStartDate,
+              newDueDate:   fDueDate,
+              requesterNote: '',
+              ts: Date.now(),
+              createdAt: Date.now()
+            };
         await saveTaskRequestFS(req);
-        db.taskRequests.push(req);
+        if (existingReq) {
+          const idx = db.taskRequests.findIndex(r => r.id === existingReq.id);
+          if (idx >= 0) db.taskRequests[idx] = req;
+        } else {
+          db.taskRequests.push(req);
+        }
         updateApprovalBadge();
         // Still save non-date fields directly (title, status, priority, etc.)
         const taskWithOldDates = {
