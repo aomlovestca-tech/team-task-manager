@@ -3037,11 +3037,23 @@ async function saveTask() {
     })()
   };
 
-  // ── Manager/Owner: bypass approval system entirely ──
-  const isMgr = currentUser && (currentUser.role==='manager'||currentUser.role==='owner');
+  // ── Approval bypass logic ──
+  // Managers always bypass. Owners bypass ONLY when the task is NOT assigned to themselves.
+  // When an owner creates/edits a task assigned to themselves, it goes through the approval queue.
+  const isManager = currentUser && currentUser.role === 'manager';
+  const isOwner   = currentUser && currentUser.role === 'owner';
+  // For new-task path: check if owner is in the new task's memberIds
+  const ownerOnOwnTask = isOwner && (task.memberIds || []).includes(currentUser.id);
+  const isMgr = isManager || (isOwner && !ownerOnOwnTask);
 
   // ── Date change request (for existing tasks where start or due changed) ──
-  if (editingTaskId && prevTask && !isMgr) {
+  // For date changes: owner must request approval if assigned to the task (old or new)
+  const ownerOnOwnTaskDate = isOwner && (
+    ((prevTask && prevTask.memberIds || []).includes(currentUser.id)) ||
+    ((task.memberIds || []).includes(currentUser.id))
+  );
+  const isMgrForDate = isManager || (isOwner && !ownerOnOwnTaskDate);
+  if (editingTaskId && prevTask && !isMgrForDate) {
     const dateChanged = (prevTask.startDate !== fStartDate) || (prevTask.due !== fDueDate);
     if (dateChanged) {
       // Create date change request instead of direct save
