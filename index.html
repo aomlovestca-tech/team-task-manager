@@ -777,6 +777,16 @@
   .wm-task-card { display:flex; align-items:flex-start; gap:8px; padding:9px 8px; border-radius:7px; margin-bottom:5px; border:1px solid var(--gray-100); }
   .wm-task-card:last-child { margin-bottom:0; }
   .wm-task-card:hover { background:var(--gray-50); }
+  @keyframes wmChallengePulse {
+    0%,100% { box-shadow:0 0 0 2px #cefb59, 0 0 12px 3px rgba(206,251,89,.5); border-color:#cefb59; }
+    50%      { box-shadow:0 0 0 2px rgba(206,251,89,.2), 0 0 3px 1px rgba(206,251,89,.08); border-color:rgba(206,251,89,.35); }
+  }
+  .wm-task-card.wm-challenge-card { background:#1a2a00; border-color:#cefb59; animation:wmChallengePulse 1.6s ease-in-out infinite; }
+  .wm-task-card.wm-challenge-card .wm-task-title { color:#cefb59; }
+  .wm-task-card.wm-challenge-card .wm-task-desc { color:rgba(206,251,89,.7); }
+  .wm-task-card.wm-challenge-card .wm-task-note { color:rgba(255,255,255,.55); }
+  .wm-task-card.wm-challenge-card .wm-task-meta { color:rgba(206,251,89,.6); }
+  .wm-task-card.wm-challenge-card .wm-due { color:rgba(206,251,89,.6); }
   .wm-task-num { width:18px; height:18px; border-radius:50%; background:var(--gray-200); color:var(--gray-500); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
   .wm-task-body { flex:1; min-width:0; }
   .wm-task-title { font-size:13px; font-weight:600; color:var(--gray-800); line-height:1.35; margin-bottom:3px; }
@@ -2297,7 +2307,10 @@ function wmTaskCard(t, showNextBadge) {
   else if (t.due) due = formatDate(t.due);
   else if (t.startDate) due = formatDate(t.startDate);
   const wmSubs = t.subtasks||[]; const wmSubDone=wmSubs.filter(s=>s.status==='Done').length;
-  return `<div class="wm-task-card" onclick="openTaskModal('${t.id}')" style="cursor:pointer">
+  const inChallenge = db.challenges && db.challenges.some(ch => (ch.tasks||[]).some(ct => ct.taskId === t.id));
+  const challengeBadge = inChallenge ? `<span style="display:inline-flex;align-items:center;gap:3px;background:#cefb59;color:#1a2a00;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:.4px;margin-bottom:4px">⚡ CHALLENGE</span>` : '';
+  return `<div class="wm-task-card${inChallenge?' wm-challenge-card':''}" onclick="openTaskModal('${t.id}')" style="cursor:pointer">
+    ${challengeBadge}
     <div class="wm-task-num">·</div>
     <div class="wm-task-body">
       <div class="wm-task-title">${t.title||'—'}</div>
