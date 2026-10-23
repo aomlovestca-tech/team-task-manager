@@ -2297,7 +2297,10 @@ function wmTaskCard(t, showNextBadge) {
   else if (t.due) due = formatDate(t.due);
   else if (t.startDate) due = formatDate(t.startDate);
   const wmSubs = t.subtasks||[]; const wmSubDone=wmSubs.filter(s=>s.status==='Done').length;
-  return `<div class="wm-task-card" onclick="openTaskModal('${t.id}')" style="cursor:pointer">
+  const inChallenge = db.challenges && db.challenges.some(ch => (ch.tasks||[]).some(ct => ct.taskId === t.id));
+  const challengeBadge = inChallenge ? `<span style="display:inline-flex;align-items:center;gap:3px;background:#cefb59;color:#1a2a00;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:.4px;margin-bottom:4px">⚡ CHALLENGE</span>` : '';
+  return `<div class="wm-task-card${inChallenge?' wm-challenge-card':''}" onclick="openTaskModal('${t.id}')" style="cursor:pointer">
+    ${challengeBadge}
     <div class="wm-task-num">·</div>
     <div class="wm-task-body">
       <div class="wm-task-title">${t.title||'—'}</div>
