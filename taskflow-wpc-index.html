@@ -404,7 +404,7 @@
   .myreq-status.rejected { background: #fee2e2; color: #991b1b; }
   .myreq-title { font-size: 15px; font-weight: 700; color: var(--gray-800); margin: 8px 0 4px; }
   .myreq-meta  { font-size: 12px; color: var(--gray-400); display: flex; flex-wrap: wrap; gap: 10px; }
-  .myreq-type-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--gray-100); color: var(--gray-600); }
+  .myreq-type-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--gray-100); color: var(--gray-600); }
   .myreq-note { font-size: 12px; color: var(--gray-500); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--gray-100); }
 
   /* CEO BANNER */
@@ -1709,7 +1709,16 @@
         <div class="form-group full">
           <div class="subtask-section-header">
             <label class="form-label" style="margin-bottom:0">งานย่อย</label>
-            <button type="button" class="subtask-add-btn" onclick="addSubtask()">＋ เพิ่มงานย่อย</button>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <div id="subtask-filter-bar" style="display:flex;gap:3px"></div>
+              <select id="subtask-sort-sel" onchange="setSubtaskSort(this.value)" style="font-size:11px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;color:var(--gray-600);cursor:pointer">
+                <option value="default">เรียง: ค่าเริ่มต้น</option>
+                <option value="name">เรียง: ชื่อ A→Z</option>
+                <option value="date">เรียง: วันที่</option>
+                <option value="status">เรียง: สถานะ</option>
+              </select>
+              <button type="button" class="subtask-add-btn" onclick="addSubtask()">＋ เพิ่มงานย่อย</button>
+            </div>
           </div>
           <div id="subtask-list"></div>
         </div>
@@ -2800,15 +2809,51 @@ function filterToMember(id) { showView('mytasks'); mtCurrentMemberId=id; mtCurre
 let editingTaskId = null;
 let selectedMemberIds = [];
 let subtaskList = []; // [{ id, title, assigneeIds, startDate, due, status }]
+let subtaskFilter = 'all';   // 'all' | 'todo' | 'done'
+let subtaskSort   = 'default'; // 'default' | 'name' | 'date'
+
+function renderSubtaskFilterBar() {
+  const bar = document.getElementById('subtask-filter-bar');
+  if (!bar) return;
+  const total = subtaskList.length;
+  const doneCount = subtaskList.filter(s=>s.status==='Done').length;
+  const todoCount = total - doneCount;
+  const filters = [
+    { key:'all',  label:`ทั้งหมด (${total})` },
+    { key:'todo', label:`รอทำ (${todoCount})` },
+    { key:'done', label:`เสร็จ (${doneCount})` },
+  ];
+  bar.innerHTML = filters.map(f =>
+    `<button type="button" onclick="setSubtaskFilter('${f.key}')"
+      style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;cursor:pointer;border:1px solid ${subtaskFilter===f.key?'var(--primary)':'var(--gray-200)'};background:${subtaskFilter===f.key?'var(--primary-light)':'#fff'};color:${subtaskFilter===f.key?'var(--primary)':'var(--gray-500)'}">
+      ${f.label}</button>`
+  ).join('');
+}
+function setSubtaskFilter(f) { subtaskFilter = f; renderSubtasks(); }
+function setSubtaskSort(s) { subtaskSort = s; renderSubtasks(); }
 
 function renderSubtasks() {
   const container = document.getElementById('subtask-list');
   if (!container) return;
+  renderSubtaskFilterBar();
   if (!subtaskList.length) {
     container.innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:10px 0;border:1px dashed var(--gray-200);border-radius:7px">ยังไม่มีงานย่อย — คลิก "＋ เพิ่มงานย่อย" เพื่อเริ่ม</div>';
     return;
   }
-  container.innerHTML = subtaskList.map((st, i) => {
+  // Build display list with original indices
+  let displayList = subtaskList.map((st, i) => ({ st, i }));
+  // Filter
+  if (subtaskFilter === 'done') displayList = displayList.filter(({st}) => st.status === 'Done');
+  else if (subtaskFilter === 'todo') displayList = displayList.filter(({st}) => st.status !== 'Done');
+  // Sort
+  if (subtaskSort === 'name') displayList.sort((a,b) => (a.st.title||'').localeCompare(b.st.title||'','th'));
+  else if (subtaskSort === 'date') displayList.sort((a,b) => (a.st.due||a.st.startDate||'').localeCompare(b.st.due||b.st.startDate||''));
+  else if (subtaskSort === 'status') displayList.sort((a,b) => (a.st.status==='Done'?1:0)-(b.st.status==='Done'?1:0));
+  if (!displayList.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:10px 0;border:1px dashed var(--gray-200);border-radius:7px">— ไม่มีงานย่อยที่ตรงกับตัวกรอง —</div>';
+    return;
+  }
+  container.innerHTML = displayList.map(({st, i}) => {
     const memberChips = db.members.map(m => {
       const sel = st.assigneeIds.includes(m.id);
       return `<div class="subtask-member-chip ${sel?'selected':''}" onclick="toggleSubtaskMember(${i},'${m.id}')">
@@ -2928,11 +2973,13 @@ function openTaskModal(id=null, defaultStatus='Todo', defaultDate=null) {
     document.getElementById('f-due').value        = t.due||'';
     document.getElementById('f-note').value       = t.note||'';
     subtaskList = (t.subtasks||[]).map(s=>({...s, assigneeIds:[...(s.assigneeIds||[])]}));
+    subtaskFilter = 'all'; subtaskSort = 'default';
     populateChallengeDropdown(ownerCh ? ownerCh.id : '');
     deleteBtn.style.display='inline-flex';
   } else {
     selectedMemberIds = [];
     subtaskList = [];
+    subtaskFilter = 'all'; subtaskSort = 'default';
     document.getElementById('task-modal-title').textContent = 'เพิ่มงานใหม่';
     document.getElementById('f-title').value      = '';
     document.getElementById('f-desc').value       = '';
@@ -4860,8 +4907,19 @@ function renderMyRequests() {
   }
   list.innerHTML = mine.sort((a,b) => b.ts - a.ts).map(req => {
     const statusClass = req.status === 'pending' ? 'pending' : req.status === 'approved' ? 'approved' : 'rejected';
-    const statusLabel = req.status === 'pending' ? '⏳ รอการอนุมัติ' : req.status === 'approved' ? '✓ อนุมัติแล้ว' : '✕ ปฏิเสธ';
-    const typeLabel = req.type === 'newTask' ? '+ ขอสร้างงานใหม่' : '📅 ขอเปลี่ยนวัน';
+    const _iconPending  = `<svg style="width:12px;height:12px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+    const _iconApproved = `<svg style="width:12px;height:12px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+    const _iconRejected = `<svg style="width:12px;height:12px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    const _iconDate     = `<svg style="width:11px;height:11px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+    const _iconPlus     = `<svg style="width:11px;height:11px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+    const statusLabel = req.status === 'pending'
+      ? `<span style="display:inline-flex;align-items:center;gap:4px">${_iconPending} รอการอนุมัติ</span>`
+      : req.status === 'approved'
+      ? `<span style="display:inline-flex;align-items:center;gap:4px">${_iconApproved} อนุมัติแล้ว</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:4px">${_iconRejected} ปฏิเสธ</span>`;
+    const typeLabel = req.type === 'newTask'
+      ? `<span style="display:inline-flex;align-items:center;gap:4px">${_iconPlus} ขอสร้างงานใหม่</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:4px">${_iconDate} ขอเปลี่ยนวัน</span>`;
     let title = '—', detail = '';
     if (req.type === 'newTask') {
       title = req.taskData?.title || '—';
