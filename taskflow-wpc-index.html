@@ -778,15 +778,10 @@
   .wm-task-card:last-child { margin-bottom:0; }
   .wm-task-card:hover { background:var(--gray-50); }
   @keyframes wmChallengePulse {
-    0%,100% { box-shadow:0 0 0 2.5px #5a7a00, 0 0 12px 3px rgba(90,122,0,.4); border-color:#5a7a00; }
-    50%      { box-shadow:0 0 0 1px rgba(90,122,0,.2), 0 0 3px 1px rgba(90,122,0,.08); border-color:rgba(90,122,0,.3); }
+    0%,100% { box-shadow:0 0 0 2.5px #cefb59, 0 0 10px 3px rgba(206,251,89,.5); border-color:#cefb59; }
+    50%      { box-shadow:0 0 0 1px rgba(206,251,89,.3), 0 0 3px 1px rgba(206,251,89,.1); border-color:rgba(206,251,89,.45); }
   }
-  .wm-task-card.wm-challenge-card { background:#cefb59; border-color:#5a7a00; animation:wmChallengePulse 1.6s ease-in-out infinite; }
-  .wm-task-card.wm-challenge-card .wm-task-title { color:#000; font-weight:700; }
-  .wm-task-card.wm-challenge-card .wm-task-desc { color:#1a1a00; }
-  .wm-task-card.wm-challenge-card .wm-task-note { color:#222; }
-  .wm-task-card.wm-challenge-card .wm-due { color:#1a1a00; }
-  .wm-task-card.wm-challenge-card .wm-task-num { background:#000; color:#cefb59; }
+  .wm-task-card.wm-challenge-card { background:#fff; border:2px solid #cefb59; animation:wmChallengePulse 1.6s ease-in-out infinite; }
   .wm-task-num { width:18px; height:18px; border-radius:50%; background:var(--gray-200); color:var(--gray-500); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
   .wm-task-body { flex:1; min-width:0; }
   .wm-task-title { font-size:13px; font-weight:600; color:var(--gray-800); line-height:1.35; margin-bottom:3px; }
