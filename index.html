@@ -1946,7 +1946,7 @@ function formatDate(str) {
 }
 
 function isOverdue(dueStr, status) {
-  if (!dueStr || status === 'Done') return false;
+  if (!dueStr || status === 'Done' || status === 'On Hold') return false;
   return new Date(dueStr + 'T23:59:59') < new Date();
 }
 
