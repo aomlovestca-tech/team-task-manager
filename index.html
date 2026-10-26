@@ -1720,6 +1720,9 @@
               <button type="button" class="subtask-add-btn" onclick="addSubtask()">＋ เพิ่มงานย่อย</button>
             </div>
           </div>
+          <div id="subtask-member-filter-bar" style="display:none;flex-wrap:wrap;gap:4px;margin-bottom:8px;padding:6px 8px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-100)">
+            <span style="font-size:10px;font-weight:700;color:var(--gray-400);align-self:center;margin-right:2px">ดูงานของ:</span>
+          </div>
           <div id="subtask-list"></div>
         </div>
       </div>
@@ -2809,8 +2812,9 @@ function filterToMember(id) { showView('mytasks'); mtCurrentMemberId=id; mtCurre
 let editingTaskId = null;
 let selectedMemberIds = [];
 let subtaskList = []; // [{ id, title, assigneeIds, startDate, due, status }]
-let subtaskFilter = 'all';   // 'all' | 'todo' | 'done'
-let subtaskSort   = 'default'; // 'default' | 'name' | 'date'
+let subtaskFilter = 'all';        // 'all' | 'todo' | 'done'
+let subtaskSort   = 'default';    // 'default' | 'name' | 'date' | 'status'
+let subtaskMemberFilter = [];     // [] = show all; [memberId, ...] = show subtasks assigned to any of these
 
 function renderSubtaskFilterBar() {
   const bar = document.getElementById('subtask-filter-bar');
@@ -2829,6 +2833,43 @@ function renderSubtaskFilterBar() {
       ${f.label}</button>`
   ).join('');
 }
+
+function renderSubtaskMemberFilterBar() {
+  const wrap = document.getElementById('subtask-member-filter-bar');
+  if (!wrap) return;
+  // Show ALL team members as filter chips (not just those in assigneeIds)
+  if (!subtaskList.length || !db.members.length) { wrap.style.display='none'; return; }
+  wrap.style.display = 'flex';
+  const memberChips = db.members.map(m => {
+    const mid = m.id;
+    const sel = subtaskMemberFilter.includes(mid);
+    const firstName = (m.name||'').split(' ')[0];
+    return `<button type="button" onclick="toggleSubtaskMemberFilter('${mid}')"
+      style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px 3px 4px;border-radius:99px;border:1.5px solid ${sel?'var(--primary)':'var(--gray-200)'};background:${sel?'var(--primary-light)':'#fff'};cursor:pointer;font-size:11px;font-weight:${sel?'700':'500'};color:${sel?'var(--primary)':'var(--gray-600)'}">
+      ${mkAvatar(m,{size:'18px',fs:'8px'})}
+      ${firstName}
+      ${sel?'<svg style="width:10px;height:10px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':''}
+    </button>`;
+  }).join('');
+  // Keep the label, rebuild chips after it
+  const label = wrap.querySelector('span');
+  wrap.innerHTML = '';
+  if (label) wrap.appendChild(label);
+  wrap.insertAdjacentHTML('beforeend', memberChips);
+  if (subtaskMemberFilter.length) {
+    wrap.insertAdjacentHTML('beforeend',
+      `<button type="button" onclick="clearSubtaskMemberFilter()"
+        style="font-size:10px;padding:2px 7px;border-radius:99px;border:1px solid var(--gray-200);background:#fff;color:var(--gray-400);cursor:pointer">✕ ล้าง</button>`);
+  }
+}
+
+function toggleSubtaskMemberFilter(mid) {
+  const idx = subtaskMemberFilter.indexOf(mid);
+  if (idx === -1) subtaskMemberFilter.push(mid);
+  else subtaskMemberFilter.splice(idx, 1);
+  renderSubtasks();
+}
+function clearSubtaskMemberFilter() { subtaskMemberFilter = []; renderSubtasks(); }
 function setSubtaskFilter(f) { subtaskFilter = f; renderSubtasks(); }
 function setSubtaskSort(s) { subtaskSort = s; renderSubtasks(); }
 
