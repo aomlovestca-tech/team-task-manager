@@ -2889,9 +2889,13 @@ function renderSubtasks() {
   }
   // Build display list with original indices
   let displayList = subtaskList.map((st, i) => ({ st, i }));
-  // Filter
+  // Filter by status
   if (subtaskFilter === 'done') displayList = displayList.filter(({st}) => st.status === 'Done');
   else if (subtaskFilter === 'todo') displayList = displayList.filter(({st}) => st.status !== 'Done');
+  // Filter by member
+  if (subtaskMemberFilter.length > 0) {
+    displayList = displayList.filter(({st}) => (st.assigneeIds||[]).some(id => subtaskMemberFilter.includes(id)));
+  }
   // Sort
   if (subtaskSort === 'name') displayList.sort((a,b) => (a.st.title||'').localeCompare(b.st.title||'','th'));
   else if (subtaskSort === 'date') displayList.sort((a,b) => (a.st.due||a.st.startDate||'').localeCompare(b.st.due||b.st.startDate||''));
