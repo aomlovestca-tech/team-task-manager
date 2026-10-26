@@ -2837,14 +2837,11 @@ function renderSubtaskFilterBar() {
 function renderSubtaskMemberFilterBar() {
   const wrap = document.getElementById('subtask-member-filter-bar');
   if (!wrap) return;
-  // Collect members who appear in at least one subtask
-  const memberIds = new Set();
-  subtaskList.forEach(s => (s.assigneeIds||[]).forEach(id => memberIds.add(id)));
-  if (!memberIds.size) { wrap.style.display='none'; return; }
+  // Show ALL team members as filter chips (not just those in assigneeIds)
+  if (!subtaskList.length || !db.members.length) { wrap.style.display='none'; return; }
   wrap.style.display = 'flex';
-  const memberChips = [...memberIds].map(mid => {
-    const m = db.members.find(x=>x.id===mid);
-    if (!m) return '';
+  const memberChips = db.members.map(m => {
+    const mid = m.id;
     const sel = subtaskMemberFilter.includes(mid);
     const firstName = (m.name||'').split(' ')[0];
     return `<button type="button" onclick="toggleSubtaskMemberFilter('${mid}')"
