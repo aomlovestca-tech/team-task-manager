@@ -2877,6 +2877,7 @@ function renderSubtasks() {
   const container = document.getElementById('subtask-list');
   if (!container) return;
   renderSubtaskFilterBar();
+  renderSubtaskMemberFilterBar();
   if (!subtaskList.length) {
     container.innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:10px 0;border:1px dashed var(--gray-200);border-radius:7px">ยังไม่มีงานย่อย — คลิก "＋ เพิ่มงานย่อย" เพื่อเริ่ม</div>';
     return;
