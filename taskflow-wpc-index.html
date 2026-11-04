@@ -381,6 +381,42 @@
 
   /* desktop: 2-col cards */
   @media(min-width:768px){ .mt-task-list { display:grid; grid-template-columns:1fr 1fr; gap:12px; } }
+
+  /* ── My Tasks Redesign ── */
+  .mt-section { margin-bottom:16px; }
+  .mt-section-hdr { display:flex; align-items:center; gap:8px; padding:9px 14px; border-radius:10px; font-size:13px; font-weight:700; cursor:default; user-select:none; margin-bottom:8px; }
+  .mt-sec-icon { font-size:15px; line-height:1; }
+  .mt-sec-count { margin-left:auto; background:var(--gray-100); color:var(--gray-500); font-size:11px; font-weight:700; padding:2px 9px; border-radius:99px; }
+  .mt-section-overdue { background:rgba(239,68,68,.10); color:#b91c1c; }
+  .mt-section-overdue .mt-sec-count { background:rgba(239,68,68,.18); color:#b91c1c; }
+  .mt-section-inprog { background:rgba(37,99,235,.09); color:#1d4ed8; }
+  .mt-section-inprog .mt-sec-count { background:rgba(37,99,235,.18); color:#1d4ed8; }
+  .mt-section-todo { background:rgba(234,179,8,.10); color:#a16207; }
+  .mt-section-todo .mt-sec-count { background:rgba(234,179,8,.22); color:#a16207; }
+  .mt-section-hold { background:var(--gray-100); color:var(--gray-500); }
+  .mt-section-done { background:rgba(22,163,74,.09); color:#166534; cursor:pointer; }
+  .mt-section-done .mt-sec-count { background:rgba(22,163,74,.18); color:#166534; }
+  .mt-done-chevron { margin-left:2px; transition:transform .25s; flex-shrink:0; }
+  .mt-done-body { display:flex; flex-direction:column; gap:8px; }
+  .mt-card.mt-challenge-card { border-left-color:#cefb59 !important; border:2px solid #cefb59; border-left:4px solid #cefb59 !important; animation:challengeBorderBlink 1.6s ease-in-out infinite; }
+  .mt-ch-badge { font-size:10px; font-weight:700; color:#cefb59; background:#1a2a00; padding:2px 7px; border-radius:6px; display:inline-flex; align-items:center; gap:2px; }
+  .mt-subtask-row { display:flex; align-items:center; gap:7px; margin:7px 0 2px; }
+  .mt-subtask-info { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--gray-500); white-space:nowrap; flex-shrink:0; }
+  .mt-subtask-bar-wrap { flex:1; height:5px; background:var(--gray-100); border-radius:99px; overflow:hidden; min-width:40px; }
+  .mt-subtask-bar-fill { height:100%; background:#cefb59; border-radius:99px; transition:width .3s; }
+  .mt-subtask-pct { font-size:10px; font-weight:700; color:var(--gray-500); flex-shrink:0; min-width:28px; text-align:right; }
+  .mt-subtask-preview { margin:4px 0 6px; display:flex; flex-direction:column; gap:3px; }
+  .mt-sub-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--gray-500); line-height:1.4; overflow:hidden; }
+  .mt-sub-item span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .mt-sub-dot { width:5px; height:5px; border-radius:50%; background:var(--gray-300); flex-shrink:0; }
+  .mt-sub-more { font-size:11px; color:var(--gray-400); padding-left:11px; }
+  .mt-card-footer { display:flex; align-items:center; justify-content:space-between; margin-top:8px; gap:8px; min-height:20px; }
+  .mt-avatar-row { display:flex; align-items:center; gap:5px; }
+  .mt-member-name { font-size:11px; color:var(--gray-400); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px; }
+  .mt-card-note-inline { color:var(--gray-400); display:flex; align-items:center; }
+  .mt-done-body .mt-card { opacity:.65; }
+  .mt-done-body .mt-card:hover { opacity:1; }
+  @media(min-width:768px){ .mt-done-body { display:grid; grid-template-columns:1fr 1fr; gap:12px; } }
   /* phone: tighter date bar */
   @media(max-width:480px){
     .mt-date-input { max-width:unset; font-size:12px; padding:5px 8px; }
@@ -2734,45 +2770,96 @@ function mtSelectStatus(s) {
   renderMyTasks();
 }
 
+function mtCardHtml(t, _closedIds) {
+  const members = getTaskMemberIds(t).map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
+  const names   = members.map(m=>m.name.split(' ')[0]).join(', ');
+  const ov      = isOverdue(t.due, t.status);
+  const dateStr = t.startDate ? formatDate(t.startDate)+' – '+formatDate(t.due) : formatDate(t.due);
+  const subs    = t.subtasks||[];
+  const subDone = subs.filter(s=>s.status==='Done').length;
+  const subPct  = subs.length ? Math.round(subDone/subs.length*100) : 0;
+  const inCh    = isInActiveChallenge(t.id);
+  const avatars = members.map(m=>mkAvatar(m,{size:'20px',fs:'9px',extra:'flex-shrink:0'})).join('');
+  const pendSubs = subs.filter(s=>s.status!=='Done');
+
+  const subtaskHtml = subs.length ? `
+    <div class="mt-subtask-row">
+      <div class="mt-subtask-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:11px;height:11px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>${subDone}/${subs.length}</span>
+      </div>
+      <div class="mt-subtask-bar-wrap"><div class="mt-subtask-bar-fill" style="width:${subPct}%"></div></div>
+      <span class="mt-subtask-pct">${subPct}%</span>
+    </div>
+    ${pendSubs.length && subPct<100 ? `<div class="mt-subtask-preview">${pendSubs.slice(0,3).map(s=>`<div class="mt-sub-item"><span class="mt-sub-dot"></span><span>${s.title||'—'}</span></div>`).join('')}${pendSubs.length>3?`<div class="mt-sub-more">+${pendSubs.length-3} รายการ</div>`:''}</div>` : ''}
+  ` : '';
+
+  return `<div class="mt-card pri-${t.priority||'Medium'}${inCh?' mt-challenge-card':''}" onclick="openTaskModal('${t.id}')">
+    <div class="mt-card-body">
+      <div class="mt-card-top">
+        ${priorityBadge(t.priority)}
+        ${inCh?'<span class="mt-ch-badge">⚡ ชาเลนจ์</span>':''}
+        ${dateStr?`<span class="mt-card-date-right${ov?' mt-ov':''}">${dateStr}</span>`:''}
+      </div>
+      <div class="mt-card-title">${t.title||'—'}</div>
+      ${t.desc?`<div class="mt-card-desc">${t.desc}</div>`:''}
+      ${subtaskHtml}
+      <div class="mt-card-footer">
+        <div class="mt-avatar-row">${avatars}<span class="mt-member-name">${names}</span></div>
+        ${t.note?`<div class="mt-card-note-inline" title="${t.note}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleMtDone(hdr) {
+  const body    = hdr.nextElementSibling;
+  const chevron = hdr.querySelector('.mt-done-chevron');
+  const isOpen  = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : '';
+  chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
 function renderMyTasks() {
   mtBuildMemberBar();
 
-  let tasks = db.tasks;
-  if (mtCurrentMemberId) tasks = tasks.filter(t => getTaskMemberIds(t).includes(mtCurrentMemberId));
+  // Member-filtered tasks (for summary counts)
+  let memberTasks = db.tasks;
+  if (mtCurrentMemberId) memberTasks = memberTasks.filter(t => getTaskMemberIds(t).includes(mtCurrentMemberId));
+
+  const total = memberTasks.length;
+  const doneCnt  = memberTasks.filter(t=>t.status==='Done').length;
+  const progCnt  = memberTasks.filter(t=>t.status==='In Progress').length;
+  const overCnt  = memberTasks.filter(t=>isOverdue(t.due,t.status)).length;
+
+  document.getElementById('mt-summary').innerHTML = [
+    {num:total,   label:'ทั้งหมด',   color:'var(--primary)'},
+    {num:progCnt, label:'กำลังทำ',   color:'#2563eb'},
+    {num:doneCnt, label:'เสร็จสิ้น', color:'var(--success)'},
+    {num:overCnt, label:'เกินกำหนด', color:'var(--danger)'},
+  ].map(s=>`<div class="mt-sum-chip">
+    <div><div class="mt-sum-num" style="color:${s.color}">${s.num}</div><div class="mt-sum-label">${s.label}</div></div>
+  </div>`).join('');
+
+  // Apply status/overdue filter for display
+  let tasks = memberTasks;
   if (mtCurrentStatus === 'overdue') {
     tasks = tasks.filter(t => isOverdue(t.due, t.status));
   } else if (mtCurrentStatus) {
     tasks = tasks.filter(t => t.status === mtCurrentStatus);
   }
 
-  // Date range filter: show tasks whose date range overlaps [mtDateFrom, mtDateTo]
+  // Date range filter
   if (mtDateFrom || mtDateTo) {
     tasks = tasks.filter(t => {
       const tStart = t.startDate || t.due || '';
       const tEnd   = t.due || t.startDate || '';
-      if (!tStart && !tEnd) return true; // no dates → always show
+      if (!tStart && !tEnd) return true;
       if (mtDateFrom && tEnd   && tEnd   < mtDateFrom) return false;
       if (mtDateTo   && tStart && tStart > mtDateTo)   return false;
       return true;
     });
   }
-
-  // summary counts (always from member-filtered, before status filter)
-  let memberTasks = db.tasks;
-  if (mtCurrentMemberId) memberTasks = memberTasks.filter(t => getTaskMemberIds(t).includes(mtCurrentMemberId));
-  const total = memberTasks.length;
-  const done  = memberTasks.filter(t=>t.status==='Done').length;
-  const prog  = memberTasks.filter(t=>t.status==='In Progress').length;
-  const over  = memberTasks.filter(t=>isOverdue(t.due,t.status)).length;
-
-  document.getElementById('mt-summary').innerHTML = [
-    {num:total, label:'ทั้งหมด',   color:'var(--primary)'},
-    {num:prog,  label:'กำลังทำ',   color:'#2563eb'},
-    {num:done,  label:'เสร็จสิ้น', color:'var(--success)'},
-    {num:over,  label:'เกินกำหนด', color:'var(--danger)'},
-  ].map(s=>`<div class="mt-sum-chip">
-    <div><div class="mt-sum-num" style="color:${s.color}">${s.num}</div><div class="mt-sum-label">${s.label}</div></div>
-  </div>`).join('');
 
   const list = document.getElementById('mt-task-list');
   if (!tasks.length) {
@@ -2780,39 +2867,52 @@ function renderMyTasks() {
     return;
   }
 
-  // Sort by due date ascending (soonest first), undated tasks go to end
-  const sorted = [...tasks].sort((a,b)=>{
-    const da = a.due || '9999-12-31';
-    const db2 = b.due || '9999-12-31';
-    if (da < db2) return -1;
-    if (da > db2) return 1;
-    // secondary: priority
-    const priOrd = {High:0,Medium:1,Low:2};
-    return (priOrd[a.priority]??1)-(priOrd[b.priority]??1);
-  });
+  const _closedIds = closedChallengeTaskIds();
+  const priOrd = {High:0,Medium:1,Low:2};
 
-  list.innerHTML = sorted.map(t=>{
-    const members = getTaskMemberIds(t).map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
-    const names   = members.map(m=>m.name.split(' ')[0]).join(', ');
-    const ov      = isOverdue(t.due, t.status);
-    const dateStr = t.startDate ? `${formatDate(t.startDate)} – ${formatDate(t.due)}` : formatDate(t.due);
-    const mtSubs = t.subtasks||[]; const mtSubDone=mtSubs.filter(s=>s.status==='Done').length; const mtSubPct=mtSubs.length?Math.round(mtSubDone/mtSubs.length*100):0;
-    return `<div class="mt-card pri-${t.priority||'Medium'}" onclick="openTaskModal('${t.id}')">
-      <div class="mt-card-body">
-        <div class="mt-card-top">
-          ${statusBadge(t.status)}
-          ${priorityBadge(t.priority)}
-          ${dateStr?`<span class="mt-card-date-right${ov?' mt-ov':''}">${dateStr}</span>`:''}
-        </div>
-        <div class="mt-card-title">${t.title||'—'}</div>
-        ${t.desc?`<div class="mt-card-desc">${t.desc}</div>`:''}
-        ${mtSubs.length?`<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--gray-500);margin:3px 0 1px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;flex-shrink:0"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>งานย่อย ${mtSubDone}/${mtSubs.length}<span style="background:#cefb59;color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px">${mtSubPct}%</span></div>`:''}
-        ${names?`<div class="mt-card-member"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${names}</div>`:''}
-        ${t.note?`<div class="mt-card-note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${t.note}</div>`:''}
+  const activeTasks = tasks.filter(t=>t.status!=='Done');
+  const doneTasks   = tasks.filter(t=>t.status==='Done');
+
+  // Sort helpers
+  const byDate = (a,b) => { const da=a.due||'9999-12-31',db2=b.due||'9999-12-31'; return da<db2?-1:da>db2?1:0; };
+  const byPri  = (a,b) => (priOrd[a.priority]??1)-(priOrd[b.priority]??1);
+
+  const overdueGrp = activeTasks.filter(t=>isOverdue(t.due,t.status)).sort(byDate);
+  const inProgGrp  = activeTasks.filter(t=>t.status==='In Progress'&&!isOverdue(t.due,t.status)).sort((a,b)=>byDate(a,b)||byPri(a,b));
+  const todoGrp    = activeTasks.filter(t=>t.status==='To Do'&&!isOverdue(t.due,t.status)).sort((a,b)=>byPri(a,b)||byDate(a,b));
+  const holdGrp    = activeTasks.filter(t=>t.status==='On Hold').sort(byDate);
+
+  const renderCards = arr => arr.map(t=>mtCardHtml(t,_closedIds)).join('');
+
+  const section = (cls,icon,label,arr) => arr.length ? `
+    <div class="mt-section">
+      <div class="mt-section-hdr ${cls}">
+        <span class="mt-sec-icon">${icon}</span>${label}
+        <span class="mt-sec-count">${arr.length}</span>
       </div>
+      ${renderCards(arr)}
+    </div>` : '';
+
+  let html = '';
+  html += section('mt-section-overdue','⚠️','เกินกำหนด',overdueGrp);
+  html += section('mt-section-inprog','▶','กำลังทำ',inProgGrp);
+  html += section('mt-section-todo','📋','รอดำเนินการ',todoGrp);
+  html += section('mt-section-hold','⏸','พักไว้',holdGrp);
+
+  if (doneTasks.length) {
+    html += `<div class="mt-section mt-done-section">
+      <div class="mt-section-hdr mt-section-done" onclick="toggleMtDone(this)">
+        <span class="mt-sec-icon">✅</span>เสร็จสิ้น
+        <span class="mt-sec-count">${doneTasks.length}</span>
+        <svg class="mt-done-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="mt-done-body" style="display:none">${renderCards(doneTasks)}</div>
     </div>`;
-  }).join('');
+  }
+
+  list.innerHTML = html;
 }
+
 
 // ══════════════════════════════════════════════════════
 //  RENDER MEMBERS
