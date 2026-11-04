@@ -4235,7 +4235,7 @@ function renderChList() {
   }
 
   // Build filter chips from unique prefixes (text before " : " or first word)
-  const prefixes = [...new Set(db.challenges.map(ch=>{
+  const prefixes = [...new Set(db.challenges.filter(ch=>!ch.closed).map(ch=>{
     const m = ch.name.match(/^([A-Z][A-Z0-9\s]*?)\s*[:\-]/);
     return m ? m[1].trim() : '';
   }).filter(Boolean))].sort();
