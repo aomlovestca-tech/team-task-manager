@@ -2879,7 +2879,7 @@ function renderMyTasks() {
 
   const overdueGrp = activeTasks.filter(t=>isOverdue(t.due,t.status)).sort(byDate);
   const inProgGrp  = activeTasks.filter(t=>t.status==='In Progress'&&!isOverdue(t.due,t.status)).sort((a,b)=>byDate(a,b)||byPri(a,b));
-  const todoGrp    = activeTasks.filter(t=>t.status==='To Do'&&!isOverdue(t.due,t.status)).sort((a,b)=>byPri(a,b)||byDate(a,b));
+  const todoGrp    = activeTasks.filter(t=>t.status==='Todo'&&!isOverdue(t.due,t.status)).sort((a,b)=>byPri(a,b)||byDate(a,b));
   const holdGrp    = activeTasks.filter(t=>t.status==='On Hold').sort(byDate);
 
   const renderCards = arr => arr.map(t=>mtCardHtml(t,_closedIds)).join('');
