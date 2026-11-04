@@ -385,7 +385,7 @@
   /* ── My Tasks Redesign ── */
   .mt-section { margin-bottom:16px; }
   .mt-section-hdr { display:flex; align-items:center; gap:8px; padding:9px 14px; border-radius:10px; font-size:13px; font-weight:700; cursor:default; user-select:none; margin-bottom:8px; }
-  .mt-sec-icon { font-size:15px; line-height:1; }
+  .mt-sec-icon { display:flex; align-items:center; flex-shrink:0; }
   .mt-sec-count { margin-left:auto; background:var(--gray-100); color:var(--gray-500); font-size:11px; font-weight:700; padding:2px 9px; border-radius:99px; }
   .mt-section-overdue { background:rgba(239,68,68,.10); color:#b91c1c; }
   .mt-section-overdue .mt-sec-count { background:rgba(239,68,68,.18); color:#b91c1c; }
@@ -2894,15 +2894,15 @@ function renderMyTasks() {
     </div>` : '';
 
   let html = '';
-  html += section('mt-section-overdue','⚠️','เกินกำหนด',overdueGrp);
-  html += section('mt-section-inprog','▶','กำลังทำ',inProgGrp);
-  html += section('mt-section-todo','📋','รอดำเนินการ',todoGrp);
-  html += section('mt-section-hold','⏸','พักไว้',holdGrp);
+  html += section('mt-section-overdue','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>','เกินกำหนด',overdueGrp);
+  html += section('mt-section-inprog','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>','กำลังทำ',inProgGrp);
+  html += section('mt-section-todo','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r=".8" fill="currentColor"/><circle cx="3" cy="12" r=".8" fill="currentColor"/><circle cx="3" cy="18" r=".8" fill="currentColor"/></svg>','รอดำเนินการ',todoGrp);
+  html += section('mt-section-hold','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>','พักไว้',holdGrp);
 
   if (doneTasks.length) {
     html += `<div class="mt-section mt-done-section">
       <div class="mt-section-hdr mt-section-done" onclick="toggleMtDone(this)">
-        <span class="mt-sec-icon">✅</span>เสร็จสิ้น
+        <span class="mt-sec-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>เสร็จสิ้น
         <span class="mt-sec-count">${doneTasks.length}</span>
         <svg class="mt-done-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
