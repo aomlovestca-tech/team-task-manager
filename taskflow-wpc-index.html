@@ -1999,6 +1999,18 @@ function isOverdue(dueStr, status) {
   if (!dueStr || status === 'Done' || status === 'On Hold') return false;
   return new Date(dueStr + 'T23:59:59') < new Date();
 }
+// Returns a Set of taskIds belonging to any CLOSED challenge
+function closedChallengeTaskIds() {
+  const ids = new Set();
+  (db.challenges||[]).filter(ch=>ch.closed).forEach(ch=>{
+    (ch.tasks||[]).forEach(ct=>ids.add(ct.taskId));
+  });
+  return ids;
+}
+// Is this task part of an ACTIVE (non-closed) challenge?
+function isInActiveChallenge(taskId) {
+  return (db.challenges||[]).some(ch=>!ch.closed && (ch.tasks||[]).some(ct=>ct.taskId===taskId));
+}
 
 // ── Week dropdown options ─────────────────────────────
 function generateWeekOptions(selYear, selWeek) {
@@ -2114,7 +2126,8 @@ function resizeImageBase64(dataUrl, maxW=200, maxH=200, q=0.82) {
 //  RENDER DASHBOARD
 // ══════════════════════════════════════════════════════
 function renderDashboard() {
-  const tasks = db.tasks;
+  const _closedIds = closedChallengeTaskIds();
+  const tasks = db.tasks.filter(t=>!_closedIds.has(t.id));
   const total   = tasks.length;
   const done    = tasks.filter(t => t.status==='Done').length;
   const prog    = tasks.filter(t => t.status==='In Progress').length;
@@ -2327,7 +2340,8 @@ function wmBuildWeekStrip() {
 }
 
 function wmUpdateStats() {
-  const all = db.tasks;
+  const _closedIds = closedChallengeTaskIds();
+  const all = db.tasks.filter(t=>!_closedIds.has(t.id));
   document.getElementById('wm-s-total').textContent  = all.length;
   document.getElementById('wm-s-done').textContent   = all.filter(t=>t.status==='Done').length;
   document.getElementById('wm-s-inprog').textContent = all.filter(t=>t.status==='In Progress').length;
@@ -2369,7 +2383,7 @@ function wmTaskCard(t, showNextBadge) {
   else if (t.due) due = formatDate(t.due);
   else if (t.startDate) due = formatDate(t.startDate);
   const wmSubs = t.subtasks||[]; const wmSubDone=wmSubs.filter(s=>s.status==='Done').length;
-  const inChallenge = db.challenges && db.challenges.some(ch => (ch.tasks||[]).some(ct => ct.taskId === t.id));
+  const inChallenge = isInActiveChallenge(t.id);
   return `<div class="wm-task-card${inChallenge?' wm-challenge-card':''}" onclick="openTaskModal('${t.id}')" style="cursor:pointer">
     <div class="wm-task-num">·</div>
     <div class="wm-task-body">
@@ -2407,7 +2421,8 @@ function wmRenderMemberReport() {
   const mid = m.id;
   const init = (m.name||'?').charAt(0).toUpperCase();
 
-  const myTasks = db.tasks.filter(t=>getTaskMemberIds(t).includes(mid));
+  const _closedIds = closedChallengeTaskIds();
+  const myTasks = db.tasks.filter(t=>!_closedIds.has(t.id)&&getTaskMemberIds(t).includes(mid));
   const {mon, sun}         = wmGetWeekBounds(0);
   const {mon:nextMon, sun:nextSun} = wmGetWeekBounds(1);
   const {mon:prevMon, sun:prevSun} = wmGetWeekBounds(-1);
@@ -2531,7 +2546,7 @@ function taskCard(t) {
   const members = ids.map(id=>db.members.find(x=>x.id===id)).filter(Boolean);
   const ov = isOverdue(t.due, t.status);
   // Check if task belongs to a challenge
-  const inChallenge = db.challenges && db.challenges.some(ch => (ch.tasks||[]).some(ct => ct.taskId === t.id));
+  const inChallenge = isInActiveChallenge(t.id);
   const borderColor = inChallenge ? '#cefb59' : ({High:'var(--danger)',Medium:'var(--warning)',Low:'var(--success)'}[t.priority]||'var(--gray-200)');
   const avBorderColor = inChallenge ? '#1a2a00' : '#fff';
   const avs = members.slice(0,3).map(m=>mkAvatar(m,{size:'20px',fs:'9px',extra:`margin-right:-4px;border:2px solid ${avBorderColor};`})).join('');
